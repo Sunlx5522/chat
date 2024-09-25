@@ -1,0 +1,43 @@
+<!-- index.html -->
+<!DOCTYPE html> <!-- 定义文档类型为HTML5 -->
+<html lang="zh-CN"> <!-- 开始HTML文档，设置语言为中文（中国） -->
+
+<head>
+    <meta charset="UTF-8"> <!-- 设置文档的字符编码为UTF-8，支持中文显示 -->
+    <title>CHAT</title> <!-- 设置网页标题，将显示在浏览器的标签页上 -->
+    <link rel="stylesheet" href="../CSS/styles.css"> <!-- 引入外部CSS样式表，定义页面样式 -->
+</head>
+
+<body>
+    <form id="loginForm" action="http://localhost:8080/api/login" method="post">
+        <!-- 创建一个表单，ID为loginForm，提交地址为/login，使用POST方法 -->
+        <img src="../SOURCEFILE/IMAGES/login/chat.png" alt="欢迎登录" id="welcome-image">
+        <!-- 账号输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/login/account.png" alt="账号图标">
+            <input type="text" id="account" name="account" placeholder="请输入账号" required>
+        </div>
+
+        <!-- 密码输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标">
+            <input type="password" id="password" name="password" placeholder="请输入密码" required>
+        </div>
+
+        <!-- 登录按钮 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/login/login.png" alt="登录图标">
+            <button type="submit" id="loginButton" class="loginButton">登录</button> <!-- 提交按钮，点击后表单数据将发送到服务器 -->
+        </div>
+
+        <!-- 注册按钮-->
+        <div class="input-container"></div>
+        <button type="button" id="findPasswordButton" class="findPasswordButton">找回密码</button>
+        <button type="button" id="registerButton" class="registerButton">注册</button>
+        </div>
+
+    </form>
+    <script src="../JS/script.js"></script> <!-- 引入外部JavaScript文件，包含交互逻辑 -->
+</body>
+
+</html> <!-- 结束HTML文档 -->

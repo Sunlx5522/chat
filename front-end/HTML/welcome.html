@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WELCOME</title>
+    <link rel="stylesheet" href="../CSS/welcome.css"> <!-- 引入 CSS 样式表 -->
+</head>
+
+<body>
+    <div class="container">
+        <div class="toolbar">
+            <button id="menuButton"> <img src="../SOURCEFILE/IMAGES/welcome/menu.png" alt="菜单" class="button-icon"
+                    id="menuImage"></button>
+            <div class="dropdown" id="dropdownMenu">
+                <div class="dropdown-content" id="dropdownContent">
+                    <a href="#" id="feature1">功能 1</a>
+                    <a href="#" id="feature2">功能 2</a>
+                    <a href="#" id="feature3">功能 3</a>
+                </div>
+            </div>
+            <button id="exitButton"> <img src="../SOURCEFILE/IMAGES/welcome/exit.png" alt="退出" class="button-icon"
+                    id="exitImage"></button>
+        </div>
+        <div class="contact-list" id="contactList"></div>
+        <div class="chat-area">
+            <div class="chat-header" id="chatHeader">
+                <h2>聊天联系人</h2>
+                <p>账号: 1234567890</p>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="输入消息...">
+                <button id="sendButton">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/welcome.js"></script>
+</body>
+
+</html>

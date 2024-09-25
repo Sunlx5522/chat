@@ -1,0 +1,172 @@
+body {
+    margin: 0;
+    /* 去除默认的页面外边距 */
+    padding: 0;
+    /* 去除默认的页面内边距 */
+    font-family: '微软雅黑', 'Helvetica Neue', sans-serif;
+    /* 设置字体族，优先使用微软雅黑 */
+    background: linear-gradient(135deg, #1e90ff, #ff69b4);
+    /* 设置135度的线性渐变背景，从蓝色到粉色 */
+    height: 100vh;
+    /* 设置高度为视口高度的100% */
+}
+
+.container {
+    display: flex;
+    height: 100%;
+}
+
+.button-icon {
+    width: 25px;
+    /* 设置图标宽度 */
+    height: 25px;
+    /* 设置图标高度 */
+}
+
+#exitImage {
+    width: 30px;
+    /* 设置图标宽度 */
+    height: 30px;
+    /* 设置图标高度 */
+}
+
+
+/* 菜单按钮的样式 */
+#menuButton {
+    display: flex;
+    align-items: center;
+    /* 垂直居中 */
+    justify-content: center;
+    /* 水平居中 */
+    padding: 10px;
+    /* 内边距 */
+    border: none;
+    /* 去掉边框 */
+    background: transparent;
+    /* 背景透明 */
+    cursor: pointer;
+    /* 鼠标指针样式 */
+    transition: 0.5s ease;
+    /* 设置过渡效果，持续时间0.3秒，缓动函数为ease */
+}
+
+#menuButton:hover {
+    background: rgba(255, 255, 255, 0.35);
+    /* 背景颜色变为浅灰色 */
+}
+
+/* 退出按钮的样式 */
+#exitButton {
+    margin-top: auto;
+    /* 将退出按钮推到工具栏底部 */
+    display: flex;
+    align-items: center;
+    /* 垂直居中 */
+    justify-content: center;
+    /* 水平居中 */
+    padding: 10px;
+    /* 内边距 */
+    border: none;
+    /* 去掉边框 */
+    background: transparent;
+    /* 背景透明 */
+    cursor: pointer;
+    /* 鼠标指针样式 */
+    transition: 0.5s ease;
+    /* 设置过渡效果，持续时间0.3秒，缓动函数为ease */
+}
+
+#exitButton:hover {
+    background: rgba(255, 255, 255, 0.35);
+    /* 背景颜色变为浅灰色 */
+}
+
+.toolbar {
+    background: rgba(255, 255, 255, 0.1);
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+.contact-list {
+    background: rgba(255, 255, 255, 0.2);
+    width: 200px;
+    padding: 10px;
+}
+
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.chat-header {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+}
+
+.messages {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.input-area {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+#dropdownMenu {
+    position: relative;
+}
+
+#dropdownContent {
+    display: none;
+    /* 初始隐藏 */
+    position: absolute;
+    top: 100%;
+    /* 在按钮下方 */
+    left: 0;
+    background: rgba(255, 255, 255, 0.1);
+    /* 半透明背景 */
+    backdrop-filter: blur(10px);
+    /* 毛玻璃效果 */
+    border-radius: 10px;
+    /* 圆角 */
+    min-width: 160px;
+    /* 最小宽度 */
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    /* 阴影效果 */
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: white;
+    /* 链接颜色 */
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background 0.5s;
+    /* 添加过渡效果 */
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    /* 悬停时背景变色 */
+    border-radius: 10px;
+    /* 圆角 */
+}

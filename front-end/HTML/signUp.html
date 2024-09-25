@@ -1,0 +1,61 @@
+<!-- index.html -->
+<!DOCTYPE html> <!-- 定义文档类型为HTML5 -->
+<html lang="zh-CN"> <!-- 开始HTML文档，设置语言为中文（中国） -->
+
+<head>
+    <meta charset="UTF-8"> <!-- 设置文档的字符编码为UTF-8，支持中文显示 -->
+    <title>SIGNUP</title> <!-- 设置网页标题，将显示在浏览器的标签页上 -->
+    <link rel="stylesheet" href="../CSS/signUp.css"> <!-- 引入外部CSS样式表，定义页面样式 -->
+</head>
+
+<body>
+    <form id="signUpForm" action="http://localhost:8080/api/signUp" method="post">
+        <!-- 创建一个表单，ID为signUpForm，提交地址为/signUp，使用POST方法 -->
+        <img src="../SOURCEFILE/IMAGES/signUp/signUp.png" alt="欢迎注册" id="signUp-image">
+        <!-- 用户名输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/signUp/user.png" alt="用户名图标">
+            <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+        </div>
+
+        <!-- 密码输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/signUp/password.png" alt="密码图标">
+            <input type="password" id="signUpPassword" name="signUpPassword" placeholder="请输入密码" required>
+        </div>
+
+        <!-- 确认密码输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/signUp/passwordConfirm.png" alt="密码确认图标">
+            <input type="password" id="signUpPassword_confirm" name="signUpPassword_confirm" placeholder="请确认密码"
+                required>
+        </div>
+
+        <!-- 电子邮箱输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/signUp/email.png" alt="电子邮箱图标">
+            <input type="text" id="email" name="email" placeholder="请输入电子邮箱" required>
+        </div>
+
+        <!-- 电话号码输入框 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/signUp/phoneNumber.png" alt="电话号码图标">
+            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="请输入电话号码" required>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="input-container">
+            <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="注册图标">
+            <button type="submit" id="submitButton" class="submitButton">注册</button> <!-- 提交按钮，点击后表单数据将发送到服务器 -->
+        </div>
+
+        <!-- 返回按钮-->
+        <div class="input-container">
+            <button type="button" id="returnBackButton" class="returnBackButton">返回</button>
+        </div>
+
+    </form>
+    <script src="../JS/signUp.js"></script> <!-- 引入外部JavaScript文件，包含交互逻辑 -->
+</body>
+
+</html> <!-- 结束HTML文档 -->

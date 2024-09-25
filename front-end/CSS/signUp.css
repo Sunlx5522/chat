@@ -1,0 +1,200 @@
+/* styles.css */
+
+/* 设置页面主体的样式 */
+body {
+    margin: 0;
+    /* 去除默认的页面外边距 */
+    padding: 0;
+    /* 去除默认的页面内边距 */
+    font-family: '微软雅黑', 'Helvetica Neue', sans-serif;
+    /* 设置字体族，优先使用微软雅黑 */
+    background: linear-gradient(135deg, #1e90ff, #ff69b4);
+    /* 设置135度的线性渐变背景，从蓝色到粉色 */
+    height: 100vh;
+    /* 设置高度为视口高度的100% */
+    display: flex;
+    /* 使用Flex布局 */
+    justify-content: center;
+    /* 水平居中对齐子元素 */
+    align-items: center;
+    /* 垂直居中对齐子元素 */
+}
+
+/* 设置表单容器的样式 */
+#signUpForm {
+    background: rgba(255, 255, 255, 0.15);
+    /* 设置半透明的白色背景 */
+    padding: 40px 30px;
+    /* 设置表单内边距：上下40px，左右30px */
+    border-radius: 15px;
+    /* 设置圆角半径为15px */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    /* 添加阴影效果 */
+    backdrop-filter: blur(8px);
+    /* 添加背景模糊效果（玻璃拟态） */
+    -webkit-backdrop-filter: blur(8px);
+    /* 兼容WebKit内核浏览器的背景模糊效果 */
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    /* 设置半透明的白色边框 */
+    text-align: center;
+    /* 文本居中对齐 */
+    opacity: 0;
+    /* 初始透明度 */
+    transform: translateY(20px);
+    /* 初始位置 */
+    transition: opacity 2.5s ease, transform 2s ease;
+    /* 动画效果 */
+}
+
+#signUpForm.show {
+    opacity: 1;
+    /* 完全可见 */
+    transform: translateY(0);
+    /* 回到原位 */
+}
+
+#signUp-image {
+    width: 80px;
+    /* 设置图片宽度 */
+    height: auto;
+    /* 高度自动适应，保持比例 */
+    display: block;
+    /* 将图片显示为块级元素 */
+    margin: 0 auto 20px;
+    /* 上下外边距调整，居中显示 */
+}
+
+/* 设置输入框的样式 */
+input {
+    width: 90%;
+    /* 宽度占父容器的100% */
+    padding: 12px 15px;
+    /* 内边距：上下12px，左右15px */
+    margin-top: 8px;
+    /* 上边距为8px，增加与上方元素的间距 */
+    border: none;
+    /* 去除默认的输入框边框 */
+    border-radius: 10px;
+    /* 圆角半径为10px */
+    background: rgba(255, 255, 255, 0.25);
+    /* 半透明的白色背景 */
+    color: #ffffff;
+    /* 字体颜色为白色 */
+    font-size: 16px;
+    /* 字体大小为16px */
+    outline: none;
+    /* 去除输入框的聚焦边框 */
+}
+
+/* 防止自动填充打乱格式 */
+input:autofill {
+    -webkit-text-fill-color: #ffffff;
+    /* 设置文本颜色为白色 */
+    transition: background-color 5000s ease-in-out 0s;
+    /* 防止背景色闪烁 */
+}
+
+/* 设置输入框占位符的样式 */
+input::placeholder {
+    color: #ffffff;
+    /* 占位符文字颜色为白色 */
+    opacity: 0.7;
+    /* 透明度为70% */
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    /* 可根据需要调整间距 */
+}
+
+.input-container img {
+    margin-right: 10px;
+    /* 调整图片与输入框之间的间距 */
+    width: 40px;
+    /* 设置图片宽度 */
+    height: 40px;
+    /* 设置图片高度 */
+}
+
+/* 设置按钮的样式 */
+#submitButton {
+    width: 90%;
+    /* 宽度占父容器的100% */
+    padding: 12px 15px;
+    /* 内边距：上下12px，左右15px */
+    margin-top: 8px;
+    /* 上边距为8px，增加与上方元素的间距 */
+    border: none;
+    /* 去除按钮的边框 */
+    border-radius: 10px;
+    /* 圆角半径为10px */
+    background: rgba(255, 255, 255, 0.25);
+    /* 背景颜色为白色透明 */
+    color: #8060E5;
+    /* 字体颜色为蓝色 */
+    font-weight: bold;
+    /* 字体加粗 */
+    font-size: 18px;
+    /* 字体大小为18px */
+    cursor: pointer;
+    /* 鼠标悬停时显示为指针样式 */
+    transition: 0.5s ease;
+    /* 设置过渡效果，持续时间0.3秒，缓动函数为ease */
+}
+
+/* 设置按钮在鼠标悬停时的样式 */
+#submitButton:hover {
+    background: rgba(255, 255, 255, 0.35);
+    /* 背景颜色变为浅灰色 */
+}
+
+
+/* 注册按钮的样式 */
+#returnBackButton {
+    width: 20%;
+    /* 宽度占父容器的100% */
+    padding: 6px 7px;
+    /* 内边距：上下12px，左右15px */
+    margin-top: 8px;
+    /* 上边距为8px，增加与上方元素的间距 */
+    border: none;
+    /* 去除按钮的边框 */
+    border-radius: 10px;
+    /* 圆角半径为10px */
+    background: rgba(255, 255, 255, 0.25);
+    /* 背景颜色为白色透明 */
+    color: #8060E5;
+    /* 字体颜色为蓝色 */
+    font-size: 12px;
+    /* 字体大小为18px */
+    cursor: pointer;
+    /* 鼠标悬停时显示为指针样式 */
+    transition: 0.5s ease;
+    /* 设置过渡效果，持续时间0.3秒，缓动函数为ease */
+    position: absolute;
+    /* 绝对位置*/
+    bottom: 3%;
+    /* 与表单底部的距离 */
+    left: 11%;
+    /* 与表单右侧的距离 */
+    font-weight: bold;
+    /* 字体加粗 */
+}
+
+#returnBackButton:hover {
+    background: rgba(255, 255, 255, 0.35);
+    /* 背景颜色变为浅灰色 */
+}
+
+
+/* 媒体查询，针对屏幕宽度小于480px的设备 */
+@media screen and (max-width: 480px) {
+    form {
+        width: 90%;
+        /* 表单宽度调整为视口宽度的90% */
+        padding: 30px 20px;
+        /* 内边距调整为上下30px，左右20px */
+    }
+}
