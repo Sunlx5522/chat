@@ -170,3 +170,25 @@ input[type="text"] {
     border-radius: 10px;
     /* 圆角 */
 }
+.contact-item {
+    cursor: pointer; /* 将鼠标光标设置为指针，提示用户这部分可点击 */
+    padding: 5px; /* 添加一些内边距 */
+    border-bottom: 1px solid #ccc; /* 添加底线 */
+}
+
+.contact-item:hover {
+    background-color: #f0f0f0; /* 鼠标悬停时的背景颜色 */
+}
+
+.chat-header {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+}
+
+.chat-header h2 {
+    margin: 0;
+}
+
+.chat-header p {
+    margin: 5px 0;
+}
