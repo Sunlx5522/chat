@@ -67,12 +67,23 @@ socket.onmessage = function (event) { // 定义接收消息的回调函数
         const senderAccount = blocks[1];
         const messageContent = blocks[2];
         const messageBubble = document.createElement("div");
-        const receiverAccount = sessionStorage.getItem('account')//用来做savemessagetolocal的参数
+        const messageWrapper = document.createElement("div");
+        messageBubble.classList.add("bubble");  // 添加样式类
+        if(senderAccount == account)
+        {
+            messageWrapper.classList.add("message", "message-right");  // 本方消息靠右
+        }
+        else
+        {
+            messageWrapper.classList.add("message", "message-left"); // 对方消息靠左
+        }
+        const receiverAccount = account;//用来做savemessagetolocal的参数
         saveMessageToLocal(senderAccount, receiverAccount, messageContent);
         if(senderAccount==document.getElementById("contactAccount").textContent.split(': ')[1]){//检测收到的消息属不属于当前会话
             messageBubble.textContent = `[${senderAccount}]: ${messageContent}`;
-                    messages.appendChild(messageBubble);
-                    messages.scrollTop = messages.scrollHeight; // 滚动到最新消息
+            messageWrapper.appendChild(messageBubble);
+            messages.appendChild(messageWrapper);
+            messages.scrollTop = messages.scrollHeight; // 滚动到最新消息
         }
         else alert("你收到来自其他联系人的消息");
     }
@@ -95,8 +106,19 @@ function startConversation(account, username) {
         const messages = JSON.parse(savedMessages);
         messages.forEach(message => {
             const messageBubble = document.createElement("div");
+            const messageWrapper = document.createElement("div");
+            messageBubble.classList.add("bubble");  // 添加样式类
+            if(message.sender == account)
+            {
+                messageWrapper.classList.add("message", "message-right");  // 本方消息靠右
+            }
+            else
+            {
+                messageWrapper.classList.add("message", "message-left"); // 对方消息靠左
+            }
             messageBubble.textContent = `[${message.sender}]: ${message.message}`;
-            messagesContainer.appendChild(messageBubble);
+            messageWrapper.appendChild(messageBubble);
+            messagesContainer.appendChild(messageWrapper);
         });
         messagesContainer.scrollTop = messagesContainer.scrollHeight; // 滚动到最新消息
     }
@@ -129,8 +151,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const message = messageInput.value.trim();
         if (message) {
             const messageBubble = document.createElement("div");
-            messageBubble.textContent = message;
-            messages.appendChild(messageBubble);
+            const messageWrapper = document.createElement("div");
+            messageBubble.classList.add("bubble");  // 添加样式类
+            messageWrapper.classList.add("message", "message-right");  // 本方消息靠右
+            messageBubble.textContent = "["+account+"]: "+message;
+            messageWrapper.appendChild(messageBubble);
+            messages.appendChild(messageWrapper);
             messageInput.value = ""; // 清空输入框
             messages.scrollTop = messages.scrollHeight; // 滚动到最新消息
             const command = "sendMessage";  // 定义 command

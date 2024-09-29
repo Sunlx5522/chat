@@ -44,7 +44,7 @@ public class YourWebSocketHandler extends TextWebSocketHandler { // 继承TextWe
             System.out.println("Account: " + account); // 打印收到的消息
 
             // 向客户端发送响应消息
-            String[] messages = { "loginSuccessfully", account, user.getUsername() };
+            String[] messages = { "loginSuccessfully", account,user.getUsername(),user.getEmail(),user.getTelephone() };
             String multiLineMessage = String.join("[b1565ef8ea49b3b3959db8c5487229ea]", messages);
             session.sendMessage(new TextMessage(multiLineMessage)); // 发送登录成功消息给客户端
 

@@ -115,6 +115,16 @@ body {
     overflow-y: auto;
 }
 
+.message-left {
+    display: flex;
+    justify-content: flex-start; /* 对方消息靠左 */
+}
+
+.message-right {
+    display: flex;
+    justify-content: flex-end; /* 本方消息靠右 */
+}
+
 .input-area {
     display: flex;
     justify-content: space-between;
@@ -191,4 +201,19 @@ input[type="text"] {
 
 .chat-header p {
     margin: 5px 0;
+}
+
+.bubble {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.3); /* 半透明背景 */
+    backdrop-filter: blur(10px); /* 模糊效果 */
+    border: 2px solid rgba(255, 255, 255, 0.2); /* 半透明边框 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加轻微阴影 */
+    color: #000; /* 文本颜色 */
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word; /* 长文本换行 */
+    margin-bottom: 10px; /* 气泡间的距离 */
 }

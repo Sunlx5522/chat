@@ -32,6 +32,7 @@ import org.example.chat.repository.UserRepository;
 public class findPasswordController {
     @Autowired // 添加此注解
     private UserRepository userRepository;
+
     // 声明一个UserRepository类型的成员变量，用于与数据库进行交互操作，例如查询用户信息。
     @PostMapping("/findPassword")
     // @PostMapping注解用于将HTTP POST请求映射到特定的处理方法上，这里映射到"/login"路径
@@ -49,7 +50,7 @@ public class findPasswordController {
         String phoneNumber = loginData.get("phoneNumber");
         // 从loginData中获取键为"password"的值，即用户提交的电话号码。
 
-        System.out.println("收到找回密码请求：账号=" + account + "，邮箱=" + email+ "，电话号码=" + phoneNumber);
+        System.out.println("收到找回密码请求：账号=" + account + "，邮箱=" + email + "，电话号码=" + phoneNumber);
         // 在服务器控制台打印收到的登录请求信息，方便调试和日志记录。
 
         // 验证逻辑
@@ -60,12 +61,9 @@ public class findPasswordController {
         // 验证用户密码
         if (user == null) {
             return "null";
-        }
-        else if(user.getEmail().equals(email) && user.getTelephone().equals(phoneNumber)) {
+        } else if (user.getEmail().equals(email) && user.getTelephone().equals(phoneNumber)) {
             return user.getPassword();
-        }
-        else
-        {
+        } else {
             return "error";
         }
     }
