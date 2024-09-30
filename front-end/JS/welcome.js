@@ -69,14 +69,7 @@ socket.onmessage = function (event) { // 定义接收消息的回调函数
         const messageBubble = document.createElement("div");
         const messageWrapper = document.createElement("div");
         messageBubble.classList.add("bubble");  // 添加样式类
-        if(senderAccount == account)
-        {
-            messageWrapper.classList.add("message", "message-right");  // 本方消息靠右
-        }
-        else
-        {
-            messageWrapper.classList.add("message", "message-left"); // 对方消息靠左
-        }
+        messageWrapper.classList.add("message", "message-left"); // 对方消息靠左
         const receiverAccount = account;//用来做savemessagetolocal的参数
         saveMessageToLocal(senderAccount, receiverAccount, messageContent);
         if(senderAccount==document.getElementById("contactAccount").textContent.split(': ')[1]){//检测收到的消息属不属于当前会话
@@ -88,18 +81,17 @@ socket.onmessage = function (event) { // 定义接收消息的回调函数
         else alert("你收到来自其他联系人的消息");
     }
 };
-function startConversation(account, username) {
+function startConversation(chatwith, username) {
     // 更新聊天头部信息
-    sessionStorage.setItem('chatwith', account); // 使用sessionStorage存储
-    let now_account=sessionStorage.getItem('account');//now_account是当前登录的account
+    sessionStorage.setItem('chatwith', chatwith); // 使用sessionStorage存储
     const contactName = document.getElementById("contactName");
     const contactAccount = document.getElementById("contactAccount");
     contactName.textContent = username;
-    contactAccount.textContent = `账号: ${account}`;
+    contactAccount.textContent = `账号: ${chatwith}`;
     const messagesContainer = document.getElementById("messages");
     messagesContainer.innerHTML = ""; // 清空聊天记录容器的内容
-    const senderAccount = sessionStorage.getItem('account');
-    const key = `messages-${now_account}-${account}`;//存消息的键名
+    const senderAccount = account;
+    const key = `messages-${account}-${chatwith}`;//存消息的键名
     console.log(key);
     const savedMessages = localStorage.getItem(key);
     if (savedMessages) {//从localstorage里读取消息
@@ -160,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
             messageInput.value = ""; // 清空输入框
             messages.scrollTop = messages.scrollHeight; // 滚动到最新消息
             const command = "sendMessage";  // 定义 command
-            const senderAccount = sessionStorage.getItem('account');
+            const senderAccount = account;
             const receiverAccount = sessionStorage.getItem('chatwith');
             const payload = `${command}[b1565ef8ea49b3b3959db8c5487229ea]${senderAccount}[b1565ef8ea49b3b3959db8c5487229ea]${receiverAccount}[b1565ef8ea49b3b3959db8c5487229ea]${message}`;
             // 发送消息到服务端
