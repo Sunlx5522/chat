@@ -1,118 +1,99 @@
 // script.js
 
 // 获取输入框元素
-var accountInput = document.getElementById('account');
-var passwordInput = document.getElementById('password');
+var accountInput = document.getElementById('account');  // 获取账号输入框的元素
+var passwordInput = document.getElementById('password');  // 获取密码输入框的元素
 
-var loginForm = document.getElementById('loginForm');
-var findPasswordButton = document.getElementById('findPasswordButton');
-var registerButton = document.getElementById('registerButton');
+var loginForm = document.getElementById('loginForm');  // 获取登录表单元素
+var findPasswordButton = document.getElementById('findPasswordButton');  // 获取找回密码按钮元素
+var registerButton = document.getElementById('registerButton');  // 获取注册按钮元素
 
+// 淡入特效
 document.addEventListener("DOMContentLoaded", function () {
-    if (loginForm) {
-        loginForm.classList.add('show'); // 添加类以触发特效
+    if (loginForm) {  // 检查是否获取到登录表单元素
+        loginForm.classList.add('show');  // 为表单添加 'show' 类，触发 CSS 特效
     }
 });
 
-
+// 添加监听事件
 // 为账号输入框添加事件监听
 accountInput.oninvalid = function () {
-    this.setCustomValidity('请输入账号');
+    this.setCustomValidity('请输入账号');  // 设置自定义的无效提示信息
 };
 accountInput.oninput = function () {
-    this.setCustomValidity('');
+    this.setCustomValidity('');  // 清除自定义的无效提示信息
 };
 
 // 为密码输入框添加事件监听
 passwordInput.oninvalid = function () {
-    this.setCustomValidity('请输入密码');
+    this.setCustomValidity('请输入密码');  // 设置自定义的无效提示信息
 };
 passwordInput.oninput = function () {
-    this.setCustomValidity('');
+    this.setCustomValidity('');  // 清除自定义的无效提示信息
 };
 
+// 添加点击事件
+// 找回密码按钮的点击事件
 findPasswordButton.addEventListener('click', () => {
-    window.location.href = '../HTML/findPassword.html';
+    window.location.href = '../HTML/findPassword.html';  // 跳转到找回密码页面
 });
 
+// 注册按钮的点击事件
 registerButton.addEventListener('click', () => {
-    window.location.href = '../HTML/signUp.html';
+    window.location.href = '../HTML/signUp.html';  // 跳转到注册页面
 });
 
 // 为账号输入框添加输入事件监听器，限制只能输入最多20位数字
 accountInput.addEventListener('input', function () {
-    // 使用正则表达式移除非数字字符
-    this.value = this.value.replace(/\D/g, ''); // \D匹配非数字字符，替换为空
-    // 限制输入长度为20位
-    if (this.value.length > 20) {
-        this.value = this.value.slice(0, 20); // 截取前20个字符
+    this.value = this.value.replace(/\D/g, '');  // 仅保留数字字符，移除其他字符
+    if (this.value.length > 20) {  // 如果输入超过20位
+        this.value = this.value.slice(0, 20);  // 截取前20个字符
     }
 });
 
 // 为密码输入框添加输入事件监听器，限制只能输入指定的字符
 passwordInput.addEventListener('input', function () {
-    // 定义允许的字符的正则表达式
-    // 允许的字符：数字、大小写字母、符号和下划线
-    // [^...]表示匹配不在括号内的字符，将其替换为空
-    this.value = this.value.replace(/[^a-zA-Z0-9_`~!@#$%^&*()\-=+\[\]{}|;:'",./?\\]/g, '');
-    // 限制输入长度为20位
-    if (this.value.length > 20) {
-        this.value = this.value.slice(0, 20); // 截取前20个字符
+    this.value = this.value.replace(/[^a-zA-Z0-9_`~!@#$%^&*()\-=+\[\]{}|;:'",./?\\]/g, '');  // 仅允许特定字符 绝对不允许出现尖括号
+    if (this.value.length > 20) {  // 如果输入超过20位
+        this.value = this.value.slice(0, 20);  // 截取前20个字符
     }
-    // 解释：
-    // - a-zA-Z0-9：匹配大小写字母和数字
-    // - _：匹配下划线
-    // - 后面的符号列表：匹配指定的符号 （不允许尖括号出现）
 });
 
-// oninvalid事件：当输入框的值不符合验证条件（如未填写必填字段）时触发。使用setCustomValidity()方法设置自定义的提示信息。
-// oninput事件：当用户在输入框中输入内容时触发。将自定义的验证信息清空，避免提示信息在输入后仍然存在。
-
+// 表单提交事件监听器
 document.getElementById('loginForm').addEventListener('submit', function (event) {
-    // 为表单添加提交事件的监听器，当用户点击“登录”按钮时触发此函数
+    event.preventDefault();  // 阻止表单的默认提交行为
 
-    event.preventDefault();
-    // 阻止浏览器的默认提交行为，防止页面刷新或跳转
+    const account = document.getElementById('account').value;  // 获取账号输入框中的值
+    const password = document.getElementById('password').value;  // 获取密码输入框中的值
 
-    const account = document.getElementById('account').value;
-    // 获取输入框中用户填写的账号
-    const password = document.getElementById('password').value;
-    // 获取输入框中用户填写的密码
-
-    // 构建要发送给后端的请求数据对象
+    // 构建要发送的请求数据
     const data = {
-        account: account,   // 账号字段，值为用户输入的账号
-        password: password  // 密码字段，值为用户输入的密码
+        account: account,   // 用户输入的账号
+        password: password  // 用户输入的密码
     };
 
-    // 使用 Fetch API 向后端发送异步请求
-    fetch('http://localhost:8080/api/login', { // 后端登录接口的完整 URL
-        method: 'POST', // 请求方法为 POST，表示向服务器提交数据
+    // 使用 Fetch API 向服务器发送登录请求
+    fetch('http://localhost:8080/api/login', {  // 登录接口的URL
+        method: 'POST',  // POST 请求方法
         headers: {
-            'Content-Type': 'application/json' // 设置请求头，指定请求体的格式为 JSON
+            'Content-Type': 'application/json'  // 设置请求头，内容类型为JSON
         },
-        body: JSON.stringify(data) // 将 JavaScript 对象转换为 JSON 字符串，作为请求体发送
+        body: JSON.stringify(data)  // 将数据对象转换为 JSON 字符串
     })
-        .then(response => response.text()) // 将服务器返回的响应转换为文本格式
-        .then(result => {
-            // 处理服务器返回的结果
-            if (result == "yes") {
-                alert("登录成功"); // 弹出提示框，显示服务器返回的消息（如登录成功或失败）
-                sessionStorage.setItem('account', account); // 使用sessionStorage存储
-                window.location.href = '../HTML/welcome.html';
-            }
-            else if (result == "repeat") {
-                alert("账号已在别处登录"); // 弹出提示框，显示服务器返回的消息（如登录成功或失败）
-            }
-            else {
-                alert("用户名或密码错误"); // 弹出提示框，显示服务器返回的消息（如登录成功或失败）
-            }
-        })
-        .catch(error => {
-            // 如果请求过程中发生错误，执行此代码块
-            console.error('Error:', error); // 在控制台输出错误信息，便于调试
-            alert('网络超时，请重试。'); // 弹出提示框，告知用户登录失败
-        });
+    .then(response => response.text())  // 将服务器响应转换为文本格式
+    .then(result => {
+        if (result == "yes") {  // 如果登录成功
+            alert("登录成功");  // 弹出成功提示
+            sessionStorage.setItem('account', account);  // 使用sessionStorage存储账号
+            window.location.href = '../HTML/welcome.html';  // 跳转到欢迎页面
+        } else if (result == "repeat") {  // 如果账号已在别处登录
+            alert("账号已在别处登录");  // 弹出警告提示
+        } else {
+            alert("用户名或密码错误");  // 如果登录失败，弹出错误提示
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);  // 在控制台输出错误信息
+        alert('网络超时，请重试。');  // 弹出网络超时提示
+    });
 });
-
-

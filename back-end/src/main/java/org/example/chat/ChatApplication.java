@@ -1,54 +1,36 @@
-package org.example.chat;
-// 指定该类所属的包名，需要根据项目包结构进行修改
+package org.example.chat;  // 定义包名为org.example.chat
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-// 导入Spring Boot框架的核心类，用于引导和自动配置Spring应用程序
+// 导入所需的类和包
+import org.springframework.boot.SpringApplication;  // Spring应用启动类
+import org.springframework.boot.autoconfigure.SpringBootApplication;  // Spring Boot自动配置注解
+import org.springframework.boot.CommandLineRunner;  // CommandLineRunner接口 用于执行初始化指令
+import org.example.chat.model.User;  // User实体类
+import org.example.chat.repository.UserRepository;  // UserRepository接口
+import org.springframework.beans.factory.annotation.Autowired;  // 自动注入注解
 
-import org.springframework.boot.CommandLineRunner;
+import java.util.List;  // List集合类
 
-import org.springframework.beans.factory.annotation.Autowired;
+@SpringBootApplication  // 标识这是一个Spring Boot应用程序，并启用自动配置和组件扫描
+public class ChatApplication implements CommandLineRunner {  // 定义ChatApplication类，实现CommandLineRunner接口
 
-import org.springframework.web.bind.annotation.*;
+    @Autowired  // 自动注入userRepository
+    private UserRepository userRepository;  // UserRepository实例，用于数据库操作
 
-import org.example.chat.model.User;
-
-import org.example.chat.repository.UserRepository;
-
-import java.util.List;
-
-@SpringBootApplication
-// @SpringBootApplication是一个组合注解，包含了@SpringBootConfiguration、@EnableAutoConfiguration和@ComponentScan
-// 标识这是一个Spring Boot应用的主配置类，并启用自动配置和组件扫描
-
-public class ChatApplication implements CommandLineRunner {
-// 定义主应用程序类ChatApplication
-
-    @Autowired
-    private UserRepository userRepository;  // 非静态字段，可以通过Spring的依赖注入正常初始化
-
-    public static void main(String[] args) {
-        // 主方法，是Java应用程序的入口点
-
-        SpringApplication.run(ChatApplication.class, args);
-        // 使用SpringApplication.run方法启动Spring Boot应用程序
-        // 参数是主应用程序类ChatApplication.class和命令行参数args
-
+    public static void main(String[] args) {  // 主方法，程序入口
+        SpringApplication.run(ChatApplication.class, args);  // 启动Spring Boot应用程序
     }
 
-    // 当应用启动并且Spring完成依赖注入后，会调用这个run方法
-    @Override
-    public void run(String... args) throws Exception {
-        init();  // 此时userRepository已经被Spring注入，可以安全使用
+    @Override  // 重写run方法
+    public void run(String... args) throws Exception {  // 当应用启动完成后调用
+        init();  // 调用初始化方法
     }
 
-    // 非静态方法，处理所有在线用户的状态
-    private void init() {
-        List<User> allUsers = userRepository.findAll();
-        for (User u : allUsers) {
-            if (u.getIsonline() == 1) {
-                u.setIsonline(0);
-                userRepository.save(u);
+    private void init() {  // 初始化方法，处理用户状态
+        List<User> allUsers = userRepository.findAll();  // 获取所有用户列表
+        for (User u : allUsers) {  // 遍历用户列表
+            if (u.getIsonline() == 1) {  // 如果用户在线
+                u.setIsonline(0);  // 设置用户为离线
+                userRepository.save(u);  // 保存用户状态
             }
         }
     }

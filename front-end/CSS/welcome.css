@@ -1,219 +1,244 @@
+/* 设置页面主体样式，包括字体、背景和布局 */
 body {
-    margin: 0;
-    /* 去除默认的页面外边距 */
-    padding: 0;
-    /* 去除默认的页面内边距 */
-    font-family: '微软雅黑', 'Helvetica Neue', sans-serif;
-    /* 设置字体族，优先使用微软雅黑 */
-    background: linear-gradient(135deg, #1e90ff, #ff69b4);
-    /* 设置135度的线性渐变背景，从蓝色到粉色 */
-    height: 100vh;
-    /* 设置高度为视口高度的100% */
+    margin: 0; /* 去除默认的外边距 */
+    padding: 0; /* 去除默认的内边距 */
+    font-family: '微软雅黑', 'Helvetica Neue', sans-serif; /* 设置字体为微软雅黑和Helvetica Neue */
+    background: linear-gradient(135deg, #1e90ff, #ff69b4); /* 创建一个135度的蓝色到粉色的线性渐变背景 */
+    height: 100vh; /* 设置高度为视口的100% */
 }
 
+/* 设置容器的布局为弹性盒模型，填充整个高度 */
 .container {
-    display: flex;
-    height: 100%;
+    display: flex; /* 启用弹性盒布局 */
+    height: 100%; /* 高度为100% */
 }
 
+/* 设置按钮和图标的样式 */
 .button-icon {
-    width: 25px;
-    /* 设置图标宽度 */
-    height: 25px;
-    /* 设置图标高度 */
+    width: 25px; /* 图标宽度为25px */
+    height: 25px; /* 图标高度为25px */
 }
 
+/* 退出图标样式 */
 #exitImage {
-    width: 30px;
-    /* 设置图标宽度 */
-    height: 30px;
-    /* 设置图标高度 */
+    width: 30px; /* 图标宽度为30px */
+    height: 30px; /* 图标高度为30px */
 }
 
-
-/* 菜单按钮的样式 */
+/* 菜单按钮样式 */
 #menuButton {
-    display: flex;
-    align-items: center;
-    /* 垂直居中 */
-    justify-content: center;
-    /* 水平居中 */
-    padding: 10px;
-    /* 内边距 */
-    border: none;
-    /* 去掉边框 */
-    background: transparent;
-    /* 背景透明 */
-    cursor: pointer;
-    /* 鼠标指针样式 */
-    transition: 0.5s ease;
-    /* 设置过渡效果，持续时间0.3秒，缓动函数为ease */
+    display: flex; /* 使用弹性盒布局 */
+    align-items: center; /* 垂直居中对齐 */
+    justify-content: center; /* 水平居中对齐 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+    background: transparent; /* 背景透明 */
+    cursor: pointer; /* 鼠标悬停时显示指针 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
 }
 
+/* 菜单按钮悬停效果 */
 #menuButton:hover {
-    background: rgba(255, 255, 255, 0.35);
-    /* 背景颜色变为浅灰色 */
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
 }
 
-/* 退出按钮的样式 */
+/* 退出按钮样式 */
 #exitButton {
-    margin-top: auto;
-    /* 将退出按钮推到工具栏底部 */
-    display: flex;
-    align-items: center;
-    /* 垂直居中 */
-    justify-content: center;
-    /* 水平居中 */
-    padding: 10px;
-    /* 内边距 */
-    border: none;
-    /* 去掉边框 */
-    background: transparent;
-    /* 背景透明 */
-    cursor: pointer;
-    /* 鼠标指针样式 */
-    transition: 0.5s ease;
-    /* 设置过渡效果，持续时间0.3秒，缓动函数为ease */
+    margin-top: auto; /* 自动填充顶部间隔，推到底部 */
+    display: flex; /* 使用弹性盒布局 */
+    align-items: center; /* 垂直居中对齐 */
+    justify-content: center; /* 水平居中对齐 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+    background: transparent; /* 背景透明 */
+    cursor: pointer; /* 鼠标悬停时显示指针 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
 }
 
+/* 退出按钮悬停效果 */
 #exitButton:hover {
-    background: rgba(255, 255, 255, 0.35);
-    /* 背景颜色变为浅灰色 */
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
 }
 
+/* 工具栏样式 */
 .toolbar {
-    background: rgba(255, 255, 255, 0.1);
-    width: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 10px;
+    background: rgba(255, 255, 255, 0.1); /* 设置半透明白色背景 */
+    width: 50px; /* 宽度为50px */
+    display: flex; /* 使用弹性盒布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    justify-content: flex-start; /* 子元素从顶部开始排列 */
+    padding: 10px; /* 内边距为10px */
 }
 
+/* 联系人列表样式 */
 .contact-list {
-    background: rgba(255, 255, 255, 0.2);
-    width: 200px;
-    padding: 10px;
+    background: rgba(255, 255, 255, 0.2); /* 设置稍微透明的白色背景 */
+    width: 200px; /* 宽度为200px */
+    padding: 10px; /* 内边距为10px */
+    overflow-y: auto; /* 内容过多时允许滚动 */
 }
 
+/* 自定义滚动条的整体样式 */
+.contact-list::-webkit-scrollbar {
+    width: 8px; /* 滚动条的宽度 */
+}
+
+/* 滚动条轨道的样式 */
+.contact-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); /* 轨道为透明黑色 */
+}
+
+/* 滚动条滑块的样式 */
+.contact-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+    border-radius: 4px; /* 滑块边缘为圆角 */
+}
+
+/* 当鼠标悬停在滚动条上时，滑块的样式 */
+.contact-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5); /* 悬停时背景变为浅灰色 */
+}
+
+
+/* 聊天区域样式 */
 .chat-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
+    flex: 1; /* 占据剩余空间 */
+    display: flex; /* 使用弹性盒布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    padding: 10px; /* 内边距为10px */
 }
 
+/* 聊天头部样式 */
 .chat-header {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
+    background: rgba(255, 255, 255, 0.2); /* 设置稍微透明的白色背景 */
+    padding: 10px; /* 内边距为10px */
 }
 
+/* 消息区域样式 */
 .messages {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    overflow-y: auto;
+    flex: 1; /* 占据剩余空间 */
+    background: rgba(255, 255, 255, 0.1); /* 设置半透明白色背景 */
+    padding: 10px; /* 内边距为10px */
+    overflow-y: auto; /* 内容过多时允许滚动 */
 }
 
+/* 自定义滚动条的整体样式 */
+.messages::-webkit-scrollbar {
+    width: 8px; /* 滚动条的宽度 */
+}
+
+/* 滚动条轨道的样式 */
+.messages::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); /* 轨道为透明黑色 */
+}
+
+/* 滚动条滑块的样式 */
+.messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+    border-radius: 4px; /* 滑块边缘为圆角 */
+}
+
+/* 当鼠标悬停在滚动条上时，滑块的样式 */
+.messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5); /* 悬停时背景变为浅灰色 */
+}
+
+/* 左侧消息样式 */
 .message-left {
-    display: flex;
-    justify-content: flex-start; /* 对方消息靠左 */
+    display: flex; /* 使用弹性盒布局 */
+    justify-content: flex-start; /* 消息靠左对齐 */
 }
 
+/* 右侧消息样式 */
 .message-right {
-    display: flex;
-    justify-content: flex-end; /* 本方消息靠右 */
+    display: flex; /* 使用弹性盒布局 */
+    justify-content: flex-end; /* 消息靠右对齐 */
 }
 
+/* 输入区域样式 */
 .input-area {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.2);
+    display: flex; /* 使用弹性盒布局 */
+    justify-content: space-between; /* 元素之间保持平均间距 */
+    padding: 10px; /* 内边距为10px */
+    background: rgba(255, 255, 255, 0.2); /* 设置稍微透明的白色背景 */
 }
 
+/* 文本输入框样式 */
 input[type="text"] {
-    flex: 1;
-    padding: 10px;
-    margin-right: 10px;
-    border: none;
-    border-radius: 5px;
+    flex: 1; /* 占据可用空间 */
+    padding: 10px; /* 内边距为10px */
+    margin-right: 10px; /* 右边距为10px */
+    border: none; /* 无边框 */
+    border-radius: 5px; /* 边框圆角为5px */
 }
 
+/* 下拉菜单容器样式 */
 #dropdownMenu {
-    position: relative;
+    position: relative; /* 相对定位，为下拉内容定位提供基准 */
 }
 
+/* 下拉内容样式 */
 #dropdownContent {
-    display: none;
-    /* 初始隐藏 */
-    position: absolute;
-    top: 100%;
-    /* 在按钮下方 */
-    left: 0;
-    background: rgba(255, 255, 255, 0.1);
-    /* 半透明背景 */
-    backdrop-filter: blur(10px);
-    /* 毛玻璃效果 */
-    border-radius: 10px;
-    /* 圆角 */
-    min-width: 160px;
-    /* 最小宽度 */
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
-    /* 阴影效果 */
-    z-index: 1;
+    display: none; /* 默认不显示 */
+    position: absolute; /* 绝对定位 */
+    top: 100%; /* 位于触发元素的底部 */
+    left: 0; /* 与触发元素左对齐 */
+    background: rgba(255, 255, 255, 0.1); /* 设置半透明白色背景 */
+    backdrop-filter: blur(10px); /* 背景模糊效果 */
+    border-radius: 10px; /* 边框圆角为10px */
+    min-width: 160px; /* 最小宽度为160px */
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    z-index: 1; /* 提高层级，使其显示在其他元素之上 */
 }
 
+/* 下拉内容中的链接样式 */
 .dropdown-content a {
-    color: white;
-    /* 链接颜色 */
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    transition: background 0.5s;
-    /* 添加过渡效果 */
+    color: white; /* 链接文字为白色 */
+    padding: 12px 16px; /* 内边距为12px上下，16px左右 */
+    text-decoration: none; /* 无下划线 */
+    display: block; /* 块级元素，占满容器宽度 */
+    transition: background 0.5s; /* 背景色过渡效果 */
+    border-radius: 10px; /* 边框圆角为10px */
 }
 
+/* 链接悬停效果 */
 .dropdown-content a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    /* 悬停时背景变色 */
-    border-radius: 10px;
-    /* 圆角 */
+    background-color: rgba(255, 255, 255, 0.2); /* 悬停时背景色变为浅灰色 */
+    border-radius: 10px; /* 边框圆角为10px */
 }
+
+/* 联系人项样式 */
 .contact-item {
-    cursor: pointer; /* 将鼠标光标设置为指针，提示用户这部分可点击 */
-    padding: 5px; /* 添加一些内边距 */
-    border-bottom: 1px solid #ccc; /* 添加底线 */
+    cursor: pointer; /* 鼠标悬停时显示指针 */
+    padding: 5px; /* 内边距为5px */
+    border-radius: 10px; /* 边框圆角为10px */
+    backdrop-filter: blur(10px); /* 背景模糊效果 */
+    border: 2px solid rgba(255, 255, 255, 0.2); /* 半透明白色边框 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 轻微阴影效果 */
+    color: #000; /* 文本颜色为黑色 */
+    font-size: 14px; /* 字体大小为14px */
+    line-height: 1.5; /* 行高为1.5 */
+    word-wrap: break-word; /* 文本自动换行 */
+    margin-bottom: 10px; /* 下边距为10px */
 }
 
+/* 联系人项悬停效果 */
 .contact-item:hover {
-    background-color: #f0f0f0; /* 鼠标悬停时的背景颜色 */
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
 }
 
-.chat-header {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
-}
-
-.chat-header h2 {
-    margin: 0;
-}
-
-.chat-header p {
-    margin: 5px 0;
-}
-
+/* 聊天气泡样式 */
 .bubble {
-    max-width: 60%;
-    padding: 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.3); /* 半透明背景 */
-    backdrop-filter: blur(10px); /* 模糊效果 */
-    border: 2px solid rgba(255, 255, 255, 0.2); /* 半透明边框 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加轻微阴影 */
-    color: #000; /* 文本颜色 */
-    font-size: 14px;
-    line-height: 1.5;
-    word-wrap: break-word; /* 长文本换行 */
-    margin-bottom: 10px; /* 气泡间的距离 */
+    max-width: 60%; /* 最大宽度为60% */
+    padding: 10px; /* 内边距为10px */
+    border-radius: 10px; /* 边框圆角为10px */
+    background: rgba(255, 255, 255, 0.3); /* 设置半透明白色背景 */
+    backdrop-filter: blur(10px); /* 背景模糊效果 */
+    border: 2px solid rgba(255, 255, 255, 0.2); /* 半透明白色边框 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 轻微阴影效果 */
+    color: #000; /* 文本颜色为黑色 */
+    font-size: 14px; /* 字体大小为14px */
+    line-height: 1.5; /* 行高为1.5 */
+    word-wrap: break-word; /* 文本自动换行 */
+    margin-bottom: 10px; /* 下边距为10px */
 }
