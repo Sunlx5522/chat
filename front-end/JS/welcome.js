@@ -4,6 +4,10 @@ const DELIMITER = '[b1565ef8ea49b3b3959db8c5487229ea]'; // 分隔符
 
 var account = sessionStorage.getItem('account'); // 从sessionStorage中获取当前登录的账号
 
+const messageChunks = {}; // 存储未完成的消息块，键为消息ID，值为消息内容
+
+const timers = {}; // 存储每个消息ID的定时器
+
 // 创建WebSocket连接，URL为后端配置的路径
 const socket = new WebSocket('ws://localhost:8080/ws'); // 指定WebSocket的连接地址
 
@@ -21,6 +25,32 @@ function saveMessageToLocal(senderAccount, receiverAccount, messageContent) {
     console.log("成功保存");  // 打印成功信息
 }
 
+function sendMessageToServer (message) {
+    const chunkSize = 1024;  // 定义每个块的大小（字节数）
+    let offset = 0;  // 初始化偏移量
+    const messageId = account + Date.now().toString();  // 生成唯一的消息ID 账号 + 时间戳
+
+    // 循环拆分并发送消息块
+    while (offset < message.length) {
+    // 提取消息的一部分作为块
+    const chunk = message.slice(offset, offset + chunkSize);
+
+    // 创建要发送的消息对象
+    const chunkMessage = {
+      type: 'chunk',  // 消息类型为块
+      messageId: messageId,  // 唯一的消息ID，用于在接收端重组
+      chunkData: chunk,  // 块的内容
+      isLastChunk: (offset + chunkSize) >= message.length  // 是否为最后一个块
+    };
+
+    // 发送块到服务器
+    socket.send(JSON.stringify(chunkMessage));  // 将消息对象序列化为JSON字符串并发送
+
+    // 更新偏移量
+    offset += chunkSize;
+  }
+}
+
 // 当WebSocket连接成功时触发
 socket.onopen = function () {  // 定义连接成功的回调函数
     console.log('WebSocket connection established');  // 打印连接成功信息
@@ -28,13 +58,12 @@ socket.onopen = function () {  // 定义连接成功的回调函数
     // 发送初始消息到服务器
     const messages = ['login', account];  // 定义包含登录和账号信息的消息
     const multiLineMessage = messages.join(DELIMITER);  // 用特定的分隔符连接消息
-    socket.send(multiLineMessage);  // 发送消息到服务器
+    sendMessageToServer(multiLineMessage);  // 发送消息到服务器
 };
 
-// 接收来自服务器的消息
-socket.onmessage = function (event) {  // 定义接收消息的回调函数
-    const payload = event.data;  // 获取消息的负载
-    const blocks = payload.split(DELIMITER);  // 使用分隔符拆分消息
+// 处理消息
+function process(fullMessage){
+    const blocks = fullMessage.split(DELIMITER);  // 使用分隔符拆分消息
     const command = blocks[0];  // 获取消息的命令
     console.log("收到命令" + command);  // 打印收到的命令
 
@@ -85,6 +114,38 @@ socket.onmessage = function (event) {  // 定义接收消息的回调函数
             messages.scrollTop = messages.scrollHeight;  // 滚动到最新消息
         } else {
             alert("你收到来自其他联系人的消息");  // 弹出提示框，提示收到其他联系人的消息
+        }
+    }
+}
+
+// 接收来自服务器的消息
+socket.onmessage = function (event) {  // 定义接收消息的回调函数
+    const payload = event.data;  // 获取消息的负载
+    console.log("收到消息" + payload);  // 打印收到消息信息
+    const json = JSON.parse(payload);  // 解析JSON
+    if (json.type === 'chunk') {
+        const messageId = json.messageId;  // 获取消息ID
+        const chunkData = json.chunkData;  // 获取块数据
+        const isLastChunk = json.isLastChunk;  // 是否为最后一个块
+        // 如果是新消息，初始化存储和定时器
+        if (!messageChunks[messageId]) {
+            messageChunks[messageId] = '';  // 初始化消息内容
+            // 设置定时器，超时后删除未完成的消息
+            timers[messageId] = setTimeout(() => {
+            delete messageChunks[messageId];  // 删除未完成的消息
+            delete timers[messageId];  // 删除定时器
+            }, 30000);  // 超时时间，例如30秒
+        }
+        // 追加块数据
+        messageChunks[messageId] += chunkData;
+        if (isLastChunk) {
+            // 收到最后一个块，处理完整消息
+            const fullMessage = messageChunks[messageId];
+            process(fullMessage);  // 自定义的消息处理函数
+            // 清理数据和定时器
+            delete messageChunks[messageId];
+            clearTimeout(timers[messageId]);
+            delete timers[messageId];
         }
     }
 };
@@ -172,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const receiverAccount = sessionStorage.getItem('chatwith');  // 获取接收方账号
             const payload = [command, senderAccount,receiverAccount,message];  // 定义包含登录和账号信息的消息
             const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
-            socket.send(multiLinePayload);  // 发送消息到服务器
+            sendMessageToServer(multiLinePayload);  // 发送消息到服务器
             console.log("发送消息");  // 打印消息发送信息
             saveMessageToLocal(senderAccount, receiverAccount, message);  // 保存消息到本地
         }
