@@ -9,11 +9,11 @@ var findPasswordButton = document.getElementById('findPasswordButton');  // 获�
 var registerButton = document.getElementById('registerButton');  // 获取注册按钮元素
 
 // 淡入特效
-document.addEventListener("DOMContentLoaded", function () {
-    if (loginForm) {  // 检查是否获取到登录表单元素
-        loginForm.classList.add('show');  // 为表单添加 'show' 类，触发 CSS 特效
+window.onload = function () {
+    if (loginForm) {
+        loginForm.classList.add('show');
     }
-});
+};
 
 // 添加监听事件
 // 为账号输入框添加事件监听

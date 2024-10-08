@@ -68,6 +68,7 @@ body {
     flex-direction: column; /* 子元素垂直排列 */
     justify-content: flex-start; /* 子元素从顶部开始排列 */
     padding: 10px; /* 内边距为10px */
+    z-index: 2; /* 提高工具栏的层级，确保始终在前面 */
 }
 
 /* 联系人列表样式 */
@@ -76,16 +77,25 @@ body {
     width: 200px; /* 宽度为200px */
     padding: 10px; /* 内边距为10px */
     overflow-y: auto; /* 内容过多时允许滚动 */
+    transition: width 0.3s ease, padding 0.3s ease; /* 平滑过渡效果，包含宽度和内边距的变化 */
+}
+
+/* 隐藏后的效果：完全收起（包含滚动条） */
+.contact-list.collapsed {
+    width: 0; /* 宽度变为0，隐藏整个联系人列表 */
+    padding: 0; /* 内边距变为0，确保列表完全收起 */
+    overflow: hidden; /* 隐藏列表内容，防止文本在宽度变化时发生不必要的调整 */
+    visibility: hidden; /* 隐藏内容，避免在宽度变化时影响文字的渲染 */
+}
+
+/* 在列表展开时，重新显示内容 */
+.contact-list:not(.collapsed) {
+    visibility: visible; /* 展开时显示内容 */
 }
 
 /* 自定义滚动条的整体样式 */
 .contact-list::-webkit-scrollbar {
     width: 8px; /* 滚动条的宽度 */
-}
-
-/* 滚动条轨道的样式 */
-.contact-list::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1); /* 轨道为透明黑色 */
 }
 
 /* 滚动条滑块的样式 */
@@ -106,12 +116,15 @@ body {
     display: flex; /* 使用弹性盒布局 */
     flex-direction: column; /* 子元素垂直排列 */
     padding: 10px; /* 内边距为10px */
+    border-radius: 10px; /* 边框圆角为10px */
 }
 
 /* 聊天头部样式 */
 .chat-header {
     background: rgba(255, 255, 255, 0.2); /* 设置稍微透明的白色背景 */
-    padding: 10px; /* 内边距为10px */
+    padding: 1px; /* 内边距为10px */
+    font-size: 14px; /* 字体大小为14px */
+    text-align: center; /*文本居中对齐*/
 }
 
 /* 消息区域样式 */
@@ -155,23 +168,6 @@ body {
     justify-content: flex-end; /* 消息靠右对齐 */
 }
 
-/* 输入区域样式 */
-.input-area {
-    display: flex; /* 使用弹性盒布局 */
-    justify-content: space-between; /* 元素之间保持平均间距 */
-    padding: 10px; /* 内边距为10px */
-    background: rgba(255, 255, 255, 0.2); /* 设置稍微透明的白色背景 */
-}
-
-/* 文本输入框样式 */
-input[type="text"] {
-    flex: 1; /* 占据可用空间 */
-    padding: 10px; /* 内边距为10px */
-    margin-right: 10px; /* 右边距为10px */
-    border: none; /* 无边框 */
-    border-radius: 5px; /* 边框圆角为5px */
-}
-
 /* 下拉菜单容器样式 */
 #dropdownMenu {
     position: relative; /* 相对定位，为下拉内容定位提供基准 */
@@ -179,7 +175,7 @@ input[type="text"] {
 
 /* 下拉内容样式 */
 #dropdownContent {
-    display: none; /* 默认不显示 */
+    visibility: hidden; /* 初始状态不可见 */ /* 显示菜单 */
     position: absolute; /* 绝对定位 */
     top: 100%; /* 位于触发元素的底部 */
     left: 0; /* 与触发元素左对齐 */
@@ -189,6 +185,16 @@ input[type="text"] {
     min-width: 160px; /* 最小宽度为160px */
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2); /* 阴影效果 */
     z-index: 1; /* 提高层级，使其显示在其他元素之上 */
+    opacity: 0; /* 初始透明度为0 */
+    transform: scale(0.9); /* 初始缩放效果，稍微缩小 */
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease; /* 过渡效果，包含透明度、缩放和可见性 */
+}
+
+/* 显示下拉菜单的样式 */
+#dropdownContent.show {
+    visibility: visible; /* 显示菜单 */
+    opacity: 1; /* 设置透明度为1 */
+    transform: scale(1); /* 恢复正常大小 */
 }
 
 /* 下拉内容中的链接样式 */
@@ -211,9 +217,7 @@ input[type="text"] {
 .contact-item {
     cursor: pointer; /* 鼠标悬停时显示指针 */
     padding: 5px; /* 内边距为5px */
-    border-radius: 10px; /* 边框圆角为10px */
     backdrop-filter: blur(10px); /* 背景模糊效果 */
-    border: 2px solid rgba(255, 255, 255, 0.2); /* 半透明白色边框 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 轻微阴影效果 */
     color: #000; /* 文本颜色为黑色 */
     font-size: 14px; /* 字体大小为14px */
@@ -225,6 +229,11 @@ input[type="text"] {
 /* 联系人项悬停效果 */
 .contact-item:hover {
     background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+}
+
+/* 联系人项选中效果 */
+.contact-item.selected {
+    background: rgba(255, 255, 255, 0.4); /* 悬停时背景变为浅灰色 */
 }
 
 /* 聊天气泡样式 */
@@ -241,4 +250,57 @@ input[type="text"] {
     line-height: 1.5; /* 行高为1.5 */
     word-wrap: break-word; /* 文本自动换行 */
     margin-bottom: 10px; /* 下边距为10px */
+}
+
+.input-area {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#messageInput {
+    width: 100%;
+    min-height: 60px;
+    max-height: 150px;
+    resize: none;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #333;
+    font-size: 16px;
+    overflow-y: auto;
+}
+
+#messageInput:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 132, 255, 0.5);
+}
+
+#messageInput::-webkit-scrollbar {
+    width: 6px;
+}
+
+#messageInput::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+#sendButton {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#sendButton:hover {
+    background-color: #0056b3;
 }

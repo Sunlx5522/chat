@@ -15,16 +15,18 @@
             </button>
             <div class="dropdown" id="dropdownMenu"> <!-- 下拉菜单 -->
                 <div class="dropdown-content" id="dropdownContent"> <!-- 下拉菜单内容 -->
-                    <a href="#" id="feature1">功能 1</a> <!-- 功能链接 1 -->
-                    <a href="#" id="feature2">功能 2</a> <!-- 功能链接 2 -->
-                    <a href="#" id="feature3">功能 3</a> <!-- 功能链接 3 -->
+                    <a href="#" id="feature1">个人中心</a> <!-- 功能链接 1 -->
+                    <a href="#" id="feature2">添加好友</a> <!-- 功能链接 2 -->
+                    <a href="#" id="feature3">好友请求</a> <!-- 功能链接 3 -->
+                    <a href="#" id="feature4">收回列表</a> <!-- 功能链接 4 -->
                 </div>
             </div>
             <button id="exitButton"> <!-- 退出按钮 -->
                 <img src="../SOURCEFILE/IMAGES/welcome/exit.png" alt="退出" class="button-icon" id="exitImage"> <!-- 退出图标 -->
             </button>
         </div>
-        <div class="contact-list" id="contactList"></div> <!-- 联系人列表区域 -->
+        <!-- 联系人列表区域，增加收起按钮 -->
+        <div class="contact-list" id="contactList"></div>
         <div class="chat-area"> <!-- 聊天区域 -->
             <div class="chat-header" id="chatHeader"> <!-- 聊天头部区域 -->
                 <h2 id="contactName"></h2> <!-- 联系人名称 -->
@@ -32,7 +34,7 @@
             </div>
             <div class="messages" id="messages"></div> <!-- 消息展示区域 -->
             <div class="input-area" id="input-area"> <!-- 消息输入区域 -->
-                <input type="text" id="messageInput" placeholder="输入消息..."> <!-- 消息输入框 -->
+                <textarea id="messageInput" placeholder="输入消息..." rows="5"></textarea> <!-- 多行输入框 -->
                 <button id="sendButton">发送</button> <!-- 发送按钮 -->
             </div>
         </div>

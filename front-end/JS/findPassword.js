@@ -8,11 +8,11 @@ var phoneNumber = document.getElementById('phoneNumber');  // 获取电话号码
 var findPasswordForm = document.getElementById('findPasswordForm');  // 获取找回密码表单的元素
 
 // 淡入特效
-document.addEventListener("DOMContentLoaded", function() {
+window.onload = function () {
     if (findPasswordForm) {  // 如果找回密码表单元素存在
         findPasswordForm.classList.add('show');  // 为表单添加 'show' 类，触发 CSS 特效
     }
-});
+};
 
 // 添加监听事件
 // 为账号输入框添加事件监听

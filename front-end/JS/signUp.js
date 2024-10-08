@@ -10,11 +10,11 @@ var phoneNumber = document.getElementById('phoneNumber');  // 获取电话号码
 var signUpForm = document.getElementById('signUpForm');  // 获取注册表单元素
 
 // 淡入特效
-document.addEventListener("DOMContentLoaded", function() {
+window.onload = function () {
     if (signUpForm) {  // 如果获取到表单元素
         signUpForm.classList.add('show');  // 为表单添加 'show' 类，触发 CSS 中的特效
     }
-});
+};
 
 // 添加监听事件
 // 为用户名输入框添加事件监听

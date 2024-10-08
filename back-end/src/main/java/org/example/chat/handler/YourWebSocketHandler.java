@@ -6,7 +6,9 @@ import org.springframework.web.socket.WebSocketSession;  // 导入WebSocketSessi
 import org.springframework.web.socket.handler.TextWebSocketHandler;  // 导入TextWebSocketHandler类
 
 import org.example.chat.model.User;  // 导入自定义的User实体类，映射数据库中的用户表
+import org.example.chat.model.Avatar; // 导入自定义的Avatar实体类，映射数据库中的头像路径
 import org.example.chat.repository.UserRepository;  // 导入自定义的UserRepository接口，用于与数据库进行交互操作
+import org.example.chat.repository.AvatarRepository; // 导入自定义的AvatarRepository接口，用于与数据库进行交互操作
 import org.springframework.beans.factory.annotation.Autowired;  // 导入@Autowired注解，用于依赖注入
 
 import java.util.*;
@@ -15,6 +17,9 @@ import java.util.List;  // 导入List接口
 import java.util.Objects;  // 导入Objects类
 import java.util.HashMap;  // 导入HashMap类，用于存储会话和账号的映射
 import org.json.JSONObject; // 将字符串解析为JSON对象
+import java.security.MessageDigest; // 哈希校验
+import javax.xml.bind.DatatypeConverter; // 哈希校验
+import java.nio.charset.StandardCharsets; // 哈希校验
 
 import org.springframework.stereotype.Component;  // 导入@Component注解，标记为Spring组件
 
@@ -23,6 +28,7 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
 
     @Autowired  // 自动注入UserRepository实例
     private UserRepository userRepository;  // 声明UserRepository类型的成员变量，用于数据库操作
+    private AvatarRepository avatarRepository; // // 声明AvatarRepository类型的成员变量，用于数据库操作
 
     private static final String DELIMITER = "[b1565ef8ea49b3b3959db8c5487229ea]";  // 定义分隔符常量
     private static final Map<WebSocketSession, String> sessions = new HashMap<>();  // 存储会话和账号的映射
@@ -30,7 +36,7 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
 
     Map<String, StringBuilder> messageChunks = new HashMap<>(); // 存储未完成的消息块，键为消息ID，值为StringBuilder
     Map<String, Timer> timers = new HashMap<>(); // 存储每个消息ID的定时器任务
-
+    Map<String,String> messageHashes = new HashMap<>(); //存储每个消息对应的哈希值
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {  // 处理收到的文本消息
         String payload = message.getPayload();  // 获取消息的内容
@@ -41,33 +47,93 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             String messageId = json.getString("messageId");  // 获取消息ID
             String chunkData = json.getString("chunkData");  // 获取块数据
             boolean isLastChunk = json.getBoolean("isLastChunk");  // 是否为最后一个块
-            // 获取或创建对应消息ID的StringBuilder
-            StringBuilder messageBuilder = messageChunks.getOrDefault(messageId, new StringBuilder());
-            messageBuilder.append(chunkData);  // 追加块数据
-            messageChunks.put(messageId, messageBuilder);  // 更新Map
-            // 如果这是第一个块，启动定时器
-            if (!timers.containsKey(messageId)) {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        // 超时处理：移除未完成的消息
-                        messageChunks.remove(messageId);
-                        timers.remove(messageId);
+            // 对第一个块进行处理 保存 SHA-256 哈希值
+            if (json.has("sha256")) {
+                messageHashes.put(messageId, json.getString("sha256"));
+                // 获取或创建对应消息ID的StringBuilder
+                StringBuilder messageBuilder = messageChunks.getOrDefault(messageId, new StringBuilder());
+                messageBuilder.append(chunkData);  // 追加块数据
+                messageChunks.put(messageId, messageBuilder);  // 更新Map
+                // 如果这是第一个块，启动定时器
+                if (!timers.containsKey(messageId)) {
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            // 超时处理：移除未完成的消息
+                            messageChunks.remove(messageId);
+                            messageHashes.remove(messageId);
+                            timers.remove(messageId);
+                        }
+                    }, 30000);  // 设置超时时间，例如30秒
+                    timers.put(messageId, timer);  // 保存定时器
+                }
+                // 最后一个快
+                if (isLastChunk) {
+                    // 收到最后一个块，组装完整消息
+                    StringBuilder messageBuilder_fresh = messageChunks.get(messageId);
+                    String fullMessage = messageBuilder_fresh.toString();
+                    // 计算消息的 SHA-256 哈希值
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    byte[] hash = digest.digest(fullMessage.getBytes(StandardCharsets.UTF_8));
+                    String hashHex = DatatypeConverter.printHexBinary(hash).toLowerCase();
+                    // 检查是否存在哈希值
+                    String messageHash = messageHashes.get(messageId);
+                    // 验证哈希值
+                    if (hashHex != null && !hashHex.isEmpty() && messageHash != null && !messageHash.isEmpty()) {
+                        if (hashHex.equals(messageHash)) {
+                            process(fullMessage, session);  // 校验通过，处理消息
+                        } else {
+                            System.err.println("消息完整性校验失败");
+                        }
+                    } else {
+                        // 如果 hashHex 或 messageHash 为空，输出警告信息
+                        System.err.println("消息的哈希值为空，无法进行完整性校验");
                     }
-                }, 30000);  // 设置超时时间，例如30秒
-                timers.put(messageId, timer);  // 保存定时器
+                    // 清理数据和定时器
+                    messageChunks.remove(messageId);
+                    messageHashes.remove(messageId);
+                    Timer timer = timers.remove(messageId);
+                    if (timer != null) {
+                        timer.cancel();
+                    }
+                }
             }
-            if (isLastChunk) {
-                // 收到最后一个块，组装完整消息
-                String fullMessage = messageBuilder.toString();
-                // 处理完整消息
-                process(fullMessage,session);
-                // 清理数据和定时器
-                messageChunks.remove(messageId);
-                Timer timer = timers.remove(messageId);
-                if (timer != null) {
-                    timer.cancel();
+            else { // 对非第一个块进行处理
+                // 获取或创建对应消息ID的StringBuilder
+                StringBuilder messageBuilder = messageChunks.get(messageId);
+                if(!messageBuilder.isEmpty()) {
+                    messageBuilder.append(chunkData);  // 追加块数据
+                    messageChunks.put(messageId, messageBuilder);  // 更新Map
+                    if (isLastChunk) {
+                        // 收到最后一个块，组装完整消息
+                        StringBuilder messageBuilder_fresh = messageChunks.get(messageId);
+                        String fullMessage = messageBuilder_fresh.toString();
+                        // 计算消息的 SHA-256 哈希值
+                        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                        byte[] hash = digest.digest(fullMessage.getBytes(StandardCharsets.UTF_8));
+                        String hashHex = DatatypeConverter.printHexBinary(hash).toLowerCase();
+                        // 检查是否存在哈希值
+                        String messageHash = messageHashes.get(messageId);
+                        // 验证哈希值
+                        if (hashHex != null && !hashHex.isEmpty() && messageHash != null && !messageHash.isEmpty()) {
+                            if (hashHex.equals(messageHash)) {
+                                process(fullMessage, session);  // 校验通过，处理消息
+                            } else {
+                                System.err.println("消息完整性校验失败");
+                            }
+                        } else {
+                            // 如果 hashHex 或 messageHash 为空，输出警告信息
+                            System.err.println("消息的哈希值为空，无法进行完整性校验");
+                        }
+                        // 清理数据和定时器
+                        messageChunks.remove(messageId);
+                        messageHashes.remove(messageId);
+                        Timer timer = timers.remove(messageId);
+                        if (timer != null) {
+                            timer.cancel();
+                        }
+                    }
                 }
             }
         }
@@ -93,6 +159,10 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         int chunkSize = 1024;  // 定义每个块的大小
         int offset = 0;  // 初始化偏移量
         String messageId = String.valueOf(System.currentTimeMillis());  // 生成唯一的消息ID
+        // 计算 SHA-256 哈希值
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
+        String hashHex = DatatypeConverter.printHexBinary(hash).toLowerCase();
         // 循环拆分并发送消息块
         while (offset < message.length()) {
             // 提取消息的一部分作为块
@@ -104,6 +174,9 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             chunkMessage.put("messageId", messageId);  // 唯一的消息ID
             chunkMessage.put("chunkData", chunk);  // 块的内容
             chunkMessage.put("isLastChunk", (offset + chunkSize) >= message.length());  // 是否为最后一个块
+            if (offset == 0) {
+                chunkMessage.put("sha256", hashHex);  // 在第一个块中附加哈希值
+            }
 
             // 发送块到客户端
             session.sendMessage(new TextMessage(chunkMessage.toString()));  // 发送消息块
@@ -147,6 +220,8 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             if (allUsersMessage.length() > 0) {
                 sendMessage(session,allUsersMessage.toString()); // 发送登录成功消息给客户端
             }
+
+            //发送头像
         } else if (Objects.equals(command, "sendMessage")) {  // 如果命令是"sendMessage"
             String senderAccount = blocks[1];  // 获取发送者账号
             String receiverAccount = blocks[2];  // 获取接收者账号

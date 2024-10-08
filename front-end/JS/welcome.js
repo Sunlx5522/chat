@@ -5,6 +5,7 @@ const DELIMITER = '[b1565ef8ea49b3b3959db8c5487229ea]'; // 分隔符
 var account = sessionStorage.getItem('account'); // 从sessionStorage中获取当前登录的账号
 
 const messageChunks = {}; // 存储未完成的消息块，键为消息ID，值为消息内容
+const messageHashes = {}; // 存储消息哈希值
 
 const timers = {}; // 存储每个消息ID的定时器
 
@@ -25,10 +26,17 @@ function saveMessageToLocal(senderAccount, receiverAccount, messageContent) {
     console.log("成功保存");  // 打印成功信息
 }
 
-function sendMessageToServer (message) {
+async function sendMessageToServer (message) {
     const chunkSize = 1024;  // 定义每个块的大小（字节数）
     let offset = 0;  // 初始化偏移量
     const messageId = account + Date.now().toString();  // 生成唯一的消息ID 账号 + 时间戳
+
+    // 计算消息的 SHA-256 哈希
+    const encoder = new TextEncoder();
+    const data = encoder.encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');  // 将哈希转换为十六进制字符串
 
     // 循环拆分并发送消息块
     while (offset < message.length) {
@@ -40,7 +48,8 @@ function sendMessageToServer (message) {
       type: 'chunk',  // 消息类型为块
       messageId: messageId,  // 唯一的消息ID，用于在接收端重组
       chunkData: chunk,  // 块的内容
-      isLastChunk: (offset + chunkSize) >= message.length  // 是否为最后一个块
+      isLastChunk: (offset + chunkSize) >= message.length,  // 是否为最后一个块
+      sha256: offset === 0 ? hashHex : undefined  // 在第一个块中附加 SHA-256 哈希
     };
 
     // 发送块到服务器
@@ -83,7 +92,7 @@ function process(fullMessage){
             const contactItem = document.createElement("div");  // 创建一个新的联系人元素
 
             if (userAccount != account) {  // 如果联系人不是当前用户
-                contactItem.textContent = `账号：${userAccount}, 昵称：${userName}`;  // 设置联系人的文本内容
+                contactItem.innerHTML = `账号：${userAccount}<br>昵称：${userName}`; //添加元素
                 contactItem.classList.add("contact-item");  // 添加样式类
                 contactList.appendChild(contactItem);  // 将联系人元素添加到联系人列表
 
@@ -106,14 +115,20 @@ function process(fullMessage){
 
         const receiverAccount = account;  // 当前接收消息的用户
         saveMessageToLocal(senderAccount, receiverAccount, messageContent);  // 调用函数保存消息到本地
-
-        if (senderAccount == document.getElementById("contactAccount").textContent.split(': ')[1]) {  // 检查收到的消息是否属于当前会话
-            messageBubble.textContent = `[${senderAccount}]: ${messageContent}`;  // 设置消息内容
-            messageWrapper.appendChild(messageBubble);  // 将消息泡泡添加到消息包装器
-            messages.appendChild(messageWrapper);  // 将消息包装器添加到消息容器
-            messages.scrollTop = messages.scrollHeight;  // 滚动到最新消息
-        } else {
-            alert("你收到来自其他联系人的消息");  // 弹出提示框，提示收到其他联系人的消息
+        const chatWith = sessionStorage.getItem('chatwith');
+        if(chatWith !== null && chatWith !== '')
+        {
+            if (senderAccount == chatWith) {  // 检查收到的消息是否属于当前会话
+                messageBubble.textContent = `[${senderAccount}]: ${messageContent}`;  // 设置消息内容
+                messageWrapper.appendChild(messageBubble);  // 将消息泡泡添加到消息包装器
+                messages.appendChild(messageWrapper);  // 将消息包装器添加到消息容器
+                messages.scrollTop = messages.scrollHeight;  // 滚动到最新消息
+            } else {
+                alert("你收到来自"+senderAccount+"的消息");  // 弹出提示框，提示收到其他联系人的消息
+            }
+        }
+        else{
+            alert("你收到来自"+senderAccount+"的消息");  // 弹出提示框，提示收到其他联系人的消息
         }
     }
 }
@@ -127,25 +142,71 @@ socket.onmessage = function (event) {  // 定义接收消息的回调函数
         const messageId = json.messageId;  // 获取消息ID
         const chunkData = json.chunkData;  // 获取块数据
         const isLastChunk = json.isLastChunk;  // 是否为最后一个块
-        // 如果是新消息，初始化存储和定时器
-        if (!messageChunks[messageId]) {
+        
+        // 如果是第一个块，保存 SHA-256 哈希值
+        if (json.sha256) {
+            messageHashes[messageId] = json.sha256;
             messageChunks[messageId] = '';  // 初始化消息内容
-            // 设置定时器，超时后删除未完成的消息
-            timers[messageId] = setTimeout(() => {
-            delete messageChunks[messageId];  // 删除未完成的消息
-            delete timers[messageId];  // 删除定时器
-            }, 30000);  // 超时时间，例如30秒
+            messageChunks[messageId] += chunkData;
+             // 设置定时器，超时后删除未完成的消息
+             timers[messageId] = setTimeout(() => {
+                delete messageChunks[messageId];  // 删除未完成的消息
+                delete messageHashes[messageId];  // 删除未完成的消息
+                delete timers[messageId];  // 删除定时器
+                }, 30000);  // 超时时间，例如30秒
+                if (isLastChunk) {
+                    // 收到最后一个块，处理完整消息
+                    const fullMessage = messageChunks[messageId];
+                     // 计算消息的 SHA-256 哈希值
+                     crypto.subtle.digest('SHA-256', new TextEncoder().encode(fullMessage))
+                        .then(hashBuffer => {
+                            const hashArray = Array.from(new Uint8Array(hashBuffer));
+                            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+                            // 比较哈希值
+                            if (hashHex === messageHashes[messageId]) {
+                                process(fullMessage);  // 校验通过，处理消息
+                            } else {
+                                console.error('消息完整性校验失败');
+                            }
+        
+                            // 清理数据和定时器
+                            delete messageChunks[messageId];
+                            delete messageHashes[messageId];
+                            clearTimeout(timers[messageId]);
+                            delete timers[messageId];
+                        });
+                }
         }
-        // 追加块数据
-        messageChunks[messageId] += chunkData;
-        if (isLastChunk) {
-            // 收到最后一个块，处理完整消息
-            const fullMessage = messageChunks[messageId];
-            process(fullMessage);  // 自定义的消息处理函数
-            // 清理数据和定时器
-            delete messageChunks[messageId];
-            clearTimeout(timers[messageId]);
-            delete timers[messageId];
+        else {
+            if(messageChunks[messageId])
+            {
+                messageChunks[messageId] += chunkData;
+
+            }
+            if (isLastChunk) {
+                // 收到最后一个块，处理完整消息
+                const fullMessage = messageChunks[messageId];
+                 // 计算消息的 SHA-256 哈希值
+                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(fullMessage))
+                    .then(hashBuffer => {
+                        const hashArray = Array.from(new Uint8Array(hashBuffer));
+                        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+                        // 比较哈希值
+                        if (hashHex === messageHashes[messageId]) {
+                            process(fullMessage);  // 校验通过，处理消息
+                        } else {
+                            console.error('消息完整性校验失败');
+                        }
+    
+                        // 清理数据和定时器
+                        delete messageChunks[messageId];
+                        delete messageHashes[messageId];
+                        clearTimeout(timers[messageId]);
+                        delete timers[messageId];
+                    });
+            }
         }
     }
 };
@@ -157,7 +218,7 @@ function startConversation(chatwith, username) {
     const contactName = document.getElementById("contactName");  // 获取联系人名称DOM元素
     const contactAccount = document.getElementById("contactAccount");  // 获取联系人账号DOM元素
     contactName.textContent = username;  // 设置联系人名称
-    contactAccount.textContent = `账号: ${chatwith}`;  // 设置联系人账号
+    contactAccount.textContent = `${chatwith}`;  // 设置联系人账号
 
     const messagesContainer = document.getElementById("messages");  // 获取消息容器DOM元素
     messagesContainer.innerHTML = "";  // 清空消息容器
@@ -208,9 +269,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendButton = document.getElementById("sendButton");  // 获取发送按钮DOM元素
     const menuButton = document.getElementById("menuButton");  // 获取菜单按钮DOM元素
     const exitButton = document.getElementById("exitButton");  // 获取退出按钮DOM元素
-    const dropdownContent = document.getElementById('dropdownContent');  // 获取下拉菜单DOM元素
+    //const dropdownContent = document.getElementById('dropdownContent');  // 获取下拉菜单DOM元素
 
     document.getElementById("input-area").style.visibility = "hidden";  // 隐藏输入区域
+
+    // 使用事件委托监听点击事件
+    contactList.addEventListener('click', (event) => {
+    // 确保点击的目标是 .contact-item
+    if (event.target.classList.contains('contact-item')) {
+        // 移除所有联系项的 'selected' 类
+        document.querySelectorAll('.contact-item').forEach(i => i.classList.remove('selected'));
+        
+        // 为当前点击的联系项添加 'selected' 类
+        event.target.classList.add('selected');
+    }
+});
 
     // 发送消息按钮的点击事件
     sendButton.addEventListener("click", function () {
@@ -246,23 +319,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 菜单按钮的点击事件
     menuButton.addEventListener("click", function () {
-        const dropdown = document.getElementById("dropdownContent");  // 获取下拉菜单DOM元素
-        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";  // 切换显示状态
+        //dropdownContent.style.display = "block";  // 点击后隐藏下拉菜单
+        dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
 
     // 处理下拉菜单项的点击事件
     document.getElementById("feature1").addEventListener("click", function () {
         alert("功能 1 被点击");  // 弹出提示框
-        document.getElementById("dropdownContent").style.display = "none";  // 点击后隐藏下拉菜单
+        dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
 
     document.getElementById("feature2").addEventListener("click", function () {
         alert("功能 2 被点击");  // 弹出提示框
-        document.getElementById("dropdownContent").style.display = "none";  // 点击后隐藏下拉菜单
+        ddropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
 
     document.getElementById("feature3").addEventListener("click", function () {
         alert("功能 3 被点击");  // 弹出提示框
-        document.getElementById("dropdownContent").style.display = "none";  // 点击后隐藏下拉菜单
+        dropdownContent.classList.toggle("show");  // 切换显示状态的类
+    });
+    document.getElementById("feature4").addEventListener("click", function () {
+        contactList.classList.toggle('collapsed');  //向左收回按钮
+        dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
 });
