@@ -11,18 +11,21 @@
     <div class="container"> <!-- 页面主容器 -->
         <div class="toolbar"> <!-- 工具栏区域 -->
             <button id="menuButton"> <!-- 菜单按钮 -->
-                <img src="../SOURCEFILE/IMAGES/welcome/menu.png" alt="菜单" class="button-icon" id="menuImage"> <!-- 菜单图标 -->
+                <img src="../SOURCEFILE/IMAGES/welcome/menu.png" alt="菜单" class="button-icon" id="menuImage">
+                <!-- 菜单图标 -->
             </button>
             <div class="dropdown" id="dropdownMenu"> <!-- 下拉菜单 -->
                 <div class="dropdown-content" id="dropdownContent"> <!-- 下拉菜单内容 -->
                     <a href="#" id="feature1">个人中心</a> <!-- 功能链接 1 -->
                     <a href="#" id="feature2">添加好友</a> <!-- 功能链接 2 -->
                     <a href="#" id="feature3">好友请求</a> <!-- 功能链接 3 -->
-                    <a href="#" id="feature4">收回列表</a> <!-- 功能链接 4 -->
+                    <a href="#" id="feature4">拉伸列表</a> <!-- 功能链接 4 -->
+                    <a href="#" id="feature5">刷新页面</a> <!-- 功能链接 4 -->
                 </div>
             </div>
             <button id="exitButton"> <!-- 退出按钮 -->
-                <img src="../SOURCEFILE/IMAGES/welcome/exit.png" alt="退出" class="button-icon" id="exitImage"> <!-- 退出图标 -->
+                <img src="../SOURCEFILE/IMAGES/welcome/exit.png" alt="退出" class="button-icon" id="exitImage">
+                <!-- 退出图标 -->
             </button>
         </div>
         <!-- 联系人列表区域，增加收起按钮 -->
@@ -33,13 +36,29 @@
                 <p id="contactAccount"></p> <!-- 联系人账号信息 -->
             </div>
             <div class="messages" id="messages"></div> <!-- 消息展示区域 -->
+            <div class="tools" id="tools">
+                <input type="file" id="fileInput" style="display: none;">
+                <button id="fileButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/file.png" alt="文件" class="button-icon" id="fileImage">
+                    <!-- 文件图标 -->
+                </button>
+                <button id="emojiButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/emoji.png" alt="表情" class="button-icon" id="emojiImage">
+                    <!-- 文件图标 -->
+                </button>
+                <button id="keyboardButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/keyboard.png" alt="键盘" class="button-icon" id="keyboard">
+                    <!-- 文件图标 -->
+                </button>
+            </div> <!-- 功能工具区域 -->
             <div class="input-area" id="input-area"> <!-- 消息输入区域 -->
                 <textarea id="messageInput" placeholder="输入消息..." rows="5"></textarea> <!-- 多行输入框 -->
                 <button id="sendButton">发送</button> <!-- 发送按钮 -->
             </div>
         </div>
     </div>
-
+    <script src="../JS/SweetAlert2.js"></script>
+    <script src="../JS/AESCryptoClient.js"></script>
     <script src="../JS/welcome.js"></script> <!-- 引入外部 JavaScript 文件，包含页面的交互逻辑 -->
 </body>
 

@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;  // 导入@Autowi
 import java.util.*;
 import java.util.Map;  // 导入Map接口
 import java.util.List;  // 导入List接口
+import java.util.Base64;  //Base64 编码
+import java.io.File;  //文件读取
+import java.io.FileInputStream;  //文件流
 import java.util.Objects;  // 导入Objects类
 import java.util.HashMap;  // 导入HashMap类，用于存储会话和账号的映射
 import org.json.JSONObject; // 将字符串解析为JSON对象
@@ -23,12 +26,17 @@ import java.nio.charset.StandardCharsets; // 哈希校验
 
 import org.springframework.stereotype.Component;  // 导入@Component注解，标记为Spring组件
 
+import org.example.chat.tools.AESCryptoServer; // 导入密钥解析器
+
 @Component  // 标记该类为Spring组件
 public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextWebSocketHandler类
 
     @Autowired  // 自动注入UserRepository实例
     private UserRepository userRepository;  // 声明UserRepository类型的成员变量，用于数据库操作
+    @Autowired
     private AvatarRepository avatarRepository; // // 声明AvatarRepository类型的成员变量，用于数据库操作
+
+    private AESCryptoServer crypto = new AESCryptoServer(); //密钥解析器
 
     private static final String DELIMITER = "[b1565ef8ea49b3b3959db8c5487229ea]";  // 定义分隔符常量
     private static final Map<WebSocketSession, String> sessions = new HashMap<>();  // 存储会话和账号的映射
@@ -73,6 +81,7 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
                     // 收到最后一个块，组装完整消息
                     StringBuilder messageBuilder_fresh = messageChunks.get(messageId);
                     String fullMessage = messageBuilder_fresh.toString();
+                    fullMessage = crypto.decrypt(fullMessage);
                     // 计算消息的 SHA-256 哈希值
                     MessageDigest digest = MessageDigest.getInstance("SHA-256");
                     byte[] hash = digest.digest(fullMessage.getBytes(StandardCharsets.UTF_8));
@@ -109,6 +118,7 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
                         // 收到最后一个块，组装完整消息
                         StringBuilder messageBuilder_fresh = messageChunks.get(messageId);
                         String fullMessage = messageBuilder_fresh.toString();
+                        fullMessage = crypto.decrypt(fullMessage);
                         // 计算消息的 SHA-256 哈希值
                         MessageDigest digest = MessageDigest.getInstance("SHA-256");
                         byte[] hash = digest.digest(fullMessage.getBytes(StandardCharsets.UTF_8));
@@ -155,6 +165,7 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
     }
 
     public void sendMessage(WebSocketSession session, String message) throws Exception{
+        String encodeMessage = crypto.encrypt(message);
         System.out.println("待发送信息：" + message);  // 待发送信息
         int chunkSize = 1024;  // 定义每个块的大小
         int offset = 0;  // 初始化偏移量
@@ -164,16 +175,16 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         byte[] hash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
         String hashHex = DatatypeConverter.printHexBinary(hash).toLowerCase();
         // 循环拆分并发送消息块
-        while (offset < message.length()) {
+        while (offset < encodeMessage.length()) {
             // 提取消息的一部分作为块
-            String chunk = message.substring(offset, Math.min(offset + chunkSize, message.length()));
+            String chunk = encodeMessage.substring(offset, Math.min(offset + chunkSize, encodeMessage.length()));
             System.out.println("块：" + chunk);  // 待发送信息
             // 创建要发送的消息对象
             JSONObject chunkMessage = new JSONObject();
             chunkMessage.put("type", "chunk");  // 消息类型为块
             chunkMessage.put("messageId", messageId);  // 唯一的消息ID
             chunkMessage.put("chunkData", chunk);  // 块的内容
-            chunkMessage.put("isLastChunk", (offset + chunkSize) >= message.length());  // 是否为最后一个块
+            chunkMessage.put("isLastChunk", (offset + chunkSize) >= encodeMessage.length());  // 是否为最后一个块
             if (offset == 0) {
                 chunkMessage.put("sha256", hashHex);  // 在第一个块中附加哈希值
             }
@@ -187,11 +198,21 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         System.out.println("发送成功");  // 待发送信息
     }
 
+    // 获取文件扩展名
+    public static String getFileExtension(File file) {
+        String fileName = file.getName();
+        int lastIndexOf = fileName.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return "Unknown"; // 如果没有扩展名
+        }
+        return fileName.substring(lastIndexOf + 1);
+    }
+
     public void process(String fullMessage,WebSocketSession session) throws Exception{
         String[] blocks = fullMessage.split("\\[b1565ef8ea49b3b3959db8c5487229ea\\]");  // 使用特殊标记拆分字符串
         String command = blocks[0];  // 获取命令类型
 
-        if (Objects.equals(command, "login")) {  // 如果命令是"login"
+        if (Objects.equals(command, "login") || Objects.equals(command, "refresh")) {  // 如果命令是"login"
             String account = blocks[1];  // 获取账号信息
             sessions.put(session, account);  // 存储会话和账号的映射
             userSessions.put(account, session);  // 存储账号和会话的映射
@@ -213,7 +234,53 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
                 if (allUsersMessage.length() > 0) {
                     allUsersMessage.append(DELIMITER);  // 添加分隔符
                 }
-                allUsersMessage.append(u.getAccount()).append(DELIMITER).append(u.getUsername());  // 添加账号和用户名
+                String fileType = "null";
+                String base64Data = "null";
+                Avatar avatar = avatarRepository.findByAccount(u.getAccount());
+                if (avatar == null){
+                    String avatar_path = "SOURCEFILES/IMAGES/PNG/default_image.png";
+                    File file = new File(avatar_path);
+                    if (file.exists()) {
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        byte[] fileBytes = new byte[(int) file.length()];
+                        fileInputStream.read(fileBytes);
+                        fileInputStream.close();
+                        base64Data = Base64.getEncoder().encodeToString(fileBytes);
+                        System.out.println("Base64 :" + base64Data);  // 打印base64编码
+                        // 向客户端发送响应消息
+                        fileType = getFileExtension(file);
+                    }
+                }
+                else{
+                    String avatar_path = avatar.getAvatar_path();
+                    System.out.println("Current working directory: " + System.getProperty("user.dir"));
+                    File file = new File(avatar_path);
+                    if (file.exists()) {
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        byte[] fileBytes = new byte[(int) file.length()];
+                        fileInputStream.read(fileBytes);
+                        fileInputStream.close();
+                        base64Data = Base64.getEncoder().encodeToString(fileBytes);
+                        System.out.println("Base64 :" + base64Data);  // 打印base64编码
+                        // 向客户端发送响应消息
+                        fileType = getFileExtension(file);
+                    }
+                    else {
+                        avatar_path = "SOURCEFILES/IMAGES/PNG/default_image.png";
+                        file = new File(avatar_path);
+                        if (file.exists()) {
+                            FileInputStream fileInputStream = new FileInputStream(file);
+                            byte[] fileBytes = new byte[(int) file.length()];
+                            fileInputStream.read(fileBytes);
+                            fileInputStream.close();
+                            base64Data = Base64.getEncoder().encodeToString(fileBytes);
+                            System.out.println("Base64 :" + base64Data);  // 打印base64编码
+                            // 向客户端发送响应消息
+                            fileType = getFileExtension(file);
+                        }
+                    }
+                }
+                allUsersMessage.append(u.getAccount()).append(DELIMITER).append(u.getUsername()).append(DELIMITER).append(fileType).append(DELIMITER).append(base64Data);  // 添加账号和用户名
             }
 
             // 发送所有用户账号和用户名
@@ -222,6 +289,68 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             }
 
             //发送头像
+            Avatar avatar = avatarRepository.findByAccount(account);
+            if (avatar == null){ //用户未存储头像
+                System.out.println("未存储头像");  // 打印base64编码
+                System.out.println("Current working directory: " + System.getProperty("user.dir"));
+                String avatar_path = "SOURCEFILES/IMAGES/PNG/default_image.png";
+                File file = new File(avatar_path);
+                if (file.exists()){
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    byte[] fileBytes = new byte[(int) file.length()];
+                    fileInputStream.read(fileBytes);
+                    fileInputStream.close();
+                    String base64Data = Base64.getEncoder().encodeToString(fileBytes);
+                    System.out.println("Base64 :" + base64Data);  // 打印base64编码
+                    // 向客户端发送响应消息
+                    String fileType = getFileExtension(file);
+                    System.out.println("File type is: " + fileType);
+                    String[] messages_tmp = { "myAvatar", fileType ,base64Data};  // 构建响应消息数组
+                    String multiLineMessage_tmp = String.join(DELIMITER, messages_tmp);  // 使用特殊标记拼接消息
+                    sendMessage(session,multiLineMessage_tmp); // 发送登录成功消息给客户
+                }
+            }
+            else {
+                System.out.println("已存储头像");  // 打印base64编码
+                String avatar_path = avatar.getAvatar_path();
+                System.out.println("Current working directory: " + System.getProperty("user.dir"));
+                File file = new File(avatar_path);
+                if (file.exists()){
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    byte[] fileBytes = new byte[(int) file.length()];
+                    fileInputStream.read(fileBytes);
+                    fileInputStream.close();
+                    String base64Data = Base64.getEncoder().encodeToString(fileBytes);
+                    System.out.println("Base64 :" + base64Data);  // 打印base64编码
+                    // 向客户端发送响应消息
+                    String fileType = getFileExtension(file);
+                    System.out.println("File type is: " + fileType);
+                    String[] messages_tmp = { "myAvatar", fileType ,base64Data};  // 构建响应消息数组
+                    String multiLineMessage_tmp = String.join(DELIMITER, messages_tmp);  // 使用特殊标记拼接消息
+                    sendMessage(session,multiLineMessage_tmp); // 发送登录成功消息给客户
+                }
+                else
+                {
+                    avatar_path = "SOURCEFILES/IMAGES/PNG/default_image.png";
+                    file = new File(avatar_path);
+                    if(file.exists()){
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        byte[] fileBytes = new byte[(int) file.length()];
+                        fileInputStream.read(fileBytes);
+                        fileInputStream.close();
+                        String base64Data = Base64.getEncoder().encodeToString(fileBytes);
+                        System.out.println("Base64 :" + base64Data);  // 打印base64编码
+                        // 向客户端发送响应消息
+                        String fileType = getFileExtension(file);
+                        System.out.println("File type is: " + fileType);
+                        String[] messages_tmp = { "myAvatar", fileType ,base64Data};  // 构建响应消息数组
+                        String multiLineMessage_tmp = String.join(DELIMITER, messages_tmp);  // 使用特殊标记拼接消息
+                        sendMessage(session,multiLineMessage_tmp); // 发送登录成功消息给客户
+                    }
+
+                }
+            }
+
         } else if (Objects.equals(command, "sendMessage")) {  // 如果命令是"sendMessage"
             String senderAccount = blocks[1];  // 获取发送者账号
             String receiverAccount = blocks[2];  // 获取接收者账号
