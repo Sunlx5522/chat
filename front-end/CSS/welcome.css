@@ -141,14 +141,20 @@ body {
     background: rgba(255, 255, 255, 0.5); /* 悬停时背景变为浅灰色 */
 }
 
-
-/* 聊天区域样式 */
-.chat-area {
+.container2 {
     flex: 1; /* 占据剩余空间 */
     display: flex; /* 使用弹性盒布局 */
-    flex-direction: column; /* 子元素垂直排列 */
+}
+
+/* 聊天区域样式 */
+.chat-area,
+#userInfo,.passwordArea {
+    flex: 1; /* 占据剩余空间 */
+   
+    display: flex; /* 使用弹性盒布局 */
+    flex-direction: column; /*子元素垂直排列*/ 
     padding: 10px; /* 内边距为10px */
-    border-radius: 10px; /* 边框圆角为10px */
+    border-radius: 10px; /* 边框圆角 */
 }
 
 /* 聊天头部样式 */
@@ -361,9 +367,27 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 添加轻微阴影效果 */
 }
 
-.user-info {
-    display: flex;
-    flex-direction: column;
+.user-info2,.passwordArea {
+    background: rgba(255, 255, 255, 0.1); /* 设置半透明白色背景 */
+    border-radius: 10px; /* 圆角边框 */
+    padding: 15px; /* 内边距 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    margin-top: 15px; /* 顶部外边距 */
+    display: flex; /* 使用弹性盒布局 */
+    flex-direction: row; /* 水平排列子元素 */
+    font-size: 14px; /* 字体大小 */
+    color: #333; /* 文本颜色 */
+}
+
+#changesForm, #changePasswordForm {
+    flex-direction: column; /* 竖直排列子元素 */
+
+    /* 设置长宽高 */
+    width: 50%;
+    height: 80%;
+    padding: 10px;
+    border-radius: 10px;
+    
 }
 
 .user-name {
@@ -399,11 +423,108 @@ body {
     justify-content: center;
 }
 
+.user-info2,.passwordArea h3 {
+    margin-bottom: 10px; /* 底部外边距 */
+    font-size: 18px; /* 标题字体大小 */
+    color: #007bff; /* 标题颜色 */
+}
+
+/* 用户信息段落样式 */
+.user-info2 p {
+    margin: 5px 0; /* 上下外边距 */
+    /* 设置段落颜色为黑色 */
+    color: #000;
+}
+
 /* 消息图片的样式 */
 .message-image {
     max-width: 200px; /* 根据需要调整 */
     border-radius: 5px;
 }
+
+/*修改信息输入框*/
+#userEmailInput,#userPhoneInput,#userNicknameInput{
+    
+    padding: 12px 15px; /* 输入框内边距 */
+    margin-top: 8px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 输入框圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #ffffff; /* 设置字体颜色 */
+    font-size: 16px; /* 字体大小 */
+    outline: none; /* 删除聚焦时的轮廓 */
+}
+
+/* 定义输入框的样式 */
+input {
+    width: 80%; /* 输入框宽度为 */
+    padding: 12px 15px; /* 输入框内边距 */
+    margin-top: 8px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 输入框圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #ffffff; /* 设置字体颜色 */
+    font-size: 16px; /* 字体大小 */
+    outline: none; /* 删除聚焦时的轮廓 */
+}
+
+/* 输入框容器样式，包含图标和输入框 */
+.input-container {
+    display: flex; /* 启用弹性盒布局 */
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 15px; /* 下边距 */
+    flex-direction: row; /* 水平排列子元素 */
+}
+
+/* 输入框前图标的样式 */
+.input-container img {
+    margin-right: 10px; /* 右边距 */
+    width: 40px; /* 图标宽度 */
+    height: 40px; /* 图标高度 */
+}
+
+#changesSubmitButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 鼠标悬停时背景色 */
+}
+
+
+/* 按钮的样式 */
+#changesSubmitButton {
+    width: 15%; /* 按钮宽度为20% */
+    height: 9%;
+    padding: 6px 7px; /* 按钮内边距 */
+    margin-top: 15px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 按钮圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #8060E5; /* 设置字体颜色 */
+    font-size: 25px; /* 字体大小 */
+    cursor: pointer; /* 设置鼠标指针样式 */
+    transition: 0.5s ease; /* 设置过渡效果 */
+    position: absolute; /* 设置绝对定位 */
+    bottom: 45%; /* 底部定位 */
+    left: 30%; /* zuo侧定位 */
+    font-weight: bold; /* 字体加粗 */
+}
+
+#changesPasswordButton{
+    width: 15%; /* 按钮宽度为20% */
+    height: 9%;
+    padding: 6px 7px; /* 按钮内边距 */
+    margin-top: 15px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 按钮圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #8060E5; /* 设置字体颜色 */
+    font-size: 25px; /* 字体大小 */
+    cursor: pointer; /* 设置鼠标指针样式 */
+    transition: 0.5s ease; /* 设置过渡效果 */
+    position: absolute; /* 设置绝对定位 */
+    bottom: 45%; /* 底部定位 */
+    left: 30%; /* zuo侧定位 */
+    font-weight: bold; /* 字体加粗 */
+}
+
 
 /* 为整个网页和常见的交互元素设置相同的鼠标指针 */
 * {

@@ -20,7 +20,8 @@
                     <a href="#" id="feature2">添加好友</a> <!-- 功能链接 2 -->
                     <a href="#" id="feature3">好友请求</a> <!-- 功能链接 3 -->
                     <a href="#" id="feature4">拉伸列表</a> <!-- 功能链接 4 -->
-                    <a href="#" id="feature5">刷新页面</a> <!-- 功能链接 4 -->
+                    <a href="#" id="feature5">密码修改</a> <!-- 功能链接 5 -->
+                    <a href="#" id="feature6">刷新页面</a> <!-- 功能链接 6 -->
                 </div>
             </div>
             <button id="exitButton"> <!-- 退出按钮 -->
@@ -30,6 +31,7 @@
         </div>
         <!-- 联系人列表区域，增加收起按钮 -->
         <div class="contact-list" id="contactList"></div>
+        <div class="container2">
         <div class="chat-area"> <!-- 聊天区域 -->
             <div class="chat-header" id="chatHeader"> <!-- 聊天头部区域 -->
                 <h2 id="contactName"></h2> <!-- 联系人名称 -->
@@ -56,7 +58,59 @@
                 <button id="sendButton">发送</button> <!-- 发送按钮 -->
             </div>
         </div>
+        <div class="user-info2" id="userInfo" style="display: none;">
+                
+            <form id="changesForm" action="http://localhost:8080/api/updateInfo" method="post"> <!-- 创建表单，ID 为 loginForm，提交地址为 /api/updateInfo，使用 POST 方法 -->
+            <h3>用户信息</h3>
+            <p>帐号: <span id="userAccount"></span></p>
+            <div class="input-container"> <!-- 邮箱输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/email.png" alt="邮箱图标"> 
+                <input type="text" id="userEmail" name="userEmail" placeholder="输入新邮箱" required> 
+            </div>
+    
+            <div class="input-container"> <!-- 电话按钮的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/phoneNumber.png" alt="电话图标"> <!-- 显示电话图标 -->
+                <input type="text" id="userPhoneInput"  name="userPhoneInput" placeholder="输入新电话" required> 
+            </div>
+
+            <div class="input-container"> <!-- 昵称输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/user.png" alt="昵称图标"> 
+                <input type="text" id="userNicknameInput" name="userNicknameInput" placeholder="输入新昵称" required> 
+            </div>
+    
+            <div class="input-container"> <!-- 提交的容器 -->
+                <button type="submit" id="changesSubmitButton" class="changesSubmitButton">提交</button> <!-- 按钮：提交修改 -->
+            </div>
+
+            </form> 
+          
+        </div>
+        <div class="passwordArea" style="display: none;">
+            <form id="changePasswordForm" action="http://localhost:8080/api/updatePassword" method="post">
+
+                <h3>&nbsp;修改密码</h3>
+                <p id="useless"> <span></span></p>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="oldPassword" name="userPassword" placeholder="输入密码" required> <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="newPassword" name="userPassword" placeholder="输入新密码" required> <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="newPassword_confirm" name="newPassword_confirm" placeholder="确认新密码" required> <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <button type="submit" id="changesPasswordButton" class="changespasswordButton">提交</button> <!-- 按钮：提交修改 -->
+                </div>
+
+            </form>
+        </div>
     </div>
+    </div>
+
     <script src="../JS/SweetAlert2.js"></script>
     <script src="../JS/AESCryptoClient.js"></script>
     <script src="../JS/welcome.js"></script> <!-- 引入外部 JavaScript 文件，包含页面的交互逻辑 -->

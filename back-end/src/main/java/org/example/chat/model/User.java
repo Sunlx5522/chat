@@ -86,4 +86,12 @@ public class User {  // 定义一个公有的类User，表示用户实体。
         this.isonline = isonline;  // 将传入的在线状态赋值给isonline字段。
     }
 
+
+    public void setName(String newName) {
+        this.username = newName;
+    }
+
+    public void setPhoneNumber(String newPhone) {
+        this.telephone = newPhone;
+    }
 }

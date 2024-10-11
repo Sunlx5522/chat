@@ -14,6 +14,12 @@ const messageHashes = {}; // 存储消息哈希值
 
 const timers = {}; // 存储每个消息ID的定时器
 
+// 保存用户信息到本地
+let userAccount="Id";
+let userEmail="Email";
+let userPhone="Phone";
+let userNickname="Nickname";
+
 // 打开或创建数据库
 let db;
 let request = window.indexedDB.open(account + "db", 1);
@@ -200,6 +206,13 @@ function process(fullMessage) {
         const receiverUsername = blocks[2];  // 获取接收方昵称
         const receiverEmail = blocks[3];  // 获取接收方邮箱
         const receiverTelephone = blocks[4];  // 获取接收方电话
+        // 保存用户信息到本地
+        userAccount=receiverAccount;
+        
+        userEmail=receiverEmail;
+        userPhone=receiverTelephone;
+        userNickname=receiverUsername;
+
         var title = "欢迎回来：" + receiverAccount;
         var text = "昵称：" + receiverUsername + "<br>" + "电子邮箱：" + receiverEmail + "<br>" + "电话号码：" + receiverTelephone;
         Swal.fire({
@@ -708,7 +721,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 处理下拉菜单项的点击事件
     document.getElementById("feature1").addEventListener("click", function () {
-        //alert("功能 1 被点击");  // 使用其他逻辑替换
+        // 隐藏聊天区域
+        const chatArea = document.querySelector(".chat-area");  // 获取聊天区域
+        const userInfo = document.getElementById("userInfo");
+        const passwordArea = document.querySelector(".passwordArea");
+        // 判断聊天区域是否显示
+        if (userInfo.style.display === "none") {
+
+            // 隐藏修改密码区域
+            passwordArea.style.display = "none";  
+            // 隐藏聊天区域
+            chatArea.style.display = "none";
+            // 显示用户信息区域
+            userInfo.style.display = "flex";
+            // 填充用户信息
+            document.getElementById("userAccount").innerText = userAccount;
+            //document.getElementById("userPassword").innerText = userPassword;
+            document.getElementById("userEmail").value = userEmail;
+            document.getElementById("userPhoneInput").value = userPhone;
+            document.getElementById("userNicknameInput").value = userNickname;
+            
+        } else {
+            
+            // 如果聊天区域已经隐藏，可以选择执行其他操作或切换回来
+            chatArea.style.display = "flex";  // 显示聊天区域
+            userInfo.style.display = "none"; // 隐藏用户信息区域
+            passwordArea.style.display = "none";  // 隐藏修改密码区域
+
+        }
+
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
 
@@ -726,6 +767,32 @@ document.addEventListener("DOMContentLoaded", function () {
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
     document.getElementById("feature5").addEventListener("click", function () {
+
+        const chatArea = document.querySelector(".chat-area");  // 获取聊天区域
+        const userInfo = document.getElementById("userInfo");
+        const passwordArea = document.querySelector(".passwordArea");
+        console.log("点击修改密码按钮");  // 打印信息
+        // 判断聊天区域和用户信息区域是否显示,
+        if (passwordArea.style.display === "none") {
+            // 隐藏聊天区域
+            chatArea.style.display = "none";
+            // 显示用户信息区域
+            userInfo.style.display = "none";
+            // 显示修改密码区域
+            passwordArea.style.display = "flex";
+        } else {
+            // 如果聊天区域和用户信息区域已经隐藏，可以选择执行其他操作或切换回来
+            chatArea.style.display = "flex";  // 显示聊天区域
+            userInfo.style.display = "none"; // 隐藏用户信息区域
+            passwordArea.style.display = "none";  // 隐藏修改密码区域
+        }
+
+
+
+        dropdownContent.classList.toggle("show");  // 切换显示状态的类
+    });
+
+    document.getElementById("feature6").addEventListener("click", function () {
         // 发送初始消息到服务器
         document.getElementById("input-area").style.visibility = "hidden";  // 隐藏输入区域
         document.getElementById("tools").style.visibility = "hidden";  // 隐藏工具区域
@@ -742,4 +809,91 @@ document.addEventListener("DOMContentLoaded", function () {
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
 });
+
+
+
+document.getElementById('changesForm').addEventListener('submit', function (event) {
+    event.preventDefault();  // 阻止表单的默认提交行为，防止页面刷新或跳转
+
+    const userId = userAccount;                                                                                                          
+    const newName = document.getElementById('userNicknameInput').value;  // 获取新用户名输入框中的值
+    const newEmail = document.getElementById('userEmail').value;  // 获取新邮箱输入框中的值
+    const newPhoneNumber = document.getElementById('userPhoneInput').value;  // 获取新电话号码输入框中的值
+
+   console.log("用户ID:" + userId + "新用户名:" + newName + "新邮箱:" + newEmail + "新电话号码:" + newPhoneNumber);  // 打印用户信息
+    // 构建要发送的请求数据对象
+    const data = {
+        userId: userId,  // 用户ID字段
+        newName: newName,   // 新用户名字段
+        newEmail: newEmail,  // 新邮箱字段
+        newPhoneNumber: newPhoneNumber  // 新电话号码字段
+    };
+
+    // 使用 Fetch API 向服务器发送异步请求
+    fetch('http://localhost:8080/api/updateInfo',{  // 注册接口的完整 URL
+        method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
+        headers: {
+            'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON
+        },
+        body: JSON.stringify(data)  // 将 JavaScript 对象转换为 JSON 字符串，作为请求体发送
+    })
+    .then(response => response.text())  // 将服务器返回的响应转换为文本格式
+    .then(result => {
+
+        alert(result);  // 弹出提示框，显示服务器返回的注册信息
+
+    })
+    .catch(error => {
+        console.error('Error:', error);  // 在控制台输出错误信息，便于调试
+        alert('网络超时，请重试。');  // 弹出提示框，告知用户网络超时
+    });
+});
+
+
+
+
+document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+    event.preventDefault();  // 阻止表单的默认提交行为，防止页面刷新或跳转
+
+    const id= userAccount;  // 获取用户ID                                                                                                   
+    const oldpassword = document.getElementById('oldPassword').value;  // 获取旧密码输入框中的值
+    const newPassword = document.getElementById('newPassword').value;  // 获取新密码输入框中的值
+    const newPassword_confirm = document.getElementById('newPassword_confirm').value;  // 获取确认新密码输入框中的值
+
+    if(newPassword != newPassword_confirm) {  // 检查两次输入的密码是否一致
+        alert('两次输入密码不一致。');  // 如果不一致，弹出提示框
+        return;  // 阻止表单提交
+    }
+
+    const data = {
+        id: userAccount,  // 用户ID字段
+        oldPassword: oldpassword,  // 旧密码字段
+        newPassword: newPassword,  // 新密码字段
+        newPassword_confirm: newPassword_confirm  // 确认新密码字段
+    };
+
+    
+
+    // 使用 Fetch API 向服务器发送异步请求
+    fetch('http://localhost:8080/api/updatePassword',{  // 注册接口的完整 URL
+        method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
+        headers: {
+            'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON
+        },
+        body: JSON.stringify(data)  // 将 JavaScript 对象转换为 JSON 字符串，作为请求体发送
+    })
+    .then(response => response.text())  // 将服务器返回的响应转换为文本格式
+    .then(result => {
+
+        alert(result);  // 弹出提示框，显示服务器返回的注册信息
+
+    })
+    .catch(error => {
+        console.error('Error:', error);  // 在控制台输出错误信息，便于调试
+        alert('网络超时，请重试。');  // 弹出提示框，告知用户网络超时
+    });
+});
+
+
+
 
