@@ -25,6 +25,39 @@ body {
     height: 30px; /* 图标高度为30px */
 }
 
+#fileButton {
+    background: transparent; /* 背景透明 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+}
+
+#fileButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+}
+
+#keyboardButton {
+    background: transparent; /* 背景透明 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+}
+
+#keyboardButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+}
+
+#emojiButton {
+    background: transparent; /* 背景透明 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+}
+
+#emojiButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+}
+
 /* 菜单按钮样式 */
 #menuButton {
     display: flex; /* 使用弹性盒布局 */
@@ -33,7 +66,6 @@ body {
     padding: 10px; /* 内边距为10px */
     border: none; /* 无边框 */
     background: transparent; /* 背景透明 */
-    cursor: pointer; /* 鼠标悬停时显示指针 */
     transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
 }
 
@@ -51,7 +83,6 @@ body {
     padding: 10px; /* 内边距为10px */
     border: none; /* 无边框 */
     background: transparent; /* 背景透明 */
-    cursor: pointer; /* 鼠标悬停时显示指针 */
     transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
 }
 
@@ -78,6 +109,7 @@ body {
     padding: 10px; /* 内边距为10px */
     overflow-y: auto; /* 内容过多时允许滚动 */
     transition: width 0.3s ease, padding 0.3s ease; /* 平滑过渡效果，包含宽度和内边距的变化 */
+    will-change: transform;
 }
 
 /* 隐藏后的效果：完全收起（包含滚动条） */
@@ -133,6 +165,8 @@ body {
     background: rgba(255, 255, 255, 0.1); /* 设置半透明白色背景 */
     padding: 10px; /* 内边距为10px */
     overflow-y: auto; /* 内容过多时允许滚动 */
+    position: relative;
+    will-change: transform;
 }
 
 /* 自定义滚动条的整体样式 */
@@ -160,12 +194,16 @@ body {
 .message-left {
     display: flex; /* 使用弹性盒布局 */
     justify-content: flex-start; /* 消息靠左对齐 */
+    align-items: flex-start; /* 垂直居中对齐 */
+    margin-bottom: 10px; /* 消息之间的下边距 */
 }
 
 /* 右侧消息样式 */
 .message-right {
     display: flex; /* 使用弹性盒布局 */
     justify-content: flex-end; /* 消息靠右对齐 */
+    align-items: flex-start; /* 垂直居中对齐 */
+    margin-bottom: 10px; /* 消息之间的下边距 */
 }
 
 /* 下拉菜单容器样式 */
@@ -215,7 +253,6 @@ body {
 
 /* 联系人项样式 */
 .contact-item {
-    cursor: pointer; /* 鼠标悬停时显示指针 */
     padding: 5px; /* 内边距为5px */
     backdrop-filter: blur(10px); /* 背景模糊效果 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 轻微阴影效果 */
@@ -224,6 +261,8 @@ body {
     line-height: 1.5; /* 行高为1.5 */
     word-wrap: break-word; /* 文本自动换行 */
     margin-bottom: 10px; /* 下边距为10px */
+    display: flex;
+    align-items: center;
 }
 
 /* 联系人项悬停效果 */
@@ -251,6 +290,16 @@ body {
     word-wrap: break-word; /* 文本自动换行 */
     margin-bottom: 10px; /* 下边距为10px */
 }
+
+.tools {
+    background: rgba(255, 255, 255, 0.2); /* 设置背景色 */
+    padding: 10px; /* 内边距 */
+    display: flex; /* 使用弹性盒布局 */
+    align-items: center; /* 垂直居中 */
+    justify-content: flex-start; /* 水平排列在起始位置 */
+    margin-bottom: 10px; /* 与输入区域的间距 */
+}
+
 
 .input-area {
     position: relative;
@@ -297,10 +346,87 @@ body {
     color: #fff;
     border: none;
     border-radius: 10px;
-    cursor: pointer;
     transition: background-color 0.3s;
 }
 
 #sendButton:hover {
     background-color: #0056b3;
 }
+
+.avatar {
+    width: 40px; /* 设置头像的宽度 */
+    height: 40px; /* 设置头像的高度 */
+    border-radius: 50%; /* 使头像变为圆形 */
+    margin-right: 10px; /* 头像与消息之间的间距 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 添加轻微阴影效果 */
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.user-account {
+    color: #333;  /* 让账号信息的颜色淡一点 */
+}
+
+/* 头像容器样式 */
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* 红点样式 */
+.red-dot {
+    position: absolute;
+    top: -5px; /* 根据需要调整位置 */
+    right: -5px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 消息图片的样式 */
+.message-image {
+    max-width: 200px; /* 根据需要调整 */
+    border-radius: 5px;
+}
+
+/* 为整个网页和常见的交互元素设置相同的鼠标指针 */
+* {
+    cursor: url('../SOURCEFILE/MOUSE/Zhand.cur'), auto !important;
+  }
+  
+  /* 为不同状态下的元素（如输入框和按钮）也统一设置 */
+  input, textarea, button, a, select ,img{
+    cursor: url('../SOURCEFILE/MOUSE/Zmidfinger.cur'), auto !important;
+  }
+  
+  /* 针对元素的悬停状态 */
+  input:hover, textarea:hover, button:hover, a:hover ,img:hover{
+    cursor: url('../SOURCEFILE/MOUSE/Zlink.cur'), auto !important;
+  }
+  
+  /* 针对元素的激活状态 */
+  input:active, textarea:active, button:active, a:active {
+    cursor: url('../SOURCEFILE/MOUSE/Zmidfinger.cur'), auto !important;
+  }
+  
+  /* 针对输入框的聚焦状态 */
+  input:focus, textarea:focus {
+    cursor: url('../SOURCEFILE/MOUSE/ZdotNS.cur'), auto !important;
+  }
+  

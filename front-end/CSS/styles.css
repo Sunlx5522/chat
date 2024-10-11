@@ -1,13 +1,18 @@
 /* 设置页面的整体布局和样式 */
 body {
+    position: relative;
     margin: 0; /* 删除外边距 */
     padding: 0; /* 删除内边距 */
     font-family: '微软雅黑', 'Helvetica Neue', sans-serif; /* 设置字体 */
     background: linear-gradient(135deg, #1e90ff, #ff69b4); /* 设置背景渐变 */
     height: 100vh; /* 设置高度为视口的100% */
-    display: flex; /* 启用弹性盒布局 */
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
+}
+
+.container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* 定义登录表单的样式 */
@@ -89,7 +94,6 @@ input::placeholder {
     color: #8060E5; /* 设置字体颜色 */
     font-weight: bold; /* 字体加粗 */
     font-size: 18px; /* 字体大小 */
-    cursor: pointer; /* 设置鼠标指针样式 */
     transition: 0.5s ease; /* 设置过渡效果 */
 }
 
@@ -108,7 +112,6 @@ input::placeholder {
     background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
     color: #8060E5; /* 设置字体颜色 */
     font-size: 12px; /* 字体大小 */
-    cursor: pointer; /* 设置鼠标指针样式 */
     transition: 0.5s ease; /* 设置过渡效果 */
     position: absolute; /* 设置绝对定位 */
     bottom: 5%; /* 底部定位 */
@@ -131,7 +134,6 @@ input::placeholder {
     background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
     color: #8060E5; /* 设置字体颜色 */
     font-size: 12px; /* 字体大小 */
-    cursor: pointer; /* 设置鼠标指针样式 */
     transition: 0.5s ease; /* 设置过渡效果 */
     position: absolute; /* 设置绝对定位 */
     bottom: 5%; /* 底部定位 */
@@ -151,3 +153,29 @@ input::placeholder {
         padding: 30px 20px; /* 调整内边距 */
     }
 }
+
+/* 为整个网页和常见的交互元素设置相同的鼠标指针 */
+* {
+    cursor: url('../SOURCEFILE/MOUSE/Zhand.cur'), auto !important;
+  }
+  
+  /* 为不同状态下的元素（如输入框和按钮）也统一设置 */
+  input, textarea, button, a, select ,img{
+    cursor: url('../SOURCEFILE/MOUSE/Zmidfinger.cur'), auto !important;
+  }
+  
+  /* 针对元素的悬停状态 */
+  input:hover, textarea:hover, button:hover, a:hover ,img:hover{
+    cursor: url('../SOURCEFILE/MOUSE/Zlink.cur'), auto !important;
+  }
+  
+  /* 针对元素的激活状态 */
+  input:active, textarea:active, button:active, a:active {
+    cursor: url('../SOURCEFILE/MOUSE/Zmidfinger.cur'), auto !important;
+  }
+  
+  /* 针对输入框的聚焦状态 */
+  input:focus, textarea:focus {
+    cursor: url('../SOURCEFILE/MOUSE/ZdotNS.cur'), auto !important;
+  }
+  

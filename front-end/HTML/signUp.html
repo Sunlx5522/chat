@@ -9,43 +9,47 @@
 </head>
 
 <body>
-    <form id="signUpForm" action="http://localhost:8080/api/signUp" method="post"> <!-- 创建表单，ID 为 signUpForm，提交地址为 /api/signUp，使用 POST 方法 -->
-        <img src="../SOURCEFILE/IMAGES/signUp/signUp.png" alt="欢迎注册" id="signUp-image"> <!-- 加载注册欢迎图像 -->
-        <div class="input-container"> <!-- 用户名输入框的容器 -->
-            <img src="../SOURCEFILE/IMAGES/signUp/user.png" alt="用户名图标"> <!-- 显示用户名图标 -->
-            <input type="text" id="username" name="username" placeholder="请输入用户名" required> <!-- 输入框：用户名 -->
-        </div>
-
-        <div class="input-container"> <!-- 密码输入框的容器 -->
-            <img src="../SOURCEFILE/IMAGES/signUp/password.png" alt="密码图标"> <!-- 显示密码图标 -->
-            <input type="password" id="signUpPassword" name="signUpPassword" placeholder="请输入密码" required> <!-- 输入框：密码 -->
-        </div>
-
-        <div class="input-container"> <!-- 确认密码输入框的容器 -->
-            <img src="../SOURCEFILE/IMAGES/signUp/passwordConfirm.png" alt="密码确认图标"> <!-- 显示密码确认图标 -->
-            <input type="password" id="signUpPassword_confirm" name="signUpPassword_confirm" placeholder="请确认密码" required> <!-- 输入框：确认密码 -->
-        </div>
-
-        <div class="input-container"> <!-- 电子邮箱输入框的容器 -->
-            <img src="../SOURCEFILE/IMAGES/signUp/email.png" alt="电子邮箱图标"> <!-- 显示电子邮箱图标 -->
-            <input type="text" id="email" name="email" placeholder="请输入电子邮箱" required> <!-- 输入框：电子邮箱 -->
-        </div>
-
-        <div class="input-container"> <!-- 电话号码输入框的容器 -->
-            <img src="../SOURCEFILE/IMAGES/signUp/phoneNumber.png" alt="电话号码图标"> <!-- 显示电话号码图标 -->
-            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="请输入电话号码" required> <!-- 输入框：电话号码 -->
-        </div>
-
-        <div class="input-container"> <!-- 注册提交按钮的容器 -->
-            <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="注册图标"> <!-- 显示注册图标 -->
-            <button type="submit" id="submitButton" class="submitButton">注册</button> <!-- 提交表单的注册按钮 -->
-        </div>
-
-        <div class="input-container"> <!-- 返回按钮的容器 -->
-            <button type="button" id="returnBackButton" class="returnBackButton">返回</button> <!-- 按钮：返回 -->
-        </div>
-
-    </form>
+    <div class="container">
+        <form id="signUpForm" action="http://localhost:8080/api/signUp" method="post"> <!-- 创建表单，ID 为 signUpForm，提交地址为 /api/signUp，使用 POST 方法 -->
+            <img src="../SOURCEFILE/IMAGES/signUp/signUp.png" alt="欢迎注册" id="signUp-image"> <!-- 加载注册欢迎图像 -->
+            <div class="input-container"> <!-- 用户名输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/user.png" alt="用户名图标"> <!-- 显示用户名图标 -->
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required> <!-- 输入框：用户名 -->
+            </div>
+    
+            <div class="input-container"> <!-- 密码输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                <input type="password" id="signUpPassword" name="signUpPassword" placeholder="请输入密码" required> <!-- 输入框：密码 -->
+            </div>
+    
+            <div class="input-container"> <!-- 确认密码输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/passwordConfirm.png" alt="密码确认图标"> <!-- 显示密码确认图标 -->
+                <input type="password" id="signUpPassword_confirm" name="signUpPassword_confirm" placeholder="请确认密码" required> <!-- 输入框：确认密码 -->
+            </div>
+    
+            <div class="input-container"> <!-- 电子邮箱输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/email.png" alt="电子邮箱图标"> <!-- 显示电子邮箱图标 -->
+                <input type="text" id="email" name="email" placeholder="请输入电子邮箱" required> <!-- 输入框：电子邮箱 -->
+            </div>
+    
+            <div class="input-container"> <!-- 电话号码输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/phoneNumber.png" alt="电话号码图标"> <!-- 显示电话号码图标 -->
+                <input type="text" id="phoneNumber" name="phoneNumber" placeholder="请输入电话号码" required> <!-- 输入框：电话号码 -->
+            </div>
+    
+            <div class="input-container"> <!-- 注册提交按钮的容器 -->
+                <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="注册图标"> <!-- 显示注册图标 -->
+                <button type="submit" id="submitButton" class="submitButton">注册</button> <!-- 提交表单的注册按钮 -->
+            </div>
+    
+            <div class="input-container"> <!-- 返回按钮的容器 -->
+                <button type="button" id="returnBackButton" class="returnBackButton">返回</button> <!-- 按钮：返回 -->
+            </div>
+    
+        </form>
+    </div>
+    
+    <script src="../JS/SweetAlert2.js"></script>
     <script src="../JS/signUp.js"></script> <!-- 引入外部 JavaScript 文件，包含页面的交互逻辑 -->
 </body>
 
