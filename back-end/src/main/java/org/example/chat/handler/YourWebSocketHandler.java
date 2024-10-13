@@ -1,32 +1,27 @@
 package org.example.chat.handler;  // 定义类所在的包
 
-import org.springframework.web.socket.TextMessage;  // 导入TextMessage类
-import org.springframework.web.socket.CloseStatus;  // 导入CloseStatus类，用于处理连接关闭状态
-import org.springframework.web.socket.WebSocketSession;  // 导入WebSocketSession类
-import org.springframework.web.socket.handler.TextWebSocketHandler;  // 导入TextWebSocketHandler类
+import org.example.chat.model.Avatar;
+import org.example.chat.model.User;
+import org.example.chat.model.Message;
+import org.example.chat.repository.AvatarRepository;
+import org.example.chat.repository.MessageRepository;
+import org.example.chat.repository.UserRepository;
+import org.example.chat.tools.AESCryptoServer;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import org.example.chat.model.User;  // 导入自定义的User实体类，映射数据库中的用户表
-import org.example.chat.model.Avatar; // 导入自定义的Avatar实体类，映射数据库中的头像路径
-import org.example.chat.repository.UserRepository;  // 导入自定义的UserRepository接口，用于与数据库进行交互操作
-import org.example.chat.repository.AvatarRepository; // 导入自定义的AvatarRepository接口，用于与数据库进行交互操作
-import org.springframework.beans.factory.annotation.Autowired;  // 导入@Autowired注解，用于依赖注入
-
+import javax.xml.bind.DatatypeConverter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.*;
-import java.util.Map;  // 导入Map接口
-import java.util.List;  // 导入List接口
-import java.util.Base64;  //Base64 编码
-import java.io.File;  //文件读取
-import java.io.FileInputStream;  //文件流
-import java.util.Objects;  // 导入Objects类
-import java.util.HashMap;  // 导入HashMap类，用于存储会话和账号的映射
-import org.json.JSONObject; // 将字符串解析为JSON对象
-import java.security.MessageDigest; // 哈希校验
-import javax.xml.bind.DatatypeConverter; // 哈希校验
-import java.nio.charset.StandardCharsets; // 哈希校验
 
-import org.springframework.stereotype.Component;  // 导入@Component注解，标记为Spring组件
-
-import org.example.chat.tools.AESCryptoServer; // 导入密钥解析器
 
 @Component  // 标记该类为Spring组件
 public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextWebSocketHandler类
@@ -35,6 +30,8 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
     private UserRepository userRepository;  // 声明UserRepository类型的成员变量，用于数据库操作
     @Autowired
     private AvatarRepository avatarRepository; // // 声明AvatarRepository类型的成员变量，用于数据库操作
+    @Autowired
+    private MessageRepository messageRepository; //  声明MessageRepository类型的成员变量，用于数据库操作
 
     private AESCryptoServer crypto = new AESCryptoServer(); //密钥解析器
 
@@ -350,6 +347,10 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
 
                 }
             }
+            //去根据账号从数据库里面找到待发送的信息 传回给用户 2
+            // 处理用户上线时，发送未读消息
+            handleUserOnline(account);
+
 
         } else if (Objects.equals(command, "sendMessage")) {  // 如果命令是"sendMessage"
             String senderAccount = blocks[1];  // 获取发送者账号
@@ -361,6 +362,9 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             WebSocketSession receiverSession = userSessions.get(receiverAccount);  // 获取接收者的会话
             if (receiverSession == null) {
                 System.out.println("not online");  // 如果接收者不在线
+                //未发送成功的信息存在数据库的 xxx表里 1
+                saveMessageToDatabase(senderAccount, receiverAccount, messageContent);
+
             } else {
                 String messageToSend = "messageFrom" + DELIMITER + senderAccount + DELIMITER + messageContent;  // 构建要发送的消息
                 sendMessage(receiverSession,messageToSend);
@@ -368,6 +372,42 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             }
         }
     }
+    // 处理用户上线时，发送未读消息
+    public void handleUserOnline(String userAccount) {
+        List<Message> unreadMessages = messageRepository.findByReceiver(userAccount); // 从数据库获取未读消息
+        WebSocketSession userSession = userSessions.get(userAccount); // 获取接受者会话
 
+        if (userSession != null) { // 检查用户会话是否存在
+            for (Message msg : unreadMessages) { // 遍历未读消息
+                String messageToSend = new JSONObject()
+                        .put("type", "messageFrom") // 构建消息格式
+                        .put("sender", msg.getSender())
+                        .put("content", msg.getContent())
+                        .toString();
+                try {
+                    //sendMessage(userSession, messageToSend); // 发送消息
+                    //System.out.println("Sent unread message from " + msg.getSender() + " to " + userAccount);
+                    String messageToSend_s = "messageFrom" + DELIMITER + msg.getSender() + DELIMITER + msg.getContent();  // 构建要发送的消息
+                    sendMessage(userSession,messageToSend_s);
+                    // 只有在消息成功发送后才删除
+                    messageRepository.delete(msg); // 删除已发送的消息
+                } catch (Exception e) {
+                    System.err.println("Error sending unread message: " + e.getMessage()); // 异常处理
+                    // 可以考虑在这里记录失败的消息，或进行重试逻辑
+                }
+            }
+        } else {
+            System.out.println("User session not found for account: " + userAccount); // 会话不存在处理
+        }
+    }
+    // 保存未发送的消息到数据库
+    private void saveMessageToDatabase(String sender, String receiver, String content) {
+        Message message = new Message();
+        message.setSender(sender);
+        message.setReceiver(receiver);
+        message.setContent(content);
+        messageRepository.save(message); // 保存消息到数据库
+        System.out.println("Message from " + sender + " to " + receiver + " saved in database.");
+    }
 
 }
