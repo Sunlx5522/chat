@@ -14,7 +14,48 @@ const messageHashes = {}; // 存储消息哈希值
 
 const timers = {}; // 存储每个消息ID的定时器
 
+const emojiMap = {
+    "[pepe鸭]": '../SOURCEFILE/IMAGES/emoji/pepe鸭.gif',
+    "[wink]": '../SOURCEFILE/IMAGES/emoji/wink.gif',
+    "[华强鸭]": '../SOURCEFILE/IMAGES/emoji/华强鸭.gif',
+    "[受不了]": '../SOURCEFILE/IMAGES/emoji/受不了.gif',
+    "[吐彩虹]": '../SOURCEFILE/IMAGES/emoji/吐彩虹.gif',
+    "[呆]": '../SOURCEFILE/IMAGES/emoji/呆.gif',
+    "[哭]": '../SOURCEFILE/IMAGES/emoji/哭.gif',
+    "[害怕]": '../SOURCEFILE/IMAGES/emoji/害怕.gif',
+    "[很酷]": '../SOURCEFILE/IMAGES/emoji/很酷.gif',
+    "[思考]": '../SOURCEFILE/IMAGES/emoji/思考.gif',
+    "[恶魔鸭]": '../SOURCEFILE/IMAGES/emoji/恶魔鸭.gif',
+    "[打伞]": '../SOURCEFILE/IMAGES/emoji/打伞.gif',
+    "[打火鸭]": '../SOURCEFILE/IMAGES/emoji/打火鸭.gif',
+    "[扔飞机]": '../SOURCEFILE/IMAGES/emoji/扔飞机.gif',
+    "[抽烟]": '../SOURCEFILE/IMAGES/emoji/抽烟.gif',
+    "[招手]": '../SOURCEFILE/IMAGES/emoji/招手.gif',
+    "[摆手]": '../SOURCEFILE/IMAGES/emoji/摆手.gif',
+    "[擦玻璃]": '../SOURCEFILE/IMAGES/emoji/擦玻璃.gif',
+    "[无所谓]": '../SOURCEFILE/IMAGES/emoji/无所谓.gif',
+    "[朋友]": '../SOURCEFILE/IMAGES/emoji/朋友.gif',
+    "[洗澡]": '../SOURCEFILE/IMAGES/emoji/洗澡.gif',
+    "[烤鸭]": '../SOURCEFILE/IMAGES/emoji/烤鸭.gif',
+    "[睡觉]": '../SOURCEFILE/IMAGES/emoji/睡觉.gif',
+    "[笑哭]": '../SOURCEFILE/IMAGES/emoji/笑哭.gif',
+    "[第一]": '../SOURCEFILE/IMAGES/emoji/第一.gif',
+    "[红温]": '../SOURCEFILE/IMAGES/emoji/红温.gif',
+    "[老母鸭]": '../SOURCEFILE/IMAGES/emoji/老母鸭.gif',
+    "[虎皮鸭]": '../SOURCEFILE/IMAGES/emoji/虎皮鸭.gif',
+    "[诱惑]": '../SOURCEFILE/IMAGES/emoji/诱惑.gif',
+    "[赞]": '../SOURCEFILE/IMAGES/emoji/赞.gif',
+    "[钱]": '../SOURCEFILE/IMAGES/emoji/钱.gif',
+    "[雪人]": '../SOURCEFILE/IMAGES/emoji/雪人.gif',
+    "[震惊]": '../SOURCEFILE/IMAGES/emoji/震惊.gif',
+    "[飞吻]": '../SOURCEFILE/IMAGES/emoji/飞吻.gif',
+    "[飞起来]": '../SOURCEFILE/IMAGES/emoji/飞起来.gif',
+    "[骷髅]": '../SOURCEFILE/IMAGES/emoji/骷髅.gif',
+    
+    // 添加更多表情包映射
+};
 // 打开或创建数据库
+
 let db;
 let request = window.indexedDB.open(account + "db", 1);
 
@@ -497,46 +538,6 @@ function replaceEmojiCodes(text) {
     if (typeof text !== 'string') return 'error'; // 如果text不是字符串，返回error
     const emojiFileNames = ['笑哭', '吐彩虹', '老母鸭', /* ... */];
     const emojiFilePath = '../SOURCEFILE/IMAGES/emoji/';
-    const emojiMap = {
-        "[pepe鸭]": '../SOURCEFILE/IMAGES/emoji/pepe鸭.gif',
-        "[wink]": '../SOURCEFILE/IMAGES/emoji/wink.gif',
-        "[华强鸭]": '../SOURCEFILE/IMAGES/emoji/华强鸭.gif',
-        "[受不了]": '../SOURCEFILE/IMAGES/emoji/受不了.gif',
-        "[吐彩虹]": '../SOURCEFILE/IMAGES/emoji/吐彩虹.gif',
-        "[呆]": '../SOURCEFILE/IMAGES/emoji/呆.gif',
-        "[哭]": '../SOURCEFILE/IMAGES/emoji/哭.gif',
-        "[害怕]": '../SOURCEFILE/IMAGES/emoji/害怕.gif',
-        "[很酷]": '../SOURCEFILE/IMAGES/emoji/很酷.gif',
-        "[思考]": '../SOURCEFILE/IMAGES/emoji/思考.gif',
-        "[恶魔鸭]": '../SOURCEFILE/IMAGES/emoji/恶魔鸭.gif',
-        "[打伞]": '../SOURCEFILE/IMAGES/emoji/打伞.gif',
-        "[打火鸭]": '../SOURCEFILE/IMAGES/emoji/打火鸭.gif',
-        "[扔飞机]": '../SOURCEFILE/IMAGES/emoji/扔飞机.gif',
-        "[抽烟]": '../SOURCEFILE/IMAGES/emoji/抽烟.gif',
-        "[招手]": '../SOURCEFILE/IMAGES/emoji/招手.gif',
-        "[摆手]": '../SOURCEFILE/IMAGES/emoji/摆手.gif',
-        "[擦玻璃]": '../SOURCEFILE/IMAGES/emoji/擦玻璃.gif',
-        "[无所谓]": '../SOURCEFILE/IMAGES/emoji/无所谓.gif',
-        "[朋友]": '../SOURCEFILE/IMAGES/emoji/朋友.gif',
-        "[洗澡]": '../SOURCEFILE/IMAGES/emoji/洗澡.gif',
-        "[烤鸭]": '../SOURCEFILE/IMAGES/emoji/烤鸭.gif',
-        "[睡觉]": '../SOURCEFILE/IMAGES/emoji/睡觉.gif',
-        "[笑哭]": '../SOURCEFILE/IMAGES/emoji/笑哭.gif',
-        "[第一]": '../SOURCEFILE/IMAGES/emoji/第一.gif',
-        "[红温]": '../SOURCEFILE/IMAGES/emoji/红温.gif',
-        "[老母鸭]": '../SOURCEFILE/IMAGES/emoji/老母鸭.gif',
-        "[虎皮鸭]": '../SOURCEFILE/IMAGES/emoji/虎皮鸭.gif',
-        "[诱惑]": '../SOURCEFILE/IMAGES/emoji/诱惑.gif',
-        "[赞]": '../SOURCEFILE/IMAGES/emoji/赞.gif',
-        "[钱]": '../SOURCEFILE/IMAGES/emoji/钱.gif',
-        "[雪人]": '../SOURCEFILE/IMAGES/emoji/雪人.gif',
-        "[震惊]": '../SOURCEFILE/IMAGES/emoji/震惊.gif',
-        "[飞吻]": '../SOURCEFILE/IMAGES/emoji/飞吻.gif',
-        "[飞起来]": '../SOURCEFILE/IMAGES/emoji/飞起来.gif',
-        "[骷髅]": '../SOURCEFILE/IMAGES/emoji/骷髅.gif',
-        
-        // 添加更多表情包映射
-    };
     let replacedText = text;
     for (const [code, imagePath] of Object.entries(emojiMap)) {
         // 使用转义函数对特殊字符进行转义
@@ -600,6 +601,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const menuButton = document.getElementById("menuButton");  // 获取菜单按钮DOM元素
     const exitButton = document.getElementById("exitButton");  // 获取退出按钮DOM元素
     const fileButton = document.getElementById("fileButton");  // 获取文件按钮DOM元素
+    const emojiButton = document.getElementById("emojiButton");
+    const emojiTable = document.getElementById("emojiTable");
+    const eTable = document.getElementById('eTable');
     //const dropdownContent = document.getElementById('dropdownContent');  // 获取下拉菜单DOM元素
 
     document.getElementById("input-area").style.visibility = "hidden";  // 隐藏输入区域
@@ -793,5 +797,43 @@ document.addEventListener("DOMContentLoaded", function () {
         sendMessageToServer(multiLineMessage);  // 发送消息到服务器
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
+    emojiButton.addEventListener("click",function(){
+        emojiTable.classList.toggle('hidden'); // 切换emojitable的显示状态
+        
+        if (emojiTable.classList.contains('hidden')) {
+            return;
+        }// 如果emojiTable是隐藏的，则不需要定位
+       
+        const buttonRect = emojiButton.getBoundingClientRect(); // 获取emojiButton的位置以定位emojiTable
+        // 设置样式以定位emojiTable
+        emojiTable.style.left = `${buttonRect.left + window.scrollX + buttonRect.width / 2 }px`;
+        emojiTable.style.bottom = `${window.innerHeight - (buttonRect.top + window.scrollY)}px`; // 使用bottom属性
+    });
+    const emojisPerRow = 4;
+    let row = document.createElement('tr');
+    Object.entries(emojiMap).forEach(([key, value], index) => {
+        // 为每个emoji创建一个单元格
+        const td = document.createElement('td');
+        const img = document.createElement('img');
+        img.src = value;
+        img.alt = key.replace(/]$/, '').replace(/\[/g, '');
+        img.style.width = '30px'; // 设置图片大小
+        img.style.height = '30px'; // 设置图片大小
+        td.appendChild(img); // 将图片添加到单元格
+        row.appendChild(td); // 将单元格添加到行
+
+        // 每当达到一行的emoji数量限制，或者这是最后一个emoji时，添加行到表格
+        if ((index + 1) % emojisPerRow === 0 || index === Object.entries(emojiMap).length - 1) {
+            eTable.appendChild(row); // 将行添加到表格
+            row = document.createElement('tr'); // 创建新的行
+        }
+    });
+    document.querySelectorAll('.emojiTable img').forEach(img => {
+        img.addEventListener('click', function() {
+            const currentText = messageInput.value;
+            messageInput.value = currentText +'[' + img.alt +']';
+        });
+    });
+    emojiTable.appendChild(eTable); // 将表格添加到emojiTable容器
 });
 
