@@ -336,6 +336,7 @@ function process(fullMessage) {
                 } else {
                     // 否则，按文本处理
                     messageBubble.textContent = messageContent;
+                    messageBubble.innerHTML=replaceEmojiCodes(message.content);
                 }
 
                 //messageBubble.textContent = `${messageContent}`;  // 设置消息内容
