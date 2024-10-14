@@ -440,7 +440,6 @@ function showMessages(messages) {
             avatar.classList.add("avatar");  // 添加头像样式类
 
             messageWrapper.classList.add("message", "message-right");  // 本方消息靠右
-
             if (imageDataUrlPattern.test(message.content)) {
                 // 如果匹配，创建 img 元素
                 const img = document.createElement("img");
@@ -452,6 +451,7 @@ function showMessages(messages) {
             } else {
                 // 否则，按文本处理
                 messageBubble.textContent = message.content;
+                messageBubble.innerHTML=replaceEmojiCodes(message.content);
             }
 
             //messageBubble.textContent = `${message.message}`;  // 设置消息内容
@@ -466,7 +466,6 @@ function showMessages(messages) {
             avatar.classList.add("avatar");  // 添加头像样式类
 
             messageWrapper.classList.add("message", "message-left");  // 对方消息靠左
-
             if (imageDataUrlPattern.test(message.content)) {
                 // 如果匹配，创建 img 元素
                 const img = document.createElement("img");
@@ -478,6 +477,7 @@ function showMessages(messages) {
             } else {
                 // 否则，按文本处理
                 messageBubble.textContent = message.content;
+                messageBubble.innerHTML=replaceEmojiCodes(message.content);
             }
 
             //messageBubble.textContent = `${message.message}`;  // 设置消息内容
@@ -493,7 +493,20 @@ function showMessages(messages) {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }, 0);
 }
-
+function replaceEmojiCodes(text) {
+    if (typeof text !== 'string') return 'error'; // 如果text不是字符串，返回error
+    const emojiMap = {
+        "[笑哭]": '../SOURCEFILE/IMAGES/emoji/CAACAgIAAxkBAUJxgmcGSESSgIefFEeim4Ad6VARqPfPAALyAANWnb0KEJ2LdlN60mQ2BA.gif',
+        // 添加更多表情包映射
+    };
+    let replacedText = text;
+    for (const [code, imagePath] of Object.entries(emojiMap)) {
+        // 使用转义函数对特殊字符进行转义
+        const escapedCode = code.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        replacedText = replacedText.replace(new RegExp(escapedCode, 'g'), `<img src="${imagePath}" alt="emoji" class="emoji" />`);
+    }
+    return replacedText;
+}
 // 开始新的对话
 function startConversation(chatwith, username) {
     document.getElementById("input-area").style.visibility = "visible";  // 显示输入区域
@@ -675,6 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
             messageWrapper.classList.add("message", "message-right");  // 本方消息靠右
 
             messageBubble.textContent = message;  // 设置消息内容
+            messageBubble.innerHTML = replaceEmojiCodes(messageBubble.textContent);//表情包替换表情包标识
             messageWrapper.appendChild(messageBubble);  // 将消息泡泡添加到包装器
             messageWrapper.appendChild(avatar);  // 将消息泡泡添加到消息包装器
             messages.appendChild(messageWrapper);  // 将消息包装器添加到消息容器

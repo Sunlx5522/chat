@@ -429,4 +429,8 @@ body {
   input:focus, textarea:focus {
     cursor: url('../SOURCEFILE/MOUSE/ZdotNS.cur'), auto !important;
   }
-  
+  .emoji {
+    border-radius: 50%;
+    max-width: 7%;
+    height: auto;
+  }
