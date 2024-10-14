@@ -495,8 +495,46 @@ function showMessages(messages) {
 }
 function replaceEmojiCodes(text) {
     if (typeof text !== 'string') return 'error'; // 如果text不是字符串，返回error
+    const emojiFileNames = ['笑哭', '吐彩虹', '老母鸭', /* ... */];
+    const emojiFilePath = '../SOURCEFILE/IMAGES/emoji/';
     const emojiMap = {
-        "[笑哭]": '../SOURCEFILE/IMAGES/emoji/CAACAgIAAxkBAUJxgmcGSESSgIefFEeim4Ad6VARqPfPAALyAANWnb0KEJ2LdlN60mQ2BA.gif',
+        "[pepe鸭]": '../SOURCEFILE/IMAGES/emoji/pepe鸭.gif',
+        "[wink]": '../SOURCEFILE/IMAGES/emoji/wink.gif',
+        "[华强鸭]": '../SOURCEFILE/IMAGES/emoji/华强鸭.gif',
+        "[受不了]": '../SOURCEFILE/IMAGES/emoji/受不了.gif',
+        "[吐彩虹]": '../SOURCEFILE/IMAGES/emoji/吐彩虹.gif',
+        "[呆]": '../SOURCEFILE/IMAGES/emoji/呆.gif',
+        "[哭]": '../SOURCEFILE/IMAGES/emoji/哭.gif',
+        "[害怕]": '../SOURCEFILE/IMAGES/emoji/害怕.gif',
+        "[很酷]": '../SOURCEFILE/IMAGES/emoji/很酷.gif',
+        "[思考]": '../SOURCEFILE/IMAGES/emoji/思考.gif',
+        "[恶魔鸭]": '../SOURCEFILE/IMAGES/emoji/恶魔鸭.gif',
+        "[打伞]": '../SOURCEFILE/IMAGES/emoji/打伞.gif',
+        "[打火鸭]": '../SOURCEFILE/IMAGES/emoji/打火鸭.gif',
+        "[扔飞机]": '../SOURCEFILE/IMAGES/emoji/扔飞机.gif',
+        "[抽烟]": '../SOURCEFILE/IMAGES/emoji/抽烟.gif',
+        "[招手]": '../SOURCEFILE/IMAGES/emoji/招手.gif',
+        "[摆手]": '../SOURCEFILE/IMAGES/emoji/摆手.gif',
+        "[擦玻璃]": '../SOURCEFILE/IMAGES/emoji/擦玻璃.gif',
+        "[无所谓]": '../SOURCEFILE/IMAGES/emoji/无所谓.gif',
+        "[朋友]": '../SOURCEFILE/IMAGES/emoji/朋友.gif',
+        "[洗澡]": '../SOURCEFILE/IMAGES/emoji/洗澡.gif',
+        "[烤鸭]": '../SOURCEFILE/IMAGES/emoji/烤鸭.gif',
+        "[睡觉]": '../SOURCEFILE/IMAGES/emoji/睡觉.gif',
+        "[笑哭]": '../SOURCEFILE/IMAGES/emoji/笑哭.gif',
+        "[第一]": '../SOURCEFILE/IMAGES/emoji/第一.gif',
+        "[红温]": '../SOURCEFILE/IMAGES/emoji/红温.gif',
+        "[老母鸭]": '../SOURCEFILE/IMAGES/emoji/老母鸭.gif',
+        "[虎皮鸭]": '../SOURCEFILE/IMAGES/emoji/虎皮鸭.gif',
+        "[诱惑]": '../SOURCEFILE/IMAGES/emoji/诱惑.gif',
+        "[赞]": '../SOURCEFILE/IMAGES/emoji/赞.gif',
+        "[钱]": '../SOURCEFILE/IMAGES/emoji/钱.gif',
+        "[雪人]": '../SOURCEFILE/IMAGES/emoji/雪人.gif',
+        "[震惊]": '../SOURCEFILE/IMAGES/emoji/震惊.gif',
+        "[飞吻]": '../SOURCEFILE/IMAGES/emoji/飞吻.gif',
+        "[飞起来]": '../SOURCEFILE/IMAGES/emoji/飞起来.gif',
+        "[骷髅]": '../SOURCEFILE/IMAGES/emoji/骷髅.gif',
+        
         // 添加更多表情包映射
     };
     let replacedText = text;
