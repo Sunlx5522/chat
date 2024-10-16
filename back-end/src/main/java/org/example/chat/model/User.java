@@ -25,7 +25,8 @@ public class User {  // 定义一个公有的类User，表示用户实体。
     @Column(name = "isonline", nullable = false)  // 将该字段映射到数据库表中的 "isonline" 列，并指定列的属性。
     private int isonline;  // 声明一个私有的整数变量isonline，表示用户的在线状态。
 
-    public User() {}  // 定义一个公有的无参构造函数，JPA要求实体类必须有一个无参构造函数。
+    public User() {
+    }  // 定义一个公有的无参构造函数，JPA要求实体类必须有一个无参构造函数。
 
     public User(String account, String password, String username, String email, String telephone) {  // 定义一个带参构造函数，方便在创建新用户对象时初始化属性。
         this.account = account;  // 初始化账号字段。

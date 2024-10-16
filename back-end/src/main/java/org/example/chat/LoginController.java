@@ -28,18 +28,22 @@ public class LoginController {  // 定义LoginController类，处理登录请求
         User user = userRepository.findByAccount(account);  // 根据账号从数据库查找用户
 
         if (user == null) {  // 如果用户不存在
+            System.out.println("登录失败：账号不存在");  // 待
             return "no";  // 返回登录失败消息
         }
 
         if (user.getIsonline() == 1) {  // 如果用户已在线
+            System.out.println("登录失败：重复登陆");
             return "repeat";  // 返回"repeat"，表示重复登录
         }
 
         if (user.getPassword().equals(password)) {  // 如果密码匹配
             user.setIsonline(1);  // 设置用户为在线状态
             userRepository.save(user);  // 保存用户状态
+            System.out.println("登录成功");
             return "yes";  // 返回登录成功消息
         } else {  // 如果密码不匹配
+            System.out.println("登录失败：密码错误");
             return "no";  // 返回登录失败消息
         }
     }

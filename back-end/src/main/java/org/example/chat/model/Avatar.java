@@ -13,7 +13,8 @@ public class Avatar {  // 定义一个公有的类User，表示用户实体。
     @Column(name = "avatar_path", nullable = true, length = 255)  // 将该字段映射到数据库表中的 "avatar_path" 列，并指定列的属性。
     private String avatar_path;  // 声明一个私有的字符串变量password，存储用户的密码。
 
-    public Avatar() {}  // 定义一个公有的无参构造函数，JPA要求实体类必须有一个无参构造函数。
+    public Avatar() {
+    }  // 定义一个公有的无参构造函数，JPA要求实体类必须有一个无参构造函数。
 
     public Avatar(String account, String avatar_path) {  // 定义一个带参构造函数，方便在创建新用户对象时初始化属性。
         this.account = account;  // 初始化账号字段。

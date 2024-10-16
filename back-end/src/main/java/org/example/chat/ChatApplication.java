@@ -1,6 +1,7 @@
 package org.example.chat;  // 定义包名为org.example.chat
 
 // 导入所需的类和包
+
 import org.springframework.boot.SpringApplication;  // Spring应用启动类
 import org.springframework.boot.autoconfigure.SpringBootApplication;  // Spring Boot自动配置注解
 import org.springframework.boot.CommandLineRunner;  // CommandLineRunner接口 用于执行初始化指令

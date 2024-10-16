@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;  // 导入Spring D
 
 public interface UserRepository extends JpaRepository<User, String> {  // 定义一个名为UserRepository的接口，继承自JpaRepository，泛型参数<User, String>指定了实体类型为User，主键类型为String。
 
-    User findByAccount(String account);  // 根据账号查找用户的方法，方法名遵循Spring Data JPA的命名规范，框架会自动生成实现代码。
+    User findByAccount(String account);  // 根据账号查找用户的方法，方法名遵循Spring Data JPA的命名规范，框架会自动生成实现代码
 
 }

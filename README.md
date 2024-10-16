@@ -35,3 +35,11 @@ create table avatar(
     avatar_path varchar(255),
     foreign key (account) references users(account)
 );
+信息表：
+CREATE TABLE messages (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    sender VARCHAR(255) NOT NULL,
+    receiver VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

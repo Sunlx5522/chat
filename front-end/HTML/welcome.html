@@ -20,7 +20,8 @@
                     <a href="#" id="feature2">添加好友</a> <!-- 功能链接 2 -->
                     <a href="#" id="feature3">好友请求</a> <!-- 功能链接 3 -->
                     <a href="#" id="feature4">拉伸列表</a> <!-- 功能链接 4 -->
-                    <a href="#" id="feature5">刷新页面</a> <!-- 功能链接 4 -->
+                    <a href="#" id="feature5">刷新页面</a> <!-- 功能链接 5 -->
+                    <a href="#" id="feature6">修改密码</a> <!-- 功能链接 6 -->
                 </div>
             </div>
             <button id="exitButton"> <!-- 退出按钮 -->
@@ -37,7 +38,8 @@
             </div>
             <div class="messages" id="messages"></div> <!-- 消息展示区域 -->
             <div class="tools" id="tools">
-                <input type="file" id="fileInput" style="display: none;">
+                <input type="file" id="fileInput" style="display: none;" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/gif,application/x-zip-compressed,.rar,.txt,video/mp4,audio/mpeg,application/pdf">
+                <input type="file" id="emojiFileInput" style="display: none;" accept="image/png,image/jpeg,image/jpg,image/gif">
                 <button id="fileButton">
                     <img src="../SOURCEFILE/IMAGES/welcome/file.png" alt="文件" class="button-icon" id="fileImage">
                     <!-- 文件图标 -->
@@ -46,17 +48,31 @@
                     <img src="../SOURCEFILE/IMAGES/welcome/emoji.png" alt="表情" class="button-icon" id="emojiImage">
                     <!-- 文件图标 -->
                 </button>
-                <button id="keyboardButton">
-                    <img src="../SOURCEFILE/IMAGES/welcome/keyboard.png" alt="键盘" class="button-icon" id="keyboard">
+                <div id="emojiTable" class="emojiTable hidden">
+                    <table id="eTable">
+                        <!-- Emoji按钮将通过JavaScript动态生成 -->
+                    </table>
+                </div>
+                <button id="superEmojiButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/superEmoji.png" alt="表情" class="button-icon" id="superEmojiImage">
                     <!-- 文件图标 -->
                 </button>
+                <div id="superEmojiTable" class="emojiTable hidden">
+                    <table id="superETable">
+                        <!-- Emoji按钮将通过JavaScript动态生成 -->
+                    </table>
+                </div>
             </div> <!-- 功能工具区域 -->
             <div class="input-area" id="input-area"> <!-- 消息输入区域 -->
-                <textarea id="messageInput" placeholder="输入消息..." rows="5"></textarea> <!-- 多行输入框 -->
+                <textarea id="messageInput" placeholder="输入消息..." rows="5" ></textarea> <!-- 多行输入框 -->
                 <button id="sendButton">发送</button> <!-- 发送按钮 -->
             </div>
         </div>
+        <div id="customMenu">
+            <a href="#" id="menuItem1">删除</a>
+        </div>
     </div>
+    <script src="../JS/viewer.js"></script>
     <script src="../JS/SweetAlert2.js"></script>
     <script src="../JS/AESCryptoClient.js"></script>
     <script src="../JS/welcome.js"></script> <!-- 引入外部 JavaScript 文件，包含页面的交互逻辑 -->
