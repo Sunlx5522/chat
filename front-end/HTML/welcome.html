@@ -39,7 +39,7 @@
             <div class="messages" id="messages"></div> <!-- 消息展示区域 -->
             <div class="tools" id="tools">
                 <input type="file" id="fileInput" style="display: none;" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/gif,application/x-zip-compressed,.rar,.txt,video/mp4,audio/mpeg,application/pdf">
-                <input type="file" id="emojiFileInput" style="display: none;" accept="image/png,image/jpeg,image/jpg,image/gif">
+                <input type="file" id="avatarInput" style="display: none;" accept="image/png,image/jpeg,image/jpg">
                 <button id="fileButton">
                     <img src="../SOURCEFILE/IMAGES/welcome/file.png" alt="文件" class="button-icon" id="fileImage">
                     <!-- 文件图标 -->
@@ -54,7 +54,8 @@
                     </table>
                 </div>
                 <button id="superEmojiButton">
-                    <img src="../SOURCEFILE/IMAGES/welcome/superEmoji.png" alt="表情" class="button-icon" id="superEmojiImage">
+                    <img src="../SOURCEFILE/IMAGES/welcome/superEmoji.png" alt="表情" class="button-icon"
+                        id="superEmojiImage">
                     <!-- 文件图标 -->
                 </button>
                 <div id="superEmojiTable" class="emojiTable hidden">
@@ -64,9 +65,67 @@
                 </div>
             </div> <!-- 功能工具区域 -->
             <div class="input-area" id="input-area"> <!-- 消息输入区域 -->
-                <textarea id="messageInput" placeholder="输入消息..." rows="5" ></textarea> <!-- 多行输入框 -->
+                <textarea id="messageInput" placeholder="输入消息..." rows="5"></textarea> <!-- 多行输入框 -->
                 <button id="sendButton">发送</button> <!-- 发送按钮 -->
             </div>
+        </div>
+        <div class="user-info2" id="userInfo" style="display: none;">
+
+            <form id="changesForm" action="http://localhost:8080/api/updateInfo" method="post">
+                <!-- 创建表单，ID 为 loginForm，提交地址为 /api/updateInfo，使用 POST 方法 -->
+                <img src="../SOURCEFILE/IMAGES/login/chat.png" alt="头像" id="avatar"> <!-- 加载头像 -->
+                <p>帐号: <span id="userAccount"></span></p>
+                <div class="input-container"> <!-- 邮箱输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/email.png" alt="邮箱图标">
+                    <input type="text" id="userEmail" name="userEmail" placeholder="请输入新邮箱" required>
+                </div>
+
+                <div class="input-container"> <!-- 电话按钮的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/phoneNumber.png" alt="电话图标"> <!-- 显示电话图标 -->
+                    <input type="text" id="userPhoneInput" name="userPhoneInput" placeholder="请输入新电话" required>
+                </div>
+
+                <div class="input-container"> <!-- 昵称输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/user.png" alt="昵称图标">
+                    <input type="text" id="userNicknameInput" name="userNicknameInput" placeholder="请输入新昵称" required>
+                </div>
+
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="图标"> <!-- 显示注册图标 -->
+                    <button type="submit" id="changesSubmitButton" class="changesSubmitButton">修改信息</button>
+                    <!-- 按钮：提交修改 -->
+                </div>
+
+            </form>
+
+        </div>
+        <div class="passwordArea" style="display: none;">
+            <form id="changePasswordForm" action="http://localhost:8080/api/updatePassword" method="post">
+
+                <h3>&nbsp;修改密码</h3>
+                <p id="useless"> <span></span></p>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="oldPassword" name="userPassword" placeholder="请输入旧密码" required>
+                    <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="newPassword" name="userPassword" placeholder="请输入新密码" required>
+                    <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="newPassword_confirm" name="newPassword_confirm" placeholder="请确认新密码"
+                        required> <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="图标"> <!-- 显示注册图标 -->
+                    <button type="submit" id="changesPasswordButton" class="changespasswordButton">修改密码</button>
+                    <!-- 按钮：提交修改 -->
+                </div>
+
+            </form>
         </div>
         <div id="customMenu">
             <a href="#" id="menuItem1">删除</a>

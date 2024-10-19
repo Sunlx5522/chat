@@ -5,11 +5,13 @@
 <head>
     <meta charset="UTF-8"> <!-- 设置文档字符编码为 UTF-8，支持中文显示 -->
     <title>CHAT</title> <!-- 设置网页标题，显示在浏览器标签页上 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../CSS/styles.css"> <!-- 引入外部 CSS 样式表，定义页面样式 -->
 </head>
 
 <body>
-    <div class="container">
+    <div class="container"> 
         <form id="loginForm" action="http://localhost:8080/api/login" method="post"> <!-- 创建表单，ID 为 loginForm，提交地址为 /api/login，使用 POST 方法 -->
             <img src="../SOURCEFILE/IMAGES/login/chat.png" alt="欢迎登录" id="welcome-image"> <!-- 加载登录欢迎图像 -->
             <div class="input-container"> <!-- 创建输入容器 -->
@@ -26,7 +28,6 @@
                 <img src="../SOURCEFILE/IMAGES/login/login.png" alt="登录图标"> <!-- 显示登录图标 -->
                 <button type="submit" id="loginButton" class="loginButton">登录</button> <!-- 提交表单的登录按钮 -->
             </div>
-    
             <div class="input-container"> <!-- 注册与找回密码按钮的容器 -->
                 <button type="button" id="findPasswordButton" class="findPasswordButton">找回密码</button> <!-- 按钮：找回密码 -->
                 <button type="button" id="registerButton" class="registerButton">注册</button> <!-- 按钮：注册新账户 -->
@@ -34,7 +35,6 @@
     
         </form>
     </div>
-    
     <script src="../JS/clickEffect.js"></script>
     <script src="../JS/Sukura.js"></script>
     <script src="../JS/SweetAlert2.js"></script>

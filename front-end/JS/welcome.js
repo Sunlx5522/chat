@@ -4,6 +4,10 @@ let db; // 数据库
 var key; //密钥
 let selectedBubbleId = null; // 用来存储选中的 .bubble 元素的 ID
 var account = sessionStorage.getItem('account'); // 从sessionStorage中获取当前登录的账号
+// 保存用户信息到本地
+let userEmail = "";
+let userPhoneNumber = "";
+let userName = "";
 sessionStorage.setItem('chatwith', '');  // 使用sessionStorage存储账号
 const timers = {}; // 存储每个消息ID的定时器
 const messageHashes = {}; // 存储消息哈希值
@@ -19,8 +23,8 @@ const txtDataUrlPattern = /^data:text\/(plain);base64,[A-Za-z0-9+/=]+$/; //rar�
 const mp4DataUrlPattern = /^data:video\/(mp4);base64,[A-Za-z0-9+/=]+$/; //rar压缩包格式
 const mp3DataUrlPattern = /^data:audio\/(mpeg);base64,[A-Za-z0-9+/=]+$/; //rar压缩包格式
 const pdfDataUrlPattern = /^data:application\/(pdf);base64,[A-Za-z0-9+/=]+$/; //rar压缩包格式
-const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/gif', 'application/x-zip-compressed', 'application/x-compressed', 'text/plain', 'video/mp4', 'audio/mpeg','application/pdf']; // 定义允许的类型
-const gifValidTypes = ['image/png', 'image/jpeg', 'image/jpg','image/gif']; // 定义允许的类型
+const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/gif', 'application/x-zip-compressed', 'application/x-compressed', 'text/plain', 'video/mp4', 'audio/mpeg', 'application/pdf']; // 定义允许的类型
+const avatarValidTypes = ['image/png', 'image/jpeg', 'image/jpg']; // 定义允许的类型
 //emoji表情处理
 
 const emojiMap = {
@@ -397,67 +401,44 @@ function removeRedDot(userAccount) {
     }
 }
 
-function base64ToBlob(base64, mimeType) {
-    //const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/gif', 'application/x-zip-compressed','application/x-compressed']; // 定义允许的类型
-    // 移除可能存在的前缀 x-compressed
-    const base64Prefix_0 = 'data:application/x-zip-compressed;base64,';
-    if (base64.startsWith(base64Prefix_0)) {
-        base64 = base64.substring(base64Prefix_0.length);
+function base64ToBlob(base64) {
+    const base64Types = [
+        { prefix: 'data:application/x-zip-compressed;base64,', mimeType: 'application/x-zip-compressed' },
+        { prefix: 'data:application/x-compressed;base64,', mimeType: 'application/x-compressed' },
+        { prefix: 'data:image/png;base64,', mimeType: 'image/png' },
+        { prefix: 'data:image/jpeg;base64,', mimeType: 'image/jpeg' },
+        { prefix: 'data:image/jpg;base64,', mimeType: 'image/jpg' },
+        { prefix: 'data:image/PNG;base64,', mimeType: 'image/png' },
+        { prefix: 'data:image/JEPG;base64,', mimeType: 'image/jpeg' },
+        { prefix: 'data:image/JPG;base64,', mimeType: 'image/jpg' },
+        { prefix: 'data:image/x-icon;base64,', mimeType: 'image/x-icon' },
+        { prefix: 'data:image/gif;base64,', mimeType: 'image/gif' },
+        { prefix: 'data:text/plain;base64,', mimeType: 'text/plain' },
+        { prefix: 'data:video/mp4;base64,', mimeType: 'video/mp4' },
+        { prefix: 'data:audio/mpeg;base64,', mimeType: 'audio/mpeg' },
+        { prefix: 'data:application/pdf;base64,', mimeType: 'application/pdf' }
+    ];
+
+    let mimeType = null;
+
+    // Detect and remove the appropriate prefix
+    for (let type of base64Types) {
+        if (base64.startsWith(type.prefix)) {
+            base64 = base64.substring(type.prefix.length);
+            mimeType = type.mimeType;
+            break;
+        }
     }
 
-    const base64Prefix_1 = 'data:application/x-compressed;base64,';
-    if (base64.startsWith(base64Prefix_1)) {
-        base64 = base64.substring(base64Prefix_1.length);
+    if (!mimeType) {
+        console.error('Unrecognized Base64 format');
+        return null;
     }
 
-    const base64Prefix_2 = 'data:image/png;base64,';
-    if (base64.startsWith(base64Prefix_2)) {
-        base64 = base64.substring(base64Prefix_2.length);
-    }
-
-    const base64Prefix_3 = 'data:image/jpeg;base64,';
-    if (base64.startsWith(base64Prefix_3)) {
-        base64 = base64.substring(base64Prefix_3.length);
-    }
-
-    const base64Prefix_4 = 'data:image/jpg;base64,';
-    if (base64.startsWith(base64Prefix_4)) {
-        base64 = base64.substring(base64Prefix_4.length);
-    }
-
-    const base64Prefix_5 = 'data:image/x-icon;base64,';
-    if (base64.startsWith(base64Prefix_5)) {
-        base64 = base64.substring(base64Prefix_5.length);
-    }
-
-    const base64Prefix_6 = 'data:image/gif;base64,';
-    if (base64.startsWith(base64Prefix_6)) {
-        base64 = base64.substring(base64Prefix_6.length);
-    }
-
-    const base64Prefix_7 = 'data:text/plain;base64,';
-    if (base64.startsWith(base64Prefix_7)) {
-        base64 = base64.substring(base64Prefix_7.length);
-    }
-
-    const base64Prefix_8 = 'data:video/mp4;base64,';
-    if (base64.startsWith(base64Prefix_8)) {
-        base64 = base64.substring(base64Prefix_8.length);
-    }
-
-    const base64Prefix_9 = 'data:audio/mpeg;base64,';
-    if (base64.startsWith(base64Prefix_9)) {
-        base64 = base64.substring(base64Prefix_9.length);
-    }
-    const base64Prefix_10 = 'data:application/pdf;base64,';
-    if (base64.startsWith(base64Prefix_10)) {
-        base64 = base64.substring(base64Prefix_10.length);
-    }
-
-    // 移除所有非 Base64 字符
+    // Clean up non-base64 characters
     base64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
 
-    // 处理长度不为4的倍数的情况，进行填充
+    // Pad the base64 string if its length is not a multiple of 4
     while (base64.length % 4 !== 0) {
         base64 += '=';
     }
@@ -466,16 +447,15 @@ function base64ToBlob(base64, mimeType) {
     try {
         byteCharacters = atob(base64);
     } catch (error) {
-        console.error('无法解码 Base64 字符串：', error);
+        console.error('Failed to decode Base64 string:', error);
         return null;
     }
 
     const byteArrays = [];
-
     for (let offset = 0; offset < byteCharacters.length; offset += 512) {
         const slice = byteCharacters.slice(offset, offset + 512);
-
         const byteNumbers = new Array(slice.length);
+
         for (let i = 0; i < slice.length; i++) {
             byteNumbers[i] = slice.charCodeAt(i);
         }
@@ -544,52 +524,114 @@ function getBase64Size(base64String) {
 
 //懒加载
 // 定义 IntersectionObserver 懒加载逻辑
-const imgObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
+const imgObserver = new IntersectionObserver(async (entries, observer) => {
+    for (const entry of entries) {
         if (entry.isIntersecting) {
             const img = entry.target;
-            // 首先显示加载中的 GIF
-            //const loadingGif = '../SOURCEFILE/IMAGES/welcome/loading.gif';
-            //img.src = loadingGif; // 设置为加载动画
-
-            // 加载真实图片
-            const realImageSrc = img.dataset.src;
-
-            // 创建一个新的 Image 对象，加载真实图片
-            const tempImg = new Image();
-            tempImg.src = realImageSrc;
-
-            // 当真实图片加载完成时，执行替换
-            tempImg.onload = function () {
-                img.classList.add("fade-in");  // 添加淡入效果的类
-                img.src = realImageSrc;  // 替换为真实图片
-                // 检查图片在页面上的显示宽度
-                //img.style.width = img.offsetWidth + "px";
-                console.log("图片的显示宽度 (offsetWidth):", img.offsetWidth);
-                // 停止观察该图片
-                observer.unobserve(img);
-            };
-
-            const messages = document.getElementById("messages");
-            const lastMessage = messages.lastElementChild;
-
-            // 判断该图片所在的消息是否是最后一个消息
-            if (img.closest('.message') === lastMessage) {
-                console.log("是最后一个消息");
-                // 图片加载完成后滚动到最底部
-                img.onload = () => {
-                    const messagesContainer = document.getElementById("messages");
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight; // 滚动到最底部
-                };
+            // 获取唯一的 ID
+            const uniqueId = Number(img.dataset.srcId);
+            if (!uniqueId) {
+                //observer.unobserve(img);
+                continue;
+            }
+            console.log(img.tagName);
+            if (img.tagName === 'IMG') {
+                loadImg(img, uniqueId, observer);
+            } else if (img.tagName === 'VIDEO') {
+                loadVideo(img, uniqueId, observer);
             }
         }
-    });
+    }
 }, {
     // 预加载的阈值
     threshold: 1
 });
 
-//添加消息
+// 异步加载 Base64 音频
+async function loadAudio(audioPlayer, id) {
+    try {
+        const message = await getMessageById(id);
+        // 异步创建 Blob 对象
+        const blob = base64ToBlob(message.content);
+        if (blob) {
+            // 创建一个指向 Blob 的 URL
+            const blobURL = URL.createObjectURL(blob);
+            audioPlayer.src = blobURL;
+        }
+    } catch (error) {
+        console.error("Error loading audio:", error);
+    }
+}
+
+// 异步加载 Base64 音频
+async function loadVideo(video, id, observer) {
+    try {
+        const message = await getMessageById(id);
+        // 异步创建 Blob 对象
+        const blob = base64ToBlob(message.content);
+        if (blob) {
+            // 创建一个指向 Blob 的 URL
+            const blobURL = URL.createObjectURL(blob);
+            video.src = blobURL;
+            video.classList.add("fade-in");  // 添加淡入效果的类
+            console.log("视频加载完成");
+            observer.unobserve(video);
+            console.log("停止观测");
+        }
+    } catch (error) {
+        console.error("Error loading video:", error);
+    }
+}
+
+// 异步加载 Base64 音频
+async function loadImg(img, id, observer) {
+    // 异步获取消息内容
+    try {
+        const message = await getMessageById(id);
+
+        const blob = base64ToBlob(message.content);
+        if (blob) {
+            // 创建一个指向 Blob 的 URL
+            const blobURL = URL.createObjectURL(blob);
+            img.src = blobURL;
+            img.classList.add("fade-in");  // 添加淡入效果的类
+            console.log("图片加载完成");
+            observer.unobserve(img);
+            console.log("停止观测");
+        }
+
+        const messages = document.getElementById("messages");
+        const lastMessage = messages.lastElementChild;
+        if (img.closest('.message') === lastMessage) {
+            console.log("是最后一个消息");
+            const messagesContainer = document.getElementById("messages");
+            messagesContainer.scrollTop = messagesContainer.scrollHeight; // 滚动到最底部
+        }
+    } catch (error) {
+        console.error('获取消息内容失败:', error);
+    }
+}
+
+// 异步加载 Base64 音频
+async function loadAvatar(avatar,senderAccount) {
+    // 异步获取消息内容
+    try {
+        const storedAvatar = mySessionStorage[senderAccount + "avatar"];
+
+        const blob = base64ToBlob(storedAvatar);
+        if (blob) {
+            // 创建一个指向 Blob 的 URL
+            const blobURL = URL.createObjectURL(blob);
+            avatar.src = blobURL;
+            avatar.classList.add("fade-in");  // 添加淡入效果的类
+        }
+
+    } catch (error) {
+        console.error('头像设置失败:', error);
+    }
+}
+
+//添加消息 针对大量资源添加.setAttribute('aria-hidden', 'true');尤为关键
 async function addMessage(id, senderAccount, messageContent, shouldObserve = true) {
     const fileType = await getMimeType(messageContent);
     if (fileType == null) {
@@ -607,14 +649,16 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
     messageBubble.title = messageBubble.id;
     //头像元素
     const avatar = document.createElement("img");
-    const storedAvatar = mySessionStorage[senderAccount + "avatar"];
-    avatar.src = storedAvatar;  // 根据发送方账号设置头像图片路径
+    loadAvatar(avatar,senderAccount);
+    //const storedAvatar = mySessionStorage[senderAccount + "avatar"];
+    //avatar.src = storedAvatar;  // 根据发送方账号设置头像图片路径
     avatar.alt = "头像";
     avatar.classList.add("avatar");  // 添加头像样式类
     if (imageDataUrlPattern.test(messageContent)) {
-
         const img = document.createElement("img");
-        img.dataset.src = messageContent;  // 设置 data-src 属性用于懒加载
+        //img.dataset.src = messageContent;  // 设置 data-src 属性用于懒加载
+        img.dataset.srcId = id;
+        console.log("srcID：" + img.dataset.srcId);
         img.alt = "图片";
         img.classList.add("message-image");
 
@@ -630,17 +674,17 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
         }
 
         img.classList.add("item");
-        messageBubble.addEventListener('click', function (e) {
-            e.preventDefault()
+        messageBubble.addEventListener('click', async function (e) {
+            //e.preventDefault()
             if (e.target.classList.contains('item')) {
-              originalEl = e.target
-              cloneEl = originalEl.cloneNode(true)
-              originalEl.style.opacity = 0
-              openPreview()
+                originalEl = e.target
+                cloneEl = originalEl.cloneNode(true)
+                originalEl.style.opacity = 0
+                openPreview()
             }
-          })
+        })
 
-        
+
     }
     else if (zipDataUrlPattern.test(messageContent)) {
         //Blob 对象本身由 JavaScript 的垃圾回收机制（Garbage Collector, GC）管理。当没有任何引用指向一个 Blob 时，GC 会自动回收其占用的内存。因此，无需手动释放 Blob 对象。
@@ -666,7 +710,7 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
             try {
                 const message = await getMessageById(id);
                 const theContent = message.content;
-                const blob = base64ToBlob(theContent, 'application/zip');
+                const blob = base64ToBlob(theContent);
                 if (blob) {
                     // 创建一个指向 Blob 的 URL
                     const blobURL = URL.createObjectURL(blob);
@@ -717,7 +761,7 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
             try {
                 const message = await getMessageById(id);
                 const theContent = message.content;
-                const blob = base64ToBlob(theContent, 'application/rar');
+                const blob = base64ToBlob(theContent);
                 if (blob) {
                     // 创建一个指向 Blob 的 URL
                     const blobURL = URL.createObjectURL(blob);
@@ -768,7 +812,7 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
             try {
                 const message = await getMessageById(id);
                 const theContent = message.content;
-                const blob = base64ToBlob(theContent, 'text/plain');
+                const blob = base64ToBlob(theContent);
                 if (blob) {
                     // 创建一个指向 Blob 的 URL
                     const blobURL = URL.createObjectURL(blob);
@@ -819,7 +863,7 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
             try {
                 const message = await getMessageById(id);
                 const theContent = message.content;
-                const blob = base64ToBlob(theContent, 'application/pdf');
+                const blob = base64ToBlob(theContent);
                 if (blob) {
                     // 创建一个指向 Blob 的 URL
                     const blobURL = URL.createObjectURL(blob);
@@ -848,80 +892,153 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
             }
         });
     } else if (mp4DataUrlPattern.test(messageContent)) {
-        //Blob 对象本身由 JavaScript 的垃圾回收机制（Garbage Collector, GC）管理。当没有任何引用指向一个 Blob 时，GC 会自动回收其占用的内存。因此，无需手动释放 Blob 对象。
-        const blobSize = getBase64Size(messageContent);
-        const formattedSize = formatBytes(blobSize, 2);
+        //由于是视频，输入法不读
+        //1.懒加载
+        //2.样式美化
+        //3.输入法不可读 --- 不用处理
+        const video = document.createElement("video");
+        video.controls = true;
+        //video.src = messageContent;
+        //loadVideo(video,id);
+        video.dataset.srcId = id;
+        video.classList.add("message-observe");
+        if (shouldObserve) {
+            // 使用 IntersectionObserver 观察图片元素
+            imgObserver.observe(video);  // 开始懒加载观察
+        }
+        video.classList.add("item");
+        messageBubble.appendChild(video); // 将图片添加到消息泡泡
 
-        const fileInfo = document.createElement("div"); // 您也可以使用 <span> 或其他元素
-        fileInfo.innerHTML = `MP4文件<br>(${formattedSize})`;
-
-        //link.title = `${formattedSize}`;
-        const img = document.createElement("img");
-        img.src = "../SOURCEFILE/IMAGES/welcome/play_video.png";
-        img.alt = "MP4文件";
-        img.classList.add("message-image"); // 添加样式类
-
-        img.style.display = 'block';
-        fileInfo.style.display = 'block';
-        messageBubble.appendChild(img); // 将图片添加到消息泡泡
-        messageBubble.appendChild(fileInfo); // 将图片添加到消息泡泡
-
-        messageBubble.addEventListener("click", async function () {
-            try {
-                const message = await getMessageById(id);
-                const theContent = message.content;
-                const blob = base64ToBlob(theContent, 'video/mp4');
-                if (blob) {
-                    // 创建一个指向 Blob 的 URL
-                    const blobURL = URL.createObjectURL(blob);
-                    // 创建一个隐藏的 <a> 元素
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = blobURL;
-                    downloadLink.download = 'download.mp4'; // 您可以根据需要更改文件名
-                    // 将 <a> 元素添加到文档中
-                    document.body.appendChild(downloadLink);
-                    // 触发点击事件，启动下载
-                    downloadLink.click();
-                    var title = "已开始下载";
-                    Swal.fire({
-                        title: title,
-                        icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
-                        showConfirmButton: false,  // 隐藏确认按钮
-                        timer: 1000,  // 设置定时器，2秒后自动关闭
-                        timerProgressBar: true,  // 显示进度条
-                    });
-                    // 移除 <a> 元素并释放 Blob URL
-                    document.body.removeChild(downloadLink);
-                    URL.revokeObjectURL(blobURL);
-                }
-            } catch (error) {
-                console.error('获取消息内容失败:', error);
-            }
-        });
+        video.addEventListener('click', async function (e) {
+            e.preventDefault()
+            video.requestFullscreen();
+        })
     } else if (mp3DataUrlPattern.test(messageContent)) {
         //Blob 对象本身由 JavaScript 的垃圾回收机制（Garbage Collector, GC）管理。当没有任何引用指向一个 Blob 时，GC 会自动回收其占用的内存。因此，无需手动释放 Blob 对象。
-        const blobSize = getBase64Size(messageContent);
-        const formattedSize = formatBytes(blobSize, 2);
+        // 创建 Shadow DOM，确保内部的 HTML 独立
 
-        const fileInfo = document.createElement("div"); // 您也可以使用 <span> 或其他元素
-        fileInfo.innerHTML = `MP3文件<br>(${formattedSize})`;
+        const shadowRoot = messageBubble.attachShadow({ mode: 'open' });
 
-        //link.title = `${formattedSize}`;
-        const img = document.createElement("img");
-        img.src = "../SOURCEFILE/IMAGES/welcome/play_mp3.png";
-        img.alt = "MP3文件";
-        img.classList.add("message-image"); // 添加样式类
+        // 将你的 HTML 动态插入到 Shadow DOM 中
+        const theHtml = `
+    <style>
+        /* 这里的样式仅作用于 Shadow DOM 内部 */
+        .audio-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: transparent;
+            padding: 10px;
+            border-radius: 12px;
+            width: 200px;
+            max-width: 220px;
+            margin: 0 auto;
+            position: relative;
+        }
 
-        img.style.display = 'block';
-        fileInfo.style.display = 'block';
-        messageBubble.appendChild(img); // 将图片添加到消息泡泡
-        messageBubble.appendChild(fileInfo); // 将图片添加到消息泡泡
+        #playButton {
+            background-color: #ff4081;
+            background: radial-gradient(circle at 30% 30%, #ff80ab, #ff4081);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
-        messageBubble.addEventListener("click", async function () {
+        #playButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            margin-left: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00aaff, #ff4081);
+            width: 0;
+            border-radius: 8px;
+            transition: width 0.2s ease-out;
+            box-shadow: 0 0 15px rgba(255, 64, 129, 0.7), 0 0 30px rgba(0, 170, 255, 0.7);
+        }
+
+        .time {
+            font-size: 12px;
+            color: white;
+            margin-left: 10px;
+            font-family: 'Roboto', sans-serif;
+            white-space: nowrap;
+        }
+
+        #downloadButton {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            background-color: transparent;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #downloadButton:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+    <div class="audio-container">
+        <button id="playButton">⬇</button>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="time" id="currentTime">0:00</div>
+        <button id="downloadButton">⬇</button>
+        <audio id="audioPlayer" style="display:none;">
+            <source type="audio/mp3">
+        </audio>
+    </div>
+`;
+
+        // 将 HTML 插入到 Shadow DOM 中
+        shadowRoot.innerHTML = theHtml;
+
+        const playButton = shadowRoot.getElementById('playButton');
+        const audioPlayer = shadowRoot.getElementById('audioPlayer');
+        const progressBar = shadowRoot.getElementById('progressBar');
+        const currentTimeDisplay = shadowRoot.getElementById('currentTime');
+        const progressContainer = shadowRoot.getElementById('progressContainer');
+        const downloadButton = shadowRoot.getElementById('downloadButton');
+        downloadButton.style.display = 'none';
+        downloadButton.addEventListener("click", async function () {
             try {
                 const message = await getMessageById(id);
                 const theContent = message.content;
-                const blob = base64ToBlob(theContent, 'video/mp4');
+                const blob = base64ToBlob(theContent);
                 if (blob) {
                     // 创建一个指向 Blob 的 URL
                     const blobURL = URL.createObjectURL(blob);
@@ -949,29 +1066,81 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
                 console.error('获取消息内容失败:', error);
             }
         });
+
+        audioPlayer.addEventListener('canplaythrough', () => {
+            console.log('音频加载完成');
+            // 开始播放音频
+            downloadButton.style.display = 'block';
+            playButton.textContent = '▶';  // 改为播放符号
+        });
+
+        // 播放/暂停功能
+        playButton.addEventListener('click', function () {
+            if (audioPlayer.paused) {
+                if (audioPlayer.readyState === 0) {
+                    loadAudio(audioPlayer, id)
+                } else {
+                    audioPlayer.play();
+                    playButton.textContent = '❚❚';  // 改为暂停符号
+                }
+            } else {
+                audioPlayer.pause();
+                playButton.textContent = '▶';  // 改为播放符号
+            }
+        });
+
+        // 更新进度条和当前播放时间
+        audioPlayer.addEventListener('timeupdate', function () {
+            const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = progressPercent + '%';
+
+            const minutes = Math.floor(audioPlayer.currentTime / 60);
+            const seconds = Math.floor(audioPlayer.currentTime % 60).toString().padStart(2, '0');
+            currentTimeDisplay.textContent = `${minutes}:${seconds}`;
+        });
+
+        // 允许拖动进度条来调整播放进度
+        progressContainer.addEventListener('click', function (e) {
+            const containerWidth = progressContainer.offsetWidth;
+            const clickX = e.offsetX;
+            const newTime = (clickX / containerWidth) * audioPlayer.duration;
+            audioPlayer.currentTime = newTime;
+        });
+
+        // 播放结束后重置按钮和进度条
+        audioPlayer.addEventListener('ended', function () {
+            playButton.textContent = '▶';  // 恢复为播放符号
+            progressBar.style.width = '0';
+            currentTimeDisplay.textContent = '0:00';
+        });
     }
     else {
         // 否则，按文本处理
-        messageBubble.innerHTML = replaceEmojiCodes(messageContent);
-        //replaceEmojiCodes(text)
-
-        messageBubble.addEventListener("click", async function () {
-            // 使用 Clipboard API 将文本复制到剪贴板
-            navigator.clipboard.writeText(messageContent).then(function () {
-                console.log('消息已复制到剪贴板');
-                var title = "消息已复制到剪贴板";
-                Swal.fire({
-                    title: title,
-                    icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
-                    showConfirmButton: false,  // 隐藏确认按钮
-                    timer: 1000,  // 设置定时器，2秒后自动关闭
-                    timerProgressBar: true,  // 显示进度条
-                });
-            }).catch(function (err) {
-                console.error('无法复制消息：', err);
-            });
-        });
-
+        if (messageContent == "[大爆炸]") {
+            const iframe = document.createElement('iframe');
+            iframe.src = '../HTML/explode.html';
+            iframe.setAttribute('width', '400'); // 设置宽度为800像素
+            iframe.setAttribute('height', '300'); // 设置高度为600像素
+            messageBubble.appendChild(iframe);
+        } else if (messageContent == "[黑客帝国]") {
+            const iframe = document.createElement('iframe');
+            iframe.src = '../HTML/Matrix.html';
+            iframe.setAttribute('width', '400'); // 设置宽度为800像素
+            iframe.setAttribute('height', '300'); // 设置高度为600像素
+            messageBubble.appendChild(iframe);
+        } else if (messageContent == "[我爱你]") {
+            const iframe = document.createElement('iframe');
+            iframe.src = '../HTML/heart.html';
+            iframe.setAttribute('width', '400'); // 设置宽度为800像素
+            iframe.setAttribute('height', '300'); // 设置高度为600像素
+            messageBubble.appendChild(iframe);
+        } else {
+            messageContent = messageContent.replace(/\n/g, '<br>');
+            //防止恶意攻击
+            const shadowRoot = messageBubble.attachShadow({ mode: 'open' });
+            const theHtml = replaceEmojiCodes(messageContent);
+            shadowRoot.innerHTML = theHtml;
+        }
     }
     //messageBubble.textContent = `${messageContent}`;  // 设置消息内容
     if (senderAccount == account) {
@@ -1000,7 +1169,7 @@ function addContantItem(contactList, userAccount, userName, fileType, base64Data
 
     //存储头像
     const avatarKey = userAccount + "avatar"; //头像 键
-    const avatarData = `data:${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
+    const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
     mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
     mySessionStorage[userAccount + "counter"] = "0"; //计数器归0
     console.log("头像已存储到 mySessionStorage");
@@ -1009,7 +1178,12 @@ function addContantItem(contactList, userAccount, userName, fileType, base64Data
     const storedAvatar = mySessionStorage[userAccount + "avatar"];//获取头像
     const avatar = document.createElement("img");
     avatar.id = userAccount + "img";
-    avatar.src = storedAvatar;  // 根据发送方账号设置头像图片路径
+    const blob = base64ToBlob(storedAvatar);
+    if (blob) {
+        // 创建一个指向 Blob 的 URL
+        const blobURL = URL.createObjectURL(blob);
+        avatar.src = blobURL;  // 根据发送方账号设置头像图片路径
+    }
     avatar.alt = "头像";
     avatar.classList.add("avatar");  // 添加头像样式类
 
@@ -1027,7 +1201,7 @@ function addContantItem(contactList, userAccount, userName, fileType, base64Data
         contactList.appendChild(contactItem);  // 将联系人元素添加到联系人列表
 
         // 为联系人添加点击事件
-        contactItem.addEventListener("click", function () {
+        contactItem.addEventListener("click", async function () {
             startConversation(userAccount, userName);  // 点击联系人后开始对话
             mySessionStorage[userAccount + "counter"] = "0";//sessionStorage.setItem(userAccount + "counter", 0);
             //待处理 移除红点
@@ -1041,6 +1215,9 @@ function command_loginSuccessfully(blocks) {
     const receiverUsername = blocks[2];  // 获取接收方昵称
     const receiverEmail = blocks[3];  // 获取接收方邮箱
     const receiverTelephone = blocks[4];  // 获取接收方电话
+    userEmail = receiverEmail;
+    userPhoneNumber = receiverTelephone;
+    userName = receiverUsername;
     var title = "欢迎回来：" + receiverAccount;
     var text = "昵称：" + receiverUsername + "<br>" + "电子邮箱：" + receiverEmail + "<br>" + "电话号码：" + receiverTelephone;
     Swal.fire({
@@ -1097,10 +1274,40 @@ function command_myAvatar(blocks) {
     const fileType = blocks[1];
     console.log("文件类型：" + fileType);
     const base64Data = blocks[2];
-    const avatarKey = "myAvatar";
-    const avatarData = `data:${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
+    const avatarKey = account + "avatar";
+    const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
     mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
     console.log("头像已存储到 mySessionStorage");//console.log("头像已存储到 sessionStorage");
+    //document.getElementById("avatar")
+    const blob = base64ToBlob(avatarData);
+    if (blob) {
+        // 创建一个指向 Blob 的 URL
+        const blobURL = URL.createObjectURL(blob);
+        document.getElementById("avatar").src = blobURL;
+    }
+}
+
+function command_setAvatar(blocks) {
+    const fileType = blocks[1];
+    console.log("文件类型：" + fileType);
+    const base64Data = blocks[2];
+    const avatarKey = account + "avatar";
+    const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
+    mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
+    console.log("头像已存储到 mySessionStorage");//console.log("头像已存储到 sessionStorage");
+    //document.getElementById("avatar")
+    const blob = base64ToBlob(avatarData);
+    if (blob) {
+        // 创建一个指向 Blob 的 URL
+        const blobURL = URL.createObjectURL(blob);
+        document.getElementById("avatar").src = blobURL;
+    }
+    var title = "修改成功";
+                Swal.fire({
+                    title: title,
+                    icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定'
+                });
 }
 
 async function command_messageConfirm(blocks) {
@@ -1115,13 +1322,6 @@ async function command_messageConfirm(blocks) {
         const messagesTmp = document.getElementById("messages");
         messagesTmp.scrollTop = messagesTmp.scrollHeight;  // 滚动到最新消息
     }, 0);
-    //const fileType = blocks[1];
-    //console.log("文件类型：" + fileType);
-    //const base64Data = blocks[2];
-    //const avatarKey = "myAvatar";
-    //const avatarData = `data:${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
-    //mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
-    //console.log("头像已存储到 mySessionStorage");//console.log("头像已存储到 sessionStorage");
 }
 
 // 处理消息
@@ -1141,6 +1341,8 @@ function process(fullMessage) {
         command_myAvatar(blocks);
     } else if (command == "messageConfirm") {
         command_messageConfirm(blocks);
+    }else if(command == "setAvatar"){
+        command_setAvatar(blocks);
     }
 }
 
@@ -1152,7 +1354,6 @@ function showMessages(messages) {
     messages.forEach(message => {  // 遍历每条消息
         addMessage(message.id, message.sender, message.content, false);
     });
-
 
     //messagesContainer.scrollTop = messagesContainer.scrollHeight;  // 滚动到最新消息
     setTimeout(() => {
@@ -1168,9 +1369,17 @@ function showMessages(messages) {
 }
 
 // 开始新的对话
-function startConversation(chatwith, username) {
+async function startConversation(chatwith, username) {
+    const chatArea = document.querySelector(".chat-area");  // 获取聊天区域
+    const userInfo = document.querySelector(".user-info2");
+    const passwordArea = document.querySelector(".passwordArea");
+    chatArea.style.display = "flex";  // 显示聊天区域
+    userInfo.style.display = "none"; // 隐藏用户信息区域
+    passwordArea.style.display = "none";  // 隐藏修改密码区域
+
     document.getElementById("input-area").style.visibility = "visible";  // 显示输入区域
     document.getElementById("tools").style.visibility = "visible";  // 显示工具区域
+    document.getElementById("messages").innerHTML = "";  // 清空输入框
     document.getElementById("messageInput").value = "";  // 清空输入框
     sessionStorage.setItem('chatwith', chatwith);  // 存储当前对话的联系人账号
     const contactName = document.getElementById("contactName");  // 获取联系人名称DOM元素
@@ -1184,29 +1393,126 @@ function startConversation(chatwith, username) {
 // 页面加载完成时的事件监听器
 document.addEventListener("DOMContentLoaded", function () {
 
-    const contactList = document.getElementById("contactList");  // 获取联系人列表DOM元素
-    const messages = document.getElementById("messages");  // 获取消息容器DOM元素
-    const messageInput = document.getElementById("messageInput");  // 获取消息输入框DOM元素
-    const sendButton = document.getElementById("sendButton");  // 获取发送按钮DOM元素
     const menuButton = document.getElementById("menuButton");  // 获取菜单按钮DOM元素
     const exitButton = document.getElementById("exitButton");  // 获取退出按钮DOM元素
+    const contactList = document.getElementById("contactList");  // 获取联系人列表DOM元素
+    const chatArea = document.querySelector(".chat-area");  // 获取聊天区域
+    const messages = document.getElementById("messages");  // 获取消息容器DOM元素
+    const tools = document.getElementById("tools");  // 工具区域
     const fileButton = document.getElementById("fileButton");  // 获取文件按钮DOM元素
-    const customMenu = document.getElementById('customMenu');  //菜单
-    //myEmojiButton
-    const myEmojiButton = document.getElementById('myEmojiButton');//按钮
+    const input_area = document.getElementById("input-area");  // 隐藏输入区域
+    const messageInput = document.getElementById("messageInput");  // 获取消息输入框DOM元素
+    const sendButton = document.getElementById("sendButton");  // 获取发送按钮DOM元素
+    const customMenu = document.getElementById('customMenu');  // 右键菜单
+    const userInfo = document.querySelector(".user-info2");
+    const passwordArea = document.querySelector(".passwordArea");
+    const changesForm = document.getElementById("changesForm");
+    const changePasswordForm = document.getElementById("changePasswordForm");
+    const avatar = document.getElementById("avatar");
+
+    const userEmailInput = document.getElementById("userEmail");
+    const userPhoneInput = document.getElementById("userPhoneInput");
+    const userNicknameInput = document.getElementById("userNicknameInput");
+    const oldPassword = document.getElementById("oldPassword");
+    const newPassword = document.getElementById("newPassword");
+    const newPassword_confirm = document.getElementById("newPassword_confirm");
+
 
     const emojiTable = document.getElementById('emojiTable');  //菜单
     const emojiButton = document.getElementById('emojiButton');  //菜单
     const eTable = document.getElementById('eTable');  //菜单
-
     const superEmojiTable = document.getElementById('superEmojiTable');  //菜单
     const superEmojiButton = document.getElementById('superEmojiButton');  //菜单
     const superETable = document.getElementById('superETable');  //菜单
 
-    document.getElementById("input-area").style.visibility = "hidden";  // 隐藏输入区域
-    document.getElementById("tools").style.visibility = "hidden";  // 隐藏工具区域
+    //changePasswordForm.classList.add('show');
 
-    //emojiButton
+    //聊天区域不显示
+    chatArea.style.display = "none";
+
+    userEmailInput.oninvalid = function () {
+        this.setCustomValidity('请输入邮箱');  // 设置自定义的无效提示信息
+    };
+    userEmailInput.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
+    userPhoneInput.oninvalid = function () {
+        this.setCustomValidity('请输入电话号');  // 设置自定义的无效提示信息
+    };
+    userPhoneInput.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
+    userNicknameInput.oninvalid = function () {
+        this.setCustomValidity('请输入用户名');  // 设置自定义的无效提示信息
+    };
+    userNicknameInput.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
+    oldPassword.oninvalid = function () {
+        this.setCustomValidity('请输入旧密码');  // 设置自定义的无效提示信息
+    };
+    oldPassword.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
+    newPassword.oninvalid = function () {
+        this.setCustomValidity('请输入新密码');  // 设置自定义的无效提示信息
+    };
+    newPassword.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
+    newPassword_confirm.oninvalid = function () {
+        this.setCustomValidity('请确认新密码');  // 设置自定义的无效提示信息
+    };
+    newPassword_confirm.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
+
+    avatar.addEventListener("click", function () {
+        console.log("修改头像");  // 打印对话信息
+        document.getElementById('avatarInput').click();
+    });
+    document.getElementById('avatarInput').addEventListener('change', async function (event) {
+        const file = event.target.files[0];
+        var base64String;
+        if (file) {
+            console.log('已选择文件：', file.name);
+            console.log('文件类型：', file.type);
+            // 检查文件大小是否为0
+            if (file.size === 0) {
+                var title = "文件内容不能为空";
+                Swal.fire({
+                    title: title,
+                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定',
+                });
+                return;  // 终止后续处理
+            }
+            if (avatarValidTypes.includes(file.type)) {
+                const reader = new FileReader();
+                console.log('已创建读取器');
+                // 当 FileReader 完成读取时的回调
+                reader.onload = async function (e) {
+                    console.log('读取完成');
+                    base64String = e.target.result; // 获取 base64 编码的字符串
+                    const command = "setAvatar";  // 定义发送消息的命令
+                    const senderAccount = account;  // 获取发送方账号
+                    const payload = [command, senderAccount,base64String];  // 定义包含登录和账号信息的消息
+                    const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
+                    sendMessageToServer(multiLinePayload);  // 发送消息到服务器
+                };
+                reader.readAsDataURL(file);
+            }
+            else {
+                var title = "不支持的文件格式";
+                Swal.fire({
+                    title: title,
+                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定',
+                });
+            }
+            document.getElementById('fileInput').value = "";
+        }
+    });
 
     const emojisPerRow = 4;
     let row = document.createElement('tr');
@@ -1216,8 +1522,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const img = document.createElement('img');
         img.src = value;
         img.alt = key.replace(/]$/, '').replace(/\[/g, '');
-        img.style.width = '30px'; // 设置图片大小
-        img.style.height = '30px'; // 设置图片大小
+        img.style.width = '32px'; // 设置图片大小
+        img.style.height = '32px'; // 设置图片大小
         img.classList.add("normalEmoji");  // 添加样式类
         td.appendChild(img); // 将图片添加到单元格
         row.appendChild(td); // 将单元格添加到行
@@ -1273,8 +1579,8 @@ document.addEventListener("DOMContentLoaded", function () {
         img.src = value;
         img.alt = key.replace(/]$/, '').replace(/\[/g, '');
         img.classList.add("superEmoji");  // 添加样式类
-        img.style.width = '30px'; // 设置图片大小
-        img.style.height = '30px'; // 设置图片大小
+        img.style.width = '32px'; // 设置图片大小
+        img.style.height = '32px'; // 设置图片大小
         td.appendChild(img); // 将图片添加到单元格
         row_s.appendChild(td); // 将单元格添加到行
 
@@ -1368,7 +1674,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     //文件按钮监听
-    fileButton.addEventListener('click', function () {
+    fileButton.addEventListener('click', async function () {
         document.getElementById('fileInput').click();
     });
     document.getElementById('fileInput').addEventListener('change', async function (event) {
@@ -1473,53 +1779,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    document.getElementById('emojiFileInput').addEventListener('change', async function (event) {
-        const file = event.target.files[0];
-        var base64String;
-        if (file) {
-            console.log('已选择文件：', file.name);
-            console.log('文件类型：', file.type);
-            // 检查文件大小是否为0
-            if (file.size === 0) {
-                var title = "文件内容不能为空";
-                Swal.fire({
-                    title: title,
-                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
-                    confirmButtonText: '确定',
-                });
-                return;  // 终止后续处理
-            }
-
-            if (gifValidTypes.includes(file.type)) {
-                const fileType = file.type; // 或者使用 file.name.split('.').pop() 获取后缀
-                // 创建 FileReader 对象来读取文件
-                const reader = new FileReader();
-                console.log('已创建表情读取器');
-                // 当 FileReader 完成读取时的回调
-                reader.onload = async function (e) {
-                    console.log('读取完成');
-                    base64String = e.target.result; // 获取 base64 编码的字符串
-                    //const id = await saveMessage(senderAccount, receiverAccount, base64String);  // 保存消息到本地//saveMessageToLocal(senderAccount, receiverAccount, base64String);  // 保存消息到本地
-                    //addMessage(id, senderAccount, base64String, true);
-                    //setTimeout(() => {
-                        //const messagesTmp = document.getElementById("messages");
-                        //messagesTmp.scrollTop = messagesTmp.scrollHeight;  // 滚动到最新消息
-                    //}, 0);
-                };
-                reader.readAsDataURL(file);
-            }
-            else {
-                var title = "不支持的文件格式";
-                Swal.fire({
-                    title: title,
-                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
-                    confirmButtonText: '确定',
-                });
-            }
-            document.getElementById('fileInput').value = "";
-        }
-    });
-
     // 退出按钮的点击事件
     exitButton.addEventListener("click", function () {
         socket.close();  // 关闭WebSocket连接
@@ -1535,6 +1794,29 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("feature1").addEventListener("click", function () {
         //alert("功能 1 被点击");  // 使用其他逻辑替换
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
+        // 判断聊天区域是否显示
+        if (userInfo.style.display === "none") {
+            // 隐藏修改密码区域
+            passwordArea.style.display = "none";
+            // 隐藏聊天区域
+            chatArea.style.display = "none";
+            // 显示用户信息区域
+            userInfo.style.display = "flex";
+            // 填充用户信息
+            changesForm.classList.add('show');
+            document.getElementById("userAccount").innerText = account;
+            document.getElementById("userEmail").value = userEmail;
+            document.getElementById("userPhoneInput").value = userPhoneNumber;
+            document.getElementById("userNicknameInput").value = userName;
+
+        } else {
+
+            // 如果聊天区域已经隐藏，可以选择执行其他操作或切换回来
+            chatArea.style.display = "flex";  // 显示聊天区域
+            userInfo.style.display = "none"; // 隐藏用户信息区域
+            passwordArea.style.display = "none";  // 隐藏修改密码区域
+
+        }
     });
 
     document.getElementById("feature2").addEventListener("click", function () {
@@ -1551,9 +1833,10 @@ document.addEventListener("DOMContentLoaded", function () {
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
     });
     document.getElementById("feature5").addEventListener("click", function () {
-        // 发送初始消息到服务器
-        document.getElementById("input-area").style.visibility = "hidden";  // 隐藏输入区域
-        document.getElementById("tools").style.visibility = "hidden";  // 隐藏工具区域
+        //聊天区域不显示
+        chatArea.style.display = "none";
+        userInfo.style.display = "none"; // 隐藏用户信息区域
+        passwordArea.style.display = "none";  // 隐藏修改密码区域
         //.innerHTML = "";
         // 清空聊天头部区域的联系人名称和账号信息
         document.getElementById("contactName").textContent = "";
@@ -1568,6 +1851,156 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     document.getElementById("feature6").addEventListener("click", function () {
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
+        // 判断聊天区域和用户信息区域是否显示,
+        if (passwordArea.style.display === "none") {
+            // 隐藏聊天区域
+            chatArea.style.display = "none";
+            // 显示用户信息区域
+            userInfo.style.display = "none";
+            // 显示修改密码区域
+            passwordArea.style.display = "flex";
+            changePasswordForm.classList.add('show');
+        } else {
+            // 如果聊天区域和用户信息区域已经隐藏，可以选择执行其他操作或切换回来
+            chatArea.style.display = "flex";  // 显示聊天区域
+            userInfo.style.display = "none"; // 隐藏用户信息区域
+            passwordArea.style.display = "none";  // 隐藏修改密码区域
+        }
     });
 });
 
+
+document.getElementById('changesForm').addEventListener('submit', function (event) {
+    event.preventDefault();  // 阻止表单的默认提交行为，防止页面刷新或跳转
+
+    const userId = account;
+    const newName = document.getElementById('userNicknameInput').value;  // 获取新用户名输入框中的值
+    const newEmail = document.getElementById('userEmail').value;  // 获取新邮箱输入框中的值
+    const newPhoneNumber = document.getElementById('userPhoneInput').value;  // 获取新电话号码输入框中的值
+
+    console.log("用户ID:" + userId + "新用户名:" + newName + "新邮箱:" + newEmail + "新电话号码:" + newPhoneNumber);  // 打印用户信息
+    // 构建要发送的请求数据对象
+    const data = {
+        userId: userId,  // 用户ID字段
+        newName: newName,   // 新用户名字段
+        newEmail: newEmail,  // 新邮箱字段
+        newPhoneNumber: newPhoneNumber  // 新电话号码字段
+    };
+
+    // 使用 Fetch API 向服务器发送异步请求
+    fetch('http://localhost:8080/api/updateInfo', {  // 注册接口的完整 URL
+        method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
+        headers: {
+            'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON
+        },
+        body: JSON.stringify(data)  // 将 JavaScript 对象转换为 JSON 字符串，作为请求体发送
+    })
+        .then(response => response.text())  // 将服务器返回的响应转换为文本格式
+        .then(result => {
+
+            if (result == "yes") {
+                userEmail = newEmail;
+                userPhoneNumber = newPhoneNumber;
+                userName = newName;
+                var title = "修改成功";
+                Swal.fire({
+                    title: title,
+                    icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定'
+                });
+            } else {
+                var title = "错误，用户不存在";
+                Swal.fire({
+                    title: title,
+                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定'
+                });
+            }
+
+        })
+        .catch(error => {
+            console.error('Error:', error);  // 在控制台输出错误信息，便于调试
+            var title = "网络超时，请重试";
+            Swal.fire({
+                title: title,
+                icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
+            });
+        });
+});
+
+
+
+
+document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+    event.preventDefault();  // 阻止表单的默认提交行为，防止页面刷新或跳转
+
+    const id = account;  // 获取用户ID                                                                                                   
+    const oldpassword = document.getElementById('oldPassword').value;  // 获取旧密码输入框中的值
+    const newPassword = document.getElementById('newPassword').value;  // 获取新密码输入框中的值
+    const newPassword_confirm = document.getElementById('newPassword_confirm').value;  // 获取确认新密码输入框中的值
+
+    if (newPassword != newPassword_confirm) {  // 检查两次输入的密码是否一致
+        var title = "两次密码输入不一致";
+        Swal.fire({
+            title: title,
+            icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+        return;  // 阻止表单提交
+    }
+
+    const data = {
+        id: id,  // 用户ID字段
+        oldPassword: oldpassword,  // 旧密码字段
+        newPassword: newPassword,  // 新密码字段
+        newPassword_confirm: newPassword_confirm  // 确认新密码字段
+    };
+
+
+
+    // 使用 Fetch API 向服务器发送异步请求
+    fetch('http://localhost:8080/api/updatePassword', {  // 注册接口的完整 URL
+        method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
+        headers: {
+            'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON
+        },
+        body: JSON.stringify(data)  // 将 JavaScript 对象转换为 JSON 字符串，作为请求体发送
+    })
+        .then(response => response.text())  // 将服务器返回的响应转换为文本格式
+        .then(result => {
+
+            if (result == "yes") {
+                var title = "修改成功";
+                Swal.fire({
+                    title: title,
+                    icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定'
+                });
+            } else if (result == "wrong") {
+                var title = "原密码错误";
+                Swal.fire({
+                    title: title,
+                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定'
+                });
+            } else {
+                var title = "错误，用户不存在";
+                Swal.fire({
+                    title: title,
+                    icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                    confirmButtonText: '确定'
+                });
+            }
+
+        })
+        .catch(error => {
+            console.error('Error:', error);  // 在控制台输出错误信息，便于调试
+            var title = "网络超时，请重试";
+            Swal.fire({
+                title: title,
+                icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
+            });
+        });
+});

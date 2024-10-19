@@ -37,14 +37,14 @@ body {
     background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
 }
 
-#keyboardButton {
+#microPhoneButton {
     background: transparent; /* 背景透明 */
     transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
     padding: 10px; /* 内边距为10px */
     border: none; /* 无边框 */
 }
 
-#keyboardButton:hover {
+#microPhoneButton:hover {
     background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
 }
 
@@ -461,8 +461,6 @@ body {
 
 .message-observe{
     opacity: 0;
-    width: auto; /* 初始宽度 */
-    height: auto; /* 初始高度 */
     transition: opacity 0.5s ease-in-out;  /* 设置过渡时间和效果 */
     /*transition: width 0.3s ease, padding 0.3s ease; /* 平滑过渡效果，包含宽度和内边距的变化 */
 }
@@ -480,8 +478,8 @@ body {
 
 .emoji {
     border-radius: 50%;
-    width: 30px; /* 设置emoji图片的大小 */
-    height: 30px;
+    width: 32px; /* 设置emoji图片的大小 */
+    height: 32px;
   }
   .hidden {
     display: none; /* 这会将元素完全隐藏，不占据布局空间 */
@@ -565,6 +563,7 @@ body {
   }
   
   /* 图片预览 */
+  /**/
   .modal {
     touch-action: none;
     position: fixed;
@@ -583,3 +582,144 @@ body {
     /* transition: all var(--delay_time); */
     transform: translateZ(0);
   }
+  .modal > video {
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    /* transition: all var(--delay_time); */
+    transform: translateZ(0);
+  }
+
+  /* 设置欢迎图片的样式 */
+#avatar {
+    width: 100px; /* 图片宽度 */
+    height: 100px; /* 图片宽度 */
+    display: block; /* 设置为块级元素 */
+    margin: 0 auto 20px; /* 上下边距为0，水平居中，下边距20px */
+    border-radius: 50px; /* 圆角边框 */
+}
+
+  .user-info2,.passwordArea {
+    flex: 1; /* 占据剩余空间 */
+    
+    border-radius: 10px; /* 边框圆角 */
+
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+#changesForm, #changePasswordForm {
+    background: rgba(255, 255, 255, 0.15); /* 设置背景颜色为半透明白色 */
+    padding: 40px 30px; /* 设置内边距 */
+    border-radius: 15px; /* 圆角边框 */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 添加阴影 */
+    backdrop-filter: blur(8px); /* 背景模糊效果 */
+    -webkit-backdrop-filter: blur(8px); /* 为WebKit浏览器添加背景模糊 */
+    border: 1px solid rgba(255, 255, 255, 0.18); /* 设置边框样式 */
+    text-align: center; /* 文本居中 */
+    opacity: 0; /* 初始透明度设置为0 */
+    transform: translateY(20px); /* 初始位置向下偏移20px */
+    transition: opacity 2.5s ease, transform 2s ease; /* 设置过渡效果 */
+}
+
+#changesForm.show, #changePasswordForm.show {
+    opacity: 1; /* 设置透明度为完全不透明 */
+    transform: translateY(0); /* 位置复原 */
+}
+
+.user-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.user-account {
+    color: #333;  /* 让账号信息的颜色淡一点 */
+}
+
+  .user-info2,.passwordArea h3 {
+    margin-bottom: 10px; /* 底部外边距 */
+    font-size: 18px; /* 标题字体大小 */
+    color: #007bff; /* 标题颜色 */
+}
+
+/* 用户信息段落样式 */
+.user-info2 p {
+    margin: 5px 0; /* 上下外边距 */
+    /* 设置段落颜色为黑色 */
+    color: #000;
+}
+
+/* 定义输入框的样式 */
+input {
+    width: 90%; /* 输入框宽度为90% */
+    padding: 12px 15px; /* 输入框内边距 */
+    margin-top: 8px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 输入框圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #ffffff; /* 设置字体颜色 */
+    font-size: 16px; /* 字体大小 */
+    outline: none; /* 删除聚焦时的轮廓 */
+}
+
+/* 防止自动填充时样式被覆盖 */
+input:autofill {
+    -webkit-text-fill-color: #ffffff; /* 设置字体颜色 */
+    transition: background-color 5000s ease-in-out 0s; /* 设置过渡效果，避免背景色变化 */
+}
+
+/* 设置输入框占位符的样式 */
+input::placeholder {
+    color: #ffffff; /* 占位符字体颜色 */
+    opacity: 0.7; /* 占位符透明度 */
+}
+
+/* 输入框容器样式，包含图标和输入框 */
+.input-container {
+    display: flex; /* 启用弹性盒布局 */
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 15px; /* 下边距 */
+}
+
+/* 输入框前图标的样式 */
+.input-container img {
+    margin-right: 10px; /* 右边距 */
+    width: 40px; /* 图标宽度 */
+    height: 40px; /* 图标高度 */
+}
+
+/* 按钮的样式 */
+#changesSubmitButton {
+    width: 90%; /* 按钮宽度为90% */
+    padding: 12px 15px; /* 按钮内边距 */
+    margin-top: 8px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 按钮圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #8060E5; /* 设置字体颜色 */
+    font-weight: bold; /* 字体加粗 */
+    font-size: 18px; /* 字体大小 */
+    transition: 0.5s ease; /* 设置过渡效果 */
+}
+
+#changesSubmitButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 鼠标悬停时背景色 */
+}
+
+#changesPasswordButton{
+    width: 90%; /* 按钮宽度为90% */
+    padding: 12px 15px; /* 按钮内边距 */
+    margin-top: 8px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 按钮圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #8060E5; /* 设置字体颜色 */
+    font-weight: bold; /* 字体加粗 */
+    font-size: 18px; /* 字体大小 */
+    transition: 0.5s ease; /* 设置过渡效果 */
+}
+
+#changesPasswordButton:hover{
+    background: rgba(255, 255, 255, 0.35); /* 鼠标悬停时背景色 */
+}

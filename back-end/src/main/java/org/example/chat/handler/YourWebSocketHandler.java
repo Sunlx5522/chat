@@ -9,6 +9,11 @@ import java.util.Objects;  // 导入Objects类
 import java.util.Map;  // 导入Map接口
 import java.util.HashMap;  // 导入HashMap类
 import java.io.File;  //文件读取
+import java.nio.file.*;
+import java.util.Base64;
+import java.io.IOException;
+import java.nio.file.Paths; //文件路径
+import java.nio.file.StandardOpenOption; //标准
 import java.io.FileInputStream;  //文件流
 
 //导入json文件处理类
@@ -161,11 +166,47 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
 
     }
 
+    public void setAvatar(Avatar avatar, WebSocketSession session) throws Exception {
+        if (avatar == null) { //用户未存储头像
+            System.out.println("未存储头像");  // 打印base64编码
+            String avatar_path = "SOURCEFILES/IMAGES/PNG/default_image.png";
+            File file = new File(avatar_path);
+            if (file.exists()) {
+                sendUserAvatar_s(file, session);
+            }
+        } else {
+            System.out.println("已存储头像");  // 打印base64编码
+            String avatar_path = avatar.getAvatar_path();
+            File file = new File(avatar_path);
+            if (file.exists()) {
+                sendUserAvatar_s(file, session);
+            } else {
+                avatar_path = "SOURCEFILES/IMAGES/PNG/default_image.png";
+                file = new File(avatar_path);
+                if (file.exists()) {
+                    sendUserAvatar_s(file, session);
+                }
+            }
+        }
+
+    }
+
+
+
     // 发送头像
     public void sendUserAvatar(File file, WebSocketSession session) throws Exception {
         String base64Data = getFileBase64(file);
         String fileType = getFileExtension(file);
         String[] messages_tmp = {"myAvatar", fileType, base64Data};  // 构建响应消息数组
+        String multiLineMessage_tmp = String.join(DELIMITER, messages_tmp);  // 使用特殊标记拼接消息
+        sendMessage(session, multiLineMessage_tmp); // 发送登录成功消息给客户
+    }
+
+    // 发送头像
+    public void sendUserAvatar_s(File file, WebSocketSession session) throws Exception {
+        String base64Data = getFileBase64(file);
+        String fileType = getFileExtension(file);
+        String[] messages_tmp = {"setAvatar", fileType, base64Data};  // 构建响应消息数组
         String multiLineMessage_tmp = String.join(DELIMITER, messages_tmp);  // 使用特殊标记拼接消息
         sendMessage(session, multiLineMessage_tmp); // 发送登录成功消息给客户
     }
@@ -386,6 +427,59 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         }
     }
 
+    public void command_setAvatar(String[] blocks,WebSocketSession session) throws Exception {
+        String senderAccount = blocks[1];  // 获取账号信息
+        String base64String = blocks[2];  // 获取 Base64 编码的图片数据
+
+        // 检查图片格式，确定文件扩展名
+        String fileExtension;
+        String folderPath;
+        if (base64String.startsWith("data:image/png")) {
+            fileExtension = ".png";
+            folderPath = "SOURCEFILES/IMAGES/PNG/";
+        } else if (base64String.startsWith("data:image/jpeg") || base64String.startsWith("data:image/jpg")) {
+            fileExtension = ".jpg";  // 将 JPEG 和 JPG 都存为 .jpg
+            folderPath = "SOURCEFILES/IMAGES/JPG/";
+        } else {
+            throw new IllegalArgumentException("Unsupported image format");  // 不支持的图片格式
+        }
+
+        // 去除 Base64 前缀
+        base64String = base64String.substring(base64String.indexOf(",") + 1);
+
+        // 设置文件路径，文件名使用 senderAccount
+        String filePath = folderPath + senderAccount + fileExtension;
+
+        // 确保目标文件夹存在，如果不存在则创建
+        Path directoryPath = Paths.get(folderPath);
+        if (Files.notExists(directoryPath)) {
+            Files.createDirectories(directoryPath);
+        }
+
+        // 解码并保存图片，覆盖已存在的文件
+        try {
+            Files.write(
+                    Paths.get(filePath),
+                    Base64.getDecoder().decode(base64String),
+                    StandardOpenOption.CREATE,  // 如果文件不存在则创建
+                    StandardOpenOption.TRUNCATE_EXISTING  // 如果文件存在则覆盖
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Avatar avatar = avatarRepository.findByAccount(senderAccount);
+        if(avatar == null){
+            Avatar newAvatar = new Avatar(senderAccount, filePath);
+            avatarRepository.save(newAvatar);
+            setAvatar(newAvatar, session);
+        }else{
+            avatar.setAvatar_path(filePath);
+            avatarRepository.save(avatar);
+            setAvatar(avatar, session);
+        }
+    }
+
     public void process(String fullMessage, WebSocketSession session) throws Exception {  // 处理完整的消息
         String[] blocks = fullMessage.split("\\[b1565ef8ea49b3b3959db8c5487229ea\\]");  // 使用特殊标记拆分字符串
         String command = blocks[0];  // 获取命令类型
@@ -397,6 +491,8 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         } else if(Objects.equals(command, "sendSuperEmoji"))
         {
             command_sendSuperEmoji(blocks);
+        }else if(Objects.equals(command, "setAvatar")){
+            command_setAvatar(blocks,session);
         }
     }
 

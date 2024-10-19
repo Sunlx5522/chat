@@ -47,20 +47,56 @@ function openPreview() {
     }, 280)
   }
   // 添加图片
-  changeStyle(cloneEl, [`left: ${left}px`, `top: ${top}px`])
-  mask.appendChild(cloneEl)
-  // 移动图片到屏幕中心位置
-  const originalCenterPoint = { x: offsetWidth / 2 + left, y: offsetHeight / 2 + top }
-  const winCenterPoint = { x: winWidth / 2, y: winHeight / 2 }
-  const offsetDistance = { left: winCenterPoint.x - originalCenterPoint.x + left, top: winCenterPoint.y - originalCenterPoint.y + top }
-  const diffs = { left: ((adaptScale() - 1) * offsetWidth) / 2, top: ((adaptScale() - 1) * offsetHeight) / 2 }
-  changeStyle(cloneEl, ['transition: all 0.3s', `width: ${offsetWidth * adaptScale() + 'px'}`, `transform: translate(${offsetDistance.left - left - diffs.left}px, ${offsetDistance.top - top - diffs.top}px)`])
-  // 消除偏差
-  setTimeout(() => {
-    changeStyle(cloneEl, ['transition: all 0s', `left: 0`, `top: 0`, `transform: translate(${offsetDistance.left - diffs.left}px, ${offsetDistance.top - diffs.top}px)`])
-    offset = { left: offsetDistance.left - diffs.left, top: offsetDistance.top - diffs.top } // 记录值
-    record()
-  }, 300)
+  //changeStyle(cloneEl, [`left: ${left}px`, `top: ${top}px`])
+  //mask.appendChild(cloneEl)
+  // 假设 cloneEl 已经被创建
+  if (cloneEl.tagName === 'IMG') {
+    // 处理图片元素
+    cloneEl.decode().then(() => {
+      // 图片已解码，安全地添加到 DOM 中
+      changeStyle(cloneEl, [`left: ${left}px`, `top: ${top}px`]);
+      mask.appendChild(cloneEl);
+      // 继续后续操作
+      setTimeout(() => {
+        // 移动图片到屏幕中心位置
+        const originalCenterPoint = { x: offsetWidth / 2 + left, y: offsetHeight / 2 + top }
+        const winCenterPoint = { x: winWidth / 2, y: winHeight / 2 }
+        const offsetDistance = { left: winCenterPoint.x - originalCenterPoint.x + left, top: winCenterPoint.y - originalCenterPoint.y + top }
+        const diffs = { left: ((adaptScale() - 1) * offsetWidth) / 2, top: ((adaptScale() - 1) * offsetHeight) / 2 }
+        //移动逻辑 (文件体积大 移动比较慢)
+        changeStyle(cloneEl, ['transition: all 0.3s', `width: ${offsetWidth * adaptScale() + 'px'}`, `transform: translate(${offsetDistance.left - left - diffs.left}px, ${offsetDistance.top - top - diffs.top}px)`])
+        setTimeout(() => {
+          changeStyle(cloneEl, ['transition: all 0s', `left: 0`, `top: 0`, `transform: translate(${offsetDistance.left - diffs.left}px, ${offsetDistance.top - diffs.top}px)`])
+          offset = { left: offsetDistance.left - diffs.left, top: offsetDistance.top - diffs.top } // 记录值
+          record()
+        }, 300)
+      }, 300)
+    }).catch((error) => {
+      console.error('图片解码失败:', error);
+    });
+  } else if (cloneEl.tagName === 'VIDEO') {
+    // 处理视频元素
+    // 视频数据已加载，安全地添加到 DOM 中
+    changeStyle(cloneEl, [`left: ${left}px`, `top: ${top}px`]);
+    mask.appendChild(cloneEl);
+    // 继续后续操作
+    setTimeout(() => {
+      // 移动图片到屏幕中心位置
+      const originalCenterPoint = { x: offsetWidth / 2 + left, y: offsetHeight / 2 + top }
+      const winCenterPoint = { x: winWidth / 2, y: winHeight / 2 }
+      const offsetDistance = { left: winCenterPoint.x - originalCenterPoint.x + left, top: winCenterPoint.y - originalCenterPoint.y + top }
+      const diffs = { left: ((adaptScale() - 1) * offsetWidth) / 2, top: ((adaptScale() - 1) * offsetHeight) / 2 }
+      //移动逻辑 (文件体积大 移动比较慢)
+      changeStyle(cloneEl, ['transition: all 0.3s', `width: ${offsetWidth * adaptScale() + 'px'}`, `transform: translate(${offsetDistance.left - left - diffs.left}px, ${offsetDistance.top - top - diffs.top}px)`])
+      setTimeout(() => {
+        changeStyle(cloneEl, ['transition: all 0s', `left: 0`, `top: 0`, `transform: translate(${offsetDistance.left - diffs.left}px, ${offsetDistance.top - diffs.top}px)`])
+        offset = { left: offsetDistance.left - diffs.left, top: offsetDistance.top - diffs.top } // 记录值
+        record()
+      }, 300)
+    }, 300)
+  } else {
+    console.error('未知元素类型:', cloneEl.tagName);
+  }
 }
 
 // 滚轮缩放
