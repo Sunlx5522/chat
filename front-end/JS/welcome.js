@@ -1243,7 +1243,7 @@ async function loadContentAvatar(avatar, avatarKey, avatarData) {
 }
 
 //添加联系人项
-function addContantItem(contactList, userAccount, userName, fileType, base64Data) {
+function addContactItem(contactList, userAccount, userName, fileType, base64Data) {
     const contactItem = document.createElement("div");  // 创建一个新的联系人元素
     contactItem.id = userAccount + "contactItem"; // 联系人项 id
     contactItem.classList.add("contact-item");  // 添加样式类
@@ -1292,6 +1292,7 @@ function addContantItem(contactList, userAccount, userName, fileType, base64Data
 
 function addRequestItem(requestList, userAccount, userName, fileType, base64Data) {
     const requestItem = document.createElement("div");  // 创建一个新的联系人元素
+    requestItem.id = userAccount + "requestItem"; // 联系人项 id
     requestItem.classList.add("request-item");  // 添加样式类
 
     // 创建一个容器来包裹头像和红点
@@ -1331,7 +1332,37 @@ function addRequestItem(requestList, userAccount, userName, fileType, base64Data
 
         // 为联系人添加点击事件
         requestItem.addEventListener("click", async function () {
-            //startConversation(userAccount, userName);  // 点击联系人后开始对话
+            Swal.fire({
+                title: '你确定要添加对方为好友吗?',
+                text: "点击确定后同意！",
+                icon: 'question',
+                showCancelButton: true,  // 显示取消按钮
+                confirmButtonColor: '#3085d6',  // 确定按钮的颜色
+                cancelButtonColor: '#d33',  // 取消按钮的颜色
+                confirmButtonText: '确定',
+                cancelButtonText: '拒绝'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log("同意");
+                    removeRequestItem(userAccount);
+                    const command = "acceptFriend";  // 定义发送消息的命令
+                    const senderAccount = account;  // 获取发送方账号
+                    const receiverAccount = userAccount;
+                    const payload = [command, senderAccount, receiverAccount];  // 定义包含登录和账号信息的消息
+                    const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
+                    sendMessageToServer(multiLinePayload);  // 发送消息到服务器
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // 用户点击了 "否" 按钮，不执行函数
+                    console.log("不同意");
+                    removeRequestItem(userAccount);
+                    const command = "rejectFriend";  // 定义发送消息的命令
+                    const senderAccount = account;  // 获取发送方账号
+                    const receiverAccount = userAccount;
+                    const payload = [command, senderAccount, receiverAccount];  // 定义包含登录和账号信息的消息
+                    const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
+                    sendMessageToServer(multiLinePayload);  // 发送消息到服务器
+                }
+            });
         });
     }
 }
@@ -1363,7 +1394,7 @@ function command_usersList(blocks) {
         const userName = blocks[i + 1];  // 获取用户昵称
         const fileType = blocks[i + 2];  //获取文件类型
         const base64Data = blocks[i + 3]; //获取文件编码
-        addContantItem(contactList, userAccount, userName, fileType, base64Data);
+        addContactItem(contactList, userAccount, userName, fileType, base64Data);
     }
 }
 
@@ -1475,41 +1506,75 @@ async function command_sendMessageError(blocks) {
 
 async function command_searchForUser(blocks) {
     const command_s = blocks[1];
-    if(command_s == "null"){
+    if (command_s == "null") {
         var title = "你搜索的账号不存在";
-    Swal.fire({
-        title: title,
-        icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
-        confirmButtonText: '确定'
-    });
-    }else if(command_s =="yourself"){
+        Swal.fire({
+            title: title,
+            icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    } else if (command_s == "yourself") {
         var title = "你不能搜索自己";
-    Swal.fire({
-        title: title,
-        icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
-        confirmButtonText: '确定'
-    });
-    }else if(command_s == "already"){
+        Swal.fire({
+            title: title,
+            icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    } else if (command_s == "already") {
         var title = "您已发送过请求";
-    Swal.fire({
-        title: title,
-        icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
-        confirmButtonText: '确定'
-    });
-    }else if(command_s == "pleaseHandel"){
+        Swal.fire({
+            title: title,
+            icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    } else if (command_s == "pleaseHandel") {
         var title = "对方已请求添加你为好友，请尽快处理";
-    Swal.fire({
-        title: title,
-        icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
-        confirmButtonText: '确定'
-    });
-    }else if(command_s == "requestSuccessfully"){
+        Swal.fire({
+            title: title,
+            icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    } else if (command_s == "requestSuccessfully") {
         var title = "请求成功";
-    Swal.fire({
-        title: title,
-        icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
-        confirmButtonText: '确定'
-    });
+        Swal.fire({
+            title: title,
+            icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    }
+}
+
+async function command_newRequest(blocks) {
+    const requestList = document.getElementById("requestList");  // 获取联系人列表的DOM元素
+    for (let i = 1; i < blocks.length; i += 4) {  // 遍历联系人列表
+        const userAccount = blocks[i];  // 获取用户账号
+        const userName = blocks[i + 1];  // 获取用户昵称
+        const fileType = blocks[i + 2];  //获取文件类型
+        const base64Data = blocks[i + 3]; //获取文件编码
+        addRequestItem(requestList, userAccount, userName, fileType, base64Data);
+        var title = "你收到了" + userAccount + "的好友请求";
+        Swal.fire({
+            title: title,
+            icon: 'info',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    }
+}
+
+async function command_newFriend(blocks) {
+    const contactList = document.getElementById("contactList");  // 获取联系人列表的DOM元素
+    for (let i = 1; i < blocks.length; i += 4) {  // 遍历联系人列表
+        const userAccount = blocks[i];  // 获取用户账号
+        const userName = blocks[i + 1];  // 获取用户昵称
+        const fileType = blocks[i + 2];  //获取文件类型
+        const base64Data = blocks[i + 3]; //获取文件编码
+        addContactItem(contactList, userAccount, userName, fileType, base64Data);
+        var title = "你和" + userAccount + "成为了好友";
+        Swal.fire({
+            title: title,
+            icon: 'info',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
     }
 }
 
@@ -1536,8 +1601,12 @@ function process(fullMessage) {
         command_requestList(blocks);
     } else if (command == "sendMessageError") {
         command_sendMessageError(blocks);
-    }else if (command == "searchForUser"){
+    } else if (command == "searchForUser") {
         command_searchForUser(blocks);
+    } else if (command == "newRequest") {
+        command_newRequest(blocks);
+    } else if(command == "newFriend"){
+        command_newFriend(blocks);
     }
 }
 
@@ -1597,6 +1666,19 @@ async function removeContactItem(userAccount) {
     for (let item of contactItems) {
         if (item.id === id) {
             contactList.removeChild(item);
+            break;
+        }
+    }
+}
+
+//删除请求项
+async function removeRequestItem(userAccount) {
+    const id = userAccount + "requestItem";
+    const requestList = document.getElementById("requestList");
+    const requestItems = requestList.getElementsByClassName("request-item");
+    for (let item of requestItems) {
+        if (item.id === id) {
+            requestList.removeChild(item);
             break;
         }
     }

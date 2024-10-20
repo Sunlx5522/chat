@@ -570,9 +570,77 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
                     requestRepository.save(newRequest);
                     String messageToSend = "searchForUser" + DELIMITER + "requestSuccessfully";  // 构建要发送的消息
                     sendMessage(session, messageToSend);
+
+                    User requestUser = userRepository.findByAccount(senderAccount);
+                    if(requestUser != null){
+                        StringBuilder allRequestUsersMessage = new StringBuilder();
+                        allRequestUsersMessage.append("newRequest");  // 添加命令名称
+                        addUserMessages(requestUser, allRequestUsersMessage);
+                        if (allRequestUsersMessage.length() > 0) {
+                            WebSocketSession receiverSession = userSessions.get(receiverAccount);  // 获取接收者的会话
+                            if(receiverSession!= null){
+                                sendMessage(receiverSession, allRequestUsersMessage.toString()); // 发送好友信息
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    public void command_acceptFriend(String[] blocks,WebSocketSession session) throws Exception {
+        String senderAccount = blocks[1];
+        String receiverAccount = blocks[2];
+        System.out.println(senderAccount+"想与"+ receiverAccount + "成为好友");  // 如果接收者不在线
+        FriendId friendId_1 = new FriendId(senderAccount, receiverAccount);
+        FriendId friendId_2 = new FriendId(receiverAccount, senderAccount);
+        Friend friend1 = new Friend(friendId_1);
+        Friend friend2 = new Friend(friendId_2);
+        if(friend1 != null){
+            friendRepository.save(friend1);
+        }
+        if(friend2 != null){
+            friendRepository.save(friend2);
+        }
+        requestRepository.deleteBySenderAndReceiver(senderAccount,receiverAccount);
+        requestRepository.deleteBySenderAndReceiver(receiverAccount,senderAccount);
+
+        WebSocketSession senderSession = userSessions.get(senderAccount);  // 获取接收者的会话
+        WebSocketSession receiverSession = userSessions.get(receiverAccount);  // 获取接收者的会话
+        User userTmp1 = userRepository.findByAccount(senderAccount);
+        User userTmp2 = userRepository.findByAccount(receiverAccount);
+        StringBuilder allUsersMessage1 = new StringBuilder();  // 创建StringBuilder用于拼接消息
+        StringBuilder allUsersMessage2 = new StringBuilder();  // 创建StringBuilder用于拼接消息
+        allUsersMessage1.append("newFriend");  // 添加命令名称
+        allUsersMessage2.append("newFriend");  // 添加命令名称
+        if(userTmp1 != null){
+            addUserMessages(userTmp1, allUsersMessage1);
+        }
+        if(userTmp2 != null){
+            addUserMessages(userTmp2, allUsersMessage2);
+        }
+
+        // 发送所有用户账号和用户名
+        if(senderSession != null){
+            if (allUsersMessage2.length() > 0) {
+                sendMessage(senderSession, allUsersMessage2.toString()); // 发送好友信息
+            }
+        }
+        if(receiverSession != null){
+            if (allUsersMessage1.length() > 0) {
+                sendMessage(receiverSession, allUsersMessage1.toString()); // 发送好友信息
+            }
+        }
+        //System.out.println(senderAccount+"已经和"+ receiverAccount + "解除好友关系");  // 如果接收者不在线
+    }
+
+    public void command_rejectFriend(String[] blocks) throws Exception {
+        String senderAccount = blocks[1];
+        String receiverAccount = blocks[2];
+        System.out.println(senderAccount+"拒绝"+ receiverAccount + "成为好友");  // 如果接收者不在线
+        requestRepository.deleteBySenderAndReceiver(senderAccount,receiverAccount);
+        requestRepository.deleteBySenderAndReceiver(receiverAccount,senderAccount);
+        //System.out.println(senderAccount+"已经和"+ receiverAccount + "解除好友关系");  // 如果接收者不在线
     }
 
     public void process(String fullMessage, WebSocketSession session) throws Exception {  // 处理完整的消息
@@ -592,6 +660,10 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             command_deleteFriend(blocks,session);
         }else if(Objects.equals(command, "searchForUser")){
             command_searchForUser(blocks,session);
+        }else if(Objects.equals(command, "acceptFriend")){
+            command_acceptFriend(blocks,session);
+        }else if(Objects.equals(command, "rejectFriend")){
+            command_rejectFriend(blocks);
         }
     }
 
