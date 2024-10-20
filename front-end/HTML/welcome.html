@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8"> <!-- 设置文档字符编码为 UTF-8，支持中文显示 -->
     <title>WELCOME</title> <!-- 设置网页标题，显示在浏览器标签页上 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../CSS/welcome.css"> <!-- 引入外部 CSS 样式表，定义页面样式 -->
 </head>
 
@@ -22,6 +23,7 @@
                     <a href="#" id="feature4">拉伸列表</a> <!-- 功能链接 4 -->
                     <a href="#" id="feature5">刷新页面</a> <!-- 功能链接 5 -->
                     <a href="#" id="feature6">修改密码</a> <!-- 功能链接 6 -->
+                    <a href="#" id="feature7">销毁记录</a> <!-- 功能链接 7 -->
                 </div>
             </div>
             <button id="exitButton"> <!-- 退出按钮 -->
@@ -62,6 +64,12 @@
                     <table id="superETable">
                         <!-- Emoji按钮将通过JavaScript动态生成 -->
                     </table>
+                </div>
+                <div id="deleteMessageButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/delete.png" alt="删除" class="button-icon" id="deleteImage">
+                </div>
+                <div id="deleteFriendButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/delete_friend.png" alt="删除" class="button-icon" id="deleteImage">
                 </div>
             </div> <!-- 功能工具区域 -->
             <div class="input-area" id="input-area"> <!-- 消息输入区域 -->
@@ -126,6 +134,24 @@
                 </div>
 
             </form>
+        </div>
+        <div class="requestdArea" style="display: none;">
+            <div id = "requestBox">
+            <div class="request-list" id="requestList" ></div>
+            </div>
+        </div>
+        <div class="addFriendArea" style="display: none;">
+            <div id="addFriendDiv">
+                <div class="input-container"> <!-- 创建输入容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/account.png" alt="账号图标"> <!-- 显示账号图标 -->
+                    <input type="text" id="addFriendAccount" name="addFriendAccount" placeholder="请输入账号" autocomplete="off" required> <!-- 输入框：账号 -->
+                </div>
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="图标"> <!-- 显示注册图标 -->
+                    <button id="searchForUserButton" class="searchForUserButton">查询用户</button>
+                    <!-- 按钮：提交修改 -->
+                </div>
+            </div>
         </div>
         <div id="customMenu">
             <a href="#" id="menuItem1">删除</a>

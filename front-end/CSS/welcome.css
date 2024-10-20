@@ -4,7 +4,7 @@ body {
     margin: 0; /* 去除默认的外边距 */
     padding: 0; /* 去除默认的内边距 */
     font-family: '微软雅黑', 'Helvetica Neue', sans-serif; /* 设置字体为微软雅黑和Helvetica Neue */
-    background: linear-gradient(135deg, #1e90ff, #ff69b4); /* 创建一个135度的蓝色到粉色的线性渐变背景 */
+    background: linear-gradient(135deg, #1e90ff, #ff69b4); /* 设置背景渐变 */ /* 创建一个135度的蓝色到粉色的线性渐变背景 */
     height: 100vh; /* 设置高度为视口的100% */
 }
 
@@ -34,6 +34,28 @@ body {
 }
 
 #fileButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+}
+
+#deleteMessageButton {
+    background: transparent; /* 背景透明 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+}
+
+#deleteMessageButton:hover {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+}
+
+#deleteFriendButton {
+    background: transparent; /* 背景透明 */
+    transition: 0.5s ease; /* 过渡效果持续0.5秒，缓和效果 */
+    padding: 10px; /* 内边距为10px */
+    border: none; /* 无边框 */
+}
+
+#deleteFriendButton:hover {
     background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
 }
 
@@ -161,6 +183,46 @@ body {
 
 /* 当鼠标悬停在滚动条上时，滑块的样式 */
 .contact-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5); /* 悬停时背景变为浅灰色 */
+}
+
+/* 联系人列表样式 */
+.request-list {
+    background: transparent; /* 背景透明 */
+    width: 200px; /* 宽度为200px */
+    height:300px;
+    padding: 10px; /* 内边距为10px */
+    overflow-y: auto; /* 内容过多时允许滚动 */
+    transition: width 0.3s ease, padding 0.3s ease; /* 平滑过渡效果，包含宽度和内边距的变化 */
+    will-change: transform;
+}
+
+/* 隐藏后的效果：完全收起（包含滚动条） */
+.request-list.collapsed {
+    width: 0; /* 宽度变为0，隐藏整个联系人列表 */
+    padding: 0; /* 内边距变为0，确保列表完全收起 */
+    overflow: hidden; /* 隐藏列表内容，防止文本在宽度变化时发生不必要的调整 */
+    visibility: hidden; /* 隐藏内容，避免在宽度变化时影响文字的渲染 */
+}
+
+/* 在列表展开时，重新显示内容 */
+.request-list:not(.collapsed) {
+    visibility: visible; /* 展开时显示内容 */
+}
+
+/* 自定义滚动条的整体样式 */
+.request-list::-webkit-scrollbar {
+    width: 8px; /* 滚动条的宽度 */
+}
+
+/* 滚动条滑块的样式 */
+.request-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35); /* 悬停时背景变为浅灰色 */
+    border-radius: 4px; /* 滑块边缘为圆角 */
+}
+
+/* 当鼠标悬停在滚动条上时，滑块的样式 */
+.request-list::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5); /* 悬停时背景变为浅灰色 */
 }
 
@@ -323,6 +385,30 @@ body {
 
 /* 联系人项选中效果 */
 .contact-item.selected {
+    background: rgba(255, 255, 255, 0.4); /* 悬停时背景变为浅灰色 */
+}
+
+/* 联系人项样式 */
+.request-item {
+    padding: 5px; /* 内边距为5px */
+    backdrop-filter: blur(10px); /* 背景模糊效果 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 轻微阴影效果 */
+    color: #000; /* 文本颜色为黑色 */
+    font-size: 14px; /* 字体大小为14px */
+    line-height: 1.5; /* 行高为1.5 */
+    word-wrap: break-word; /* 文本自动换行 */
+    margin-bottom: 10px; /* 下边距为10px */
+    display: flex;
+    align-items: center;
+}
+
+/* 联系人项悬停效果 */
+.request-item:hover {
+    background: rgba(255, 255, 255, 0.1); /* 悬停时背景变为浅灰色 */
+}
+
+/* 联系人项选中效果 */
+.request-item.selected {
     background: rgba(255, 255, 255, 0.4); /* 悬停时背景变为浅灰色 */
 }
 
@@ -599,11 +685,9 @@ body {
     border-radius: 50px; /* 圆角边框 */
 }
 
-  .user-info2,.passwordArea {
+  .user-info2,.passwordArea ,.requestdArea,.addFriendArea{
     flex: 1; /* 占据剩余空间 */
-    
     border-radius: 10px; /* 边框圆角 */
-
     height: 100vh;
     justify-content: center;
     align-items: center;
@@ -722,4 +806,83 @@ input::placeholder {
 
 #changesPasswordButton:hover{
     background: rgba(255, 255, 255, 0.35); /* 鼠标悬停时背景色 */
+}
+
+#searchForUserButton{
+    width: 90%; /* 按钮宽度为90% */
+    padding: 12px 15px; /* 按钮内边距 */
+    margin-top: 8px; /* 上边距 */
+    border: none; /* 删除边框 */
+    border-radius: 10px; /* 按钮圆角 */
+    background: rgba(255, 255, 255, 0.25); /* 设置背景颜色 */
+    color: #8060E5; /* 设置字体颜色 */
+    font-weight: bold; /* 字体加粗 */
+    font-size: 18px; /* 字体大小 */
+    transition: 0.5s ease; /* 设置过渡效果 */
+}
+
+#searchForUserButton:hover{
+    background: rgba(255, 255, 255, 0.35); /* 鼠标悬停时背景色 */
+}
+
+#addFriendDiv{
+    background: rgba(255, 255, 255, 0.15); /* 设置背景颜色为半透明白色 */
+    padding: 40px 30px; /* 设置内边距 */
+    border-radius: 15px; /* 圆角边框 */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 添加阴影 */
+    backdrop-filter: blur(8px); /* 背景模糊效果 */
+    -webkit-backdrop-filter: blur(8px); /* 为WebKit浏览器添加背景模糊 */
+    border: 1px solid rgba(255, 255, 255, 0.18); /* 设置边框样式 */
+    text-align: center; /* 文本居中 */
+}
+
+#requestBox{
+    background: rgba(255, 255, 255, 0.15); /* 设置背景颜色为半透明白色 */
+    padding: 40px 30px; /* 设置内边距 */
+    border-radius: 15px; /* 圆角边框 */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 添加阴影 */
+    backdrop-filter: blur(8px); /* 背景模糊效果 */
+    -webkit-backdrop-filter: blur(8px); /* 为WebKit浏览器添加背景模糊 */
+    border: 1px solid rgba(255, 255, 255, 0.18); /* 设置边框样式 */
+    text-align: center; /* 文本居中 */
+}
+
+@media screen and (max-width: 480px) {
+    .container{
+        width: 95%; /* ? */
+        flex-direction: column;
+    }
+    .toolbar{
+        width: 100%; /* 调整为自适应宽度 */
+        flex-direction: row-reverse;    
+        justify-content: space-between;
+    }
+    .contact-list{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        overflow-x: visible;
+    }
+    .contact-item{
+        min-width: 35%;
+    }
+    .chat-area{
+        flex:1;
+        width: 100%; /* 调整为自适应宽度 */
+        height: 75%;/* ? */
+    }
+    .chat-header{
+        display: flex;
+        justify-content: space-evenly;
+        flex-direction: row;
+    }
+    #contactAccount{
+        align-self: center
+    }
+    .contact-list.collapsed {
+        height: 0; /* 宽度变为0，隐藏整个联系人列表 */
+    }
+    .emojiTable{
+        margin-left: 20px;
+    }
 }

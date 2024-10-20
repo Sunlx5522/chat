@@ -10,12 +10,26 @@ let lastDistance = 0
 let lastScale = 1 // 记录下最后的缩放值
 let scaleOrigin = { x: 0, y: 0 }
 
-const { innerWidth: winWidth, innerHeight: winHeight } = window
+let { innerWidth: winWidth, innerHeight: winHeight } = window
 let cloneEl = null
 let originalEl = null
 
 function openPreview() {
-  scale = 1
+  
+  scale = 1;
+    offset = { left: 0, top: 0 };
+    origin = 'center';
+    startPoint = { x: 0, y: 0 };
+    isTouching = false;
+    isMove = false;
+    touches.clear();
+    lastDistance = 0;
+    lastScale = 1;
+    scaleOrigin = { x: 0, y: 0 };
+    
+    // 重新获取窗口的宽高
+    ({ innerWidth: winWidth, innerHeight: winHeight } = window);
+
   const { offsetWidth, offsetHeight } = originalEl
   const { top, left } = originalEl.getBoundingClientRect()
   // 创建蒙层

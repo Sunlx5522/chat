@@ -146,14 +146,6 @@ input::placeholder {
     background: rgba(255, 255, 255, 0.35); /* 鼠标悬停时背景色 */
 }
 
-/* 媒体查询，调整小屏设备上的样式 */
-@media screen and (max-width: 480px) {
-    form {
-        width: 90%; /* 调整表单宽度为90% */
-        padding: 30px 20px; /* 调整内边距 */
-    }
-}
-
 /* 为整个网页和常见的交互元素设置相同的鼠标指针 */
 * {
     cursor: url('../SOURCEFILE/MOUSE/Zhand.cur'), auto !important;

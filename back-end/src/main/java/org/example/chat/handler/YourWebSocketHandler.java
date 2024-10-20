@@ -4,13 +4,13 @@ package org.example.chat.handler;  // 定义类所在的包
 
 import java.util.*;
 import java.util.List;  // 导入List接口
+import java.util.ArrayList; //实例化
 import java.util.Base64;  //Base64 编码
 import java.util.Objects;  // 导入Objects类
 import java.util.Map;  // 导入Map接口
 import java.util.HashMap;  // 导入HashMap类
 import java.io.File;  //文件读取
 import java.nio.file.*;
-import java.util.Base64;
 import java.io.IOException;
 import java.nio.file.Paths; //文件路径
 import java.nio.file.StandardOpenOption; //标准
@@ -32,9 +32,14 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;  // 导入Te
 import org.example.chat.model.User;  // 导入自定义的User实体类，映射数据库中的用户表
 import org.example.chat.model.Avatar; // 导入自定义的Avatar实体类，映射数据库中的头像路径
 import org.example.chat.model.Message; //导入信息
+import org.example.chat.model.FriendId;
+import org.example.chat.model.Friend; //导入信息
+import org.example.chat.model.Request;
 import org.example.chat.repository.UserRepository;  // 导入自定义的UserRepository接口，用于与数据库进行交互操作
 import org.example.chat.repository.AvatarRepository; // 导入自定义的AvatarRepository接口，用于与数据库进行交互操作
 import org.example.chat.repository.MessageRepository; //导入信息接口
+import org.example.chat.repository.FriendRepository; //导入信息接口
+import org.example.chat.repository.RequestRepository; //导入信息接口
 import org.springframework.beans.factory.annotation.Autowired;  // 导入@Autowired注解，用于依赖注入
 
 //导入用于哈希校验的类
@@ -53,6 +58,10 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
     private AvatarRepository avatarRepository; // ／/声明AvatarRepository类型的成员变量，用于数据库操作
     @Autowired
     private MessageRepository messageRepository; //  声明MessageRepository类型的成员变量，用于数据库操作
+    @Autowired
+    private FriendRepository friendRepository; //  声明FriendRepository类型的成员变量，用于数据库操作
+    @Autowired
+    private RequestRepository requestRepository; //  声明好友请求
 
     private static final String DELIMITER = "[b1565ef8ea49b3b3959db8c5487229ea]";  // 定义分隔符常量
     private static final AESCryptoServer crypto = new AESCryptoServer(); // 密钥解析器
@@ -357,16 +366,32 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         String senderAccount = blocks[1];  // 获取发送者账号
         String receiverAccount = blocks[2];  // 获取接收者账号
         String messageContent = blocks[3];  // 获取消息内容
-        // 这里可以添加将消息发送给特定用户的逻辑
-        System.out.println("Message from " + senderAccount + " " + " to " + receiverAccount);  // 打印消息信息
-        WebSocketSession receiverSession = userSessions.get(receiverAccount);  // 获取接收者的会话
-        if (receiverSession == null) {
-            System.out.println("not online");  // 如果接收者不在线
-            saveMessageToDatabase(senderAccount, receiverAccount, messageContent);
-        } else {
-            String messageToSend = "messageFrom" + DELIMITER + senderAccount + DELIMITER + messageContent;  // 构建要发送的消息
-            sendMessage(receiverSession, messageToSend);
-            System.out.println("Message sent to " + receiverAccount);  // 打印发送成功信息
+        FriendId friendId = new FriendId(senderAccount, receiverAccount);
+        Friend friend = null;
+        Optional<Friend> optionalFriend = friendRepository.findById(friendId);
+        if (optionalFriend.isPresent()) {
+            friend = optionalFriend.get();
+            // 处理 friend 对象
+        }
+        if(friend != null){
+            System.out.println("是好友");  // 如果接收者不在线
+            // 这里可以添加将消息发送给特定用户的逻辑
+            System.out.println("Message from " + senderAccount + " " + " to " + receiverAccount);  // 打印消息信息
+            WebSocketSession receiverSession = userSessions.get(receiverAccount);  // 获取接收者的会话
+            if (receiverSession == null) {
+                System.out.println("not online");  // 如果接收者不在线
+                saveMessageToDatabase(senderAccount, receiverAccount, messageContent);
+            } else {
+                String messageToSend = "messageFrom" + DELIMITER + senderAccount + DELIMITER + messageContent;  // 构建要发送的消息
+                sendMessage(receiverSession, messageToSend);
+                System.out.println("Message sent to " + receiverAccount);  // 打印发送成功信息
+            }
+        }else{
+            System.out.println("不是好友");  // 如果接收者不在线
+            WebSocketSession senderSession = userSessions.get(senderAccount);  // 获取接收者的会话
+            String messageToSend = "sendMessageError" + DELIMITER + receiverAccount;  // 构建要发送的消息
+            sendMessage(senderSession, messageToSend);
+            System.out.println("Message sent to " + receiverAccount + "错误");  // 打印发送成功信息
         }
     }
 
@@ -382,7 +407,16 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         setOnline(user); // 设置用户在线
         sendBasicMessageToClient(user, session); // 向客户端发送响应消息
         // 获取数据库中的所有用户信息
-        List<User> allUsers = userRepository.findAll();  // 获取所有用户列表
+        List<Friend> allFriends = friendRepository.findByUserAccount(account);
+        List<User> allUsers = new ArrayList<>();
+        for(Friend friend : allFriends) {
+            System.out.println(friend.getFriend_account());
+            User userTmp = userRepository.findByAccount(friend.getFriend_account());  // 根据账号从数据库查找用户
+            if (userTmp != null) {
+                allUsers.add(userTmp);
+            }
+        }
+
         StringBuilder allUsersMessage = new StringBuilder();  // 创建StringBuilder用于拼接消息
 
         // 构建包含所有用户账号和用户名以及头像的一条消息
@@ -398,6 +432,27 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
         //发送头像
         Avatar avatar = avatarRepository.findByAccount(account);
         sendAvatar(avatar, session);
+
+        //发送请求
+        List<Request> allRequests = requestRepository.findByReceiver_account(account);
+        List<User> allRequestUsers = new ArrayList<>();
+        for(Request request : allRequests) {
+            System.out.println(request.getSender_account()+" "+request.getReceiver_account());
+            User userTmp = userRepository.findByAccount(request.getSender_account());  // 根据账号从数据库查找用户
+            if (userTmp != null) {
+                allRequestUsers.add(userTmp);
+            }
+        }
+        StringBuilder allRequestUsersMessage = new StringBuilder();  // 创建StringBuilder用于拼接消息
+        // 构建包含所有用户账号和用户名以及头像的一条消息
+        allRequestUsersMessage.append("requestList");  // 添加命令名称
+        for (User u : allRequestUsers) {  // 遍历所有用户
+            addUserMessages(u, allRequestUsersMessage);
+        }
+        // 发送所有用户账号和用户名
+        if (allRequestUsersMessage.length() > 0) {
+            sendMessage(session, allRequestUsersMessage.toString()); // 发送好友信息
+        }
 
         //发送信息
         handleUserOnline(account);
@@ -479,6 +534,46 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             setAvatar(avatar, session);
         }
     }
+    public void command_deleteFriend(String[] blocks,WebSocketSession session) throws Exception {
+        String senderAccount = blocks[1];
+        String receiverAccount = blocks[2];
+        System.out.println(senderAccount+"想与"+ receiverAccount + "解除好友关系");  // 如果接收者不在线
+        FriendId friendId_1 = new FriendId(senderAccount, receiverAccount);
+        FriendId friendId_2 = new FriendId(receiverAccount, senderAccount);
+        friendRepository.deleteById(friendId_1);
+        friendRepository.deleteById(friendId_2);
+        System.out.println(senderAccount+"已经和"+ receiverAccount + "解除好友关系");  // 如果接收者不在线
+    }
+    public void command_searchForUser(String[] blocks,WebSocketSession session) throws Exception {
+        String senderAccount = blocks[1];
+        String receiverAccount = blocks[2];
+        System.out.println(senderAccount+"想搜索"+ receiverAccount);  // 如果接收者不在线
+        User user = userRepository.findByAccount(receiverAccount);  // 根据账号从数据库查找用户
+        if (user == null) {  // 如果用户不存在
+            String messageToSend = "searchForUser" + DELIMITER + "null";  // 构建要发送的消息
+            sendMessage(session, messageToSend);
+        }else if(Objects.equals(user.getAccount(), senderAccount)){
+            String messageToSend = "searchForUser" + DELIMITER + "yourself";  // 构建要发送的消息
+            sendMessage(session, messageToSend);
+        }else{
+            Request request = requestRepository.findBySenderAndReceiver(senderAccount,receiverAccount);
+            if(request != null){
+                String messageToSend = "searchForUser" + DELIMITER + "already";  // 构建要发送的消息
+                sendMessage(session, messageToSend);
+            }else{
+                Request request_s = requestRepository.findBySenderAndReceiver(receiverAccount,senderAccount);
+                if(request_s != null){
+                    String messageToSend = "searchForUser" + DELIMITER + "pleaseHandel";  // 构建要发送的消息
+                    sendMessage(session, messageToSend);
+                }else{
+                    Request newRequest = new Request(senderAccount,receiverAccount);
+                    requestRepository.save(newRequest);
+                    String messageToSend = "searchForUser" + DELIMITER + "requestSuccessfully";  // 构建要发送的消息
+                    sendMessage(session, messageToSend);
+                }
+            }
+        }
+    }
 
     public void process(String fullMessage, WebSocketSession session) throws Exception {  // 处理完整的消息
         String[] blocks = fullMessage.split("\\[b1565ef8ea49b3b3959db8c5487229ea\\]");  // 使用特殊标记拆分字符串
@@ -493,6 +588,10 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             command_sendSuperEmoji(blocks);
         }else if(Objects.equals(command, "setAvatar")){
             command_setAvatar(blocks,session);
+        }else if(Objects.equals(command, "deleteFriend")){
+            command_deleteFriend(blocks,session);
+        }else if(Objects.equals(command, "searchForUser")){
+            command_searchForUser(blocks,session);
         }
     }
 

@@ -119,13 +119,6 @@ input::placeholder {
     background: rgba(255, 255, 255, 0.35); /* 鼠标悬停背景颜色 */
 }
 
-/* 媒体查询适配小屏设备 */
-@media screen and (max-width: 480px) {
-    form {
-        width: 90%; /* 调整表单宽度为90% */
-        padding: 30px 20px; /* 调整内边距 */
-    }
-}
 
 /* 为整个网页和常见的交互元素设置相同的鼠标指针 */
 * {

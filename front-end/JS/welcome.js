@@ -374,6 +374,65 @@ function getMessagesForConversation(account, chatwith, callback) {
     };
 }
 
+// 获取并删除特定会话的所有消息
+function deleteMessagesForConversation(account, chatwith) {
+    let transaction = db.transaction(['messages'], 'readwrite');
+    let objectStore = transaction.objectStore('messages');
+
+    // 打开游标以遍历所有消息
+    let request = objectStore.openCursor();
+
+    request.onsuccess = function (event) {
+        let cursor = event.target.result;
+        if (cursor) {
+            let message = cursor.value;
+            // 检查消息是否属于当前会话
+            if ((message.sender === account && message.receiver === chatwith) ||
+                (message.sender === chatwith && message.receiver === account)) {
+                // 删除该消息
+                let deleteRequest = cursor.delete();
+                deleteRequest.onsuccess = function () {
+                    console.log(`消息已删除，ID: ${message.id}`);
+                };
+                deleteRequest.onerror = function (event) {
+                    console.error('删除消息时出错：', event.target.error);
+                };
+            }
+            cursor.continue(); // 继续下一个游标项
+        } else {
+            // 如果游标遍历完成，执行回调函数
+            console.log('会话中所有消息已删除');
+        }
+    };
+}
+
+function deleteAllMessages() {
+    let transaction = db.transaction(['messages'], 'readwrite');
+    let objectStore = transaction.objectStore('messages');
+
+    // 打开游标以遍历所有消息
+    let request = objectStore.openCursor();
+
+    request.onsuccess = function (event) {
+        let cursor = event.target.result;
+        if (cursor) {
+            let message = cursor.value;
+            // 检查消息是否属于当前会话
+            let deleteRequest = cursor.delete();
+            deleteRequest.onsuccess = function () {
+                console.log(`消息已删除，ID: ${message.id}`);
+            };
+            deleteRequest.onerror = function (event) {
+                console.error('删除消息时出错：', event.target.error);
+            };
+            cursor.continue(); // 继续下一个游标项
+        } else {
+            // 如果游标遍历完成，执行回调函数
+            console.log('所有消息已删除');
+        }
+    };
+}
+
 //显示红点
 function showRedDot(userAccount, count) {
     // 获取头像容器
@@ -563,7 +622,7 @@ async function loadAudio(audioPlayer, id) {
     }
 }
 
-// 异步加载 Base64 音频
+// 异步加载 Base64 视频
 async function loadVideo(video, id, observer) {
     try {
         const message = await getMessageById(id);
@@ -613,19 +672,12 @@ async function loadImg(img, id, observer) {
 }
 
 // 异步加载 Base64 音频
-async function loadAvatar(avatar,senderAccount) {
+async function loadAvatar(avatar, senderAccount) {
     // 异步获取消息内容
     try {
-        const storedAvatar = mySessionStorage[senderAccount + "avatar"];
-
-        const blob = base64ToBlob(storedAvatar);
-        if (blob) {
-            // 创建一个指向 Blob 的 URL
-            const blobURL = URL.createObjectURL(blob);
-            avatar.src = blobURL;
-            avatar.classList.add("fade-in");  // 添加淡入效果的类
-        }
-
+        const storedURL = mySessionStorage[senderAccount + "avatar"];
+        avatar.src = storedURL;
+        avatar.classList.add("fade-in");  // 添加淡入效果的类
     } catch (error) {
         console.error('头像设置失败:', error);
     }
@@ -649,7 +701,7 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
     messageBubble.title = messageBubble.id;
     //头像元素
     const avatar = document.createElement("img");
-    loadAvatar(avatar,senderAccount);
+    loadAvatar(avatar, senderAccount);
     //const storedAvatar = mySessionStorage[senderAccount + "avatar"];
     //avatar.src = storedAvatar;  // 根据发送方账号设置头像图片路径
     avatar.alt = "头像";
@@ -1119,20 +1171,20 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
         if (messageContent == "[大爆炸]") {
             const iframe = document.createElement('iframe');
             iframe.src = '../HTML/explode.html';
-            iframe.setAttribute('width', '400'); // 设置宽度为800像素
-            iframe.setAttribute('height', '300'); // 设置高度为600像素
+            iframe.setAttribute('width', '200'); // 设置宽度为800像素
+            iframe.setAttribute('height', '100'); // 设置高度为600像素
             messageBubble.appendChild(iframe);
         } else if (messageContent == "[黑客帝国]") {
             const iframe = document.createElement('iframe');
             iframe.src = '../HTML/Matrix.html';
-            iframe.setAttribute('width', '400'); // 设置宽度为800像素
-            iframe.setAttribute('height', '300'); // 设置高度为600像素
+            iframe.setAttribute('width', '200'); // 设置宽度为800像素
+            iframe.setAttribute('height', '100'); // 设置高度为600像素
             messageBubble.appendChild(iframe);
         } else if (messageContent == "[我爱你]") {
             const iframe = document.createElement('iframe');
             iframe.src = '../HTML/heart.html';
-            iframe.setAttribute('width', '400'); // 设置宽度为800像素
-            iframe.setAttribute('height', '300'); // 设置高度为600像素
+            iframe.setAttribute('width', '200'); // 设置宽度为800像素
+            iframe.setAttribute('height', '100'); // 设置高度为600像素
             messageBubble.appendChild(iframe);
         } else {
             messageContent = messageContent.replace(/\n/g, '<br>');
@@ -1140,6 +1192,29 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
             const shadowRoot = messageBubble.attachShadow({ mode: 'open' });
             const theHtml = replaceEmojiCodes(messageContent);
             shadowRoot.innerHTML = theHtml;
+            messageBubble.addEventListener("click", async function () {
+                try {
+                    // 获取要复制的内容
+                    const message = await getMessageById(id);
+                    const theContent = message.content;
+                    const contentToCopy = theContent; // 如果需要保持换行，转换回来
+
+                    // 复制内容到剪贴板
+                    await navigator.clipboard.writeText(contentToCopy);
+
+                    var title = "已复制内容到剪贴板";
+                    Swal.fire({
+                        title: title,
+                        icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                        showConfirmButton: false,  // 隐藏确认按钮
+                        timer: 1000,  // 设置定时器，2秒后自动关闭
+                        timerProgressBar: true,  // 显示进度条
+                    });
+
+                } catch (err) {
+                    console.error("无法复制内容到剪贴板", err);
+                }
+            });
         }
     }
     //messageBubble.textContent = `${messageContent}`;  // 设置消息内容
@@ -1156,10 +1231,21 @@ async function addMessage(id, senderAccount, messageContent, shouldObserve = tru
     }
 }
 
+//异步加载联系人头像
+async function loadContentAvatar(avatar, avatarKey, avatarData) {
+    const blob = base64ToBlob(avatarData);
+    if (blob) {
+        // 创建一个指向 Blob 的 URL
+        const blobURL = URL.createObjectURL(blob);
+        mySessionStorage[avatarKey] = blobURL;
+        avatar.src = blobURL;  // 根据发送方账号设置头像图片路径
+    }
+}
+
 //添加联系人项
 function addContantItem(contactList, userAccount, userName, fileType, base64Data) {
     const contactItem = document.createElement("div");  // 创建一个新的联系人元素
-    contactItem.id = userAccount; // 联系人项 id
+    contactItem.id = userAccount + "contactItem"; // 联系人项 id
     contactItem.classList.add("contact-item");  // 添加样式类
 
     // 创建一个容器来包裹头像和红点
@@ -1170,20 +1256,14 @@ function addContantItem(contactList, userAccount, userName, fileType, base64Data
     //存储头像
     const avatarKey = userAccount + "avatar"; //头像 键
     const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
-    mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
+    //mySessionStorage[avatarKey] = avatarData;
     mySessionStorage[userAccount + "counter"] = "0"; //计数器归0
     console.log("头像已存储到 mySessionStorage");
 
     //设置头像
-    const storedAvatar = mySessionStorage[userAccount + "avatar"];//获取头像
     const avatar = document.createElement("img");
     avatar.id = userAccount + "img";
-    const blob = base64ToBlob(storedAvatar);
-    if (blob) {
-        // 创建一个指向 Blob 的 URL
-        const blobURL = URL.createObjectURL(blob);
-        avatar.src = blobURL;  // 根据发送方账号设置头像图片路径
-    }
+    loadContentAvatar(avatar, avatarKey, avatarData);
     avatar.alt = "头像";
     avatar.classList.add("avatar");  // 添加头像样式类
 
@@ -1206,6 +1286,52 @@ function addContantItem(contactList, userAccount, userName, fileType, base64Data
             mySessionStorage[userAccount + "counter"] = "0";//sessionStorage.setItem(userAccount + "counter", 0);
             //待处理 移除红点
             removeRedDot(userAccount);
+        });
+    }
+}
+
+function addRequestItem(requestList, userAccount, userName, fileType, base64Data) {
+    const requestItem = document.createElement("div");  // 创建一个新的联系人元素
+    requestItem.classList.add("request-item");  // 添加样式类
+
+    // 创建一个容器来包裹头像和红点
+    const avatarContainer = document.createElement("div");
+    avatarContainer.id = "request" + userAccount + "avatarContainer"; // 设置唯一的 id
+    avatarContainer.classList.add("avatar-container"); // 添加样式类
+
+    //存储头像
+    const avatarKey = userAccount + "avatar"; //头像 键
+    const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
+
+    //设置头像
+    const avatar = document.createElement("img");
+    avatar.id = "request" + userAccount + "img";
+    const blob = base64ToBlob(avatarData);
+    if (blob) {
+        // 创建一个指向 Blob 的 URL
+        const blobURL = URL.createObjectURL(blob);
+        mySessionStorage[avatarKey] = blobURL;
+        avatar.src = blobURL;  // 根据发送方账号设置头像图片路径
+    }
+    avatar.alt = "头像";
+    avatar.classList.add("avatar");  // 添加头像样式类
+
+    // 将头像添加到容器中
+    avatarContainer.appendChild(avatar);
+
+    // 创建一个用户信息的容器
+    const userInfo = document.createElement("div");
+    userInfo.classList.add("user-info");  // 添加样式类
+    userInfo.innerHTML = `<div class="user-name">${userName}</div><div class="user-account">${userAccount}</div>`;
+
+    if (userAccount != account) {  // 如果联系人不是当前用户
+        requestItem.appendChild(avatarContainer);
+        requestItem.appendChild(userInfo);
+        requestList.appendChild(requestItem);  // 将联系人元素添加到联系人列表
+
+        // 为联系人添加点击事件
+        requestItem.addEventListener("click", async function () {
+            //startConversation(userAccount, userName);  // 点击联系人后开始对话
         });
     }
 }
@@ -1276,13 +1402,13 @@ function command_myAvatar(blocks) {
     const base64Data = blocks[2];
     const avatarKey = account + "avatar";
     const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
-    mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
     console.log("头像已存储到 mySessionStorage");//console.log("头像已存储到 sessionStorage");
     //document.getElementById("avatar")
     const blob = base64ToBlob(avatarData);
     if (blob) {
         // 创建一个指向 Blob 的 URL
         const blobURL = URL.createObjectURL(blob);
+        mySessionStorage[avatarKey] = blobURL;
         document.getElementById("avatar").src = blobURL;
     }
 }
@@ -1293,21 +1419,21 @@ function command_setAvatar(blocks) {
     const base64Data = blocks[2];
     const avatarKey = account + "avatar";
     const avatarData = `data:image/${fileType};base64,${base64Data}`; // 将 Base64 数据加上 data URL 前缀
-    mySessionStorage[avatarKey] = avatarData;//sessionStorage.setItem(avatarKey, avatarData);
     console.log("头像已存储到 mySessionStorage");//console.log("头像已存储到 sessionStorage");
     //document.getElementById("avatar")
     const blob = base64ToBlob(avatarData);
     if (blob) {
         // 创建一个指向 Blob 的 URL
         const blobURL = URL.createObjectURL(blob);
+        mySessionStorage[avatarKey] = blobURL;
         document.getElementById("avatar").src = blobURL;
     }
     var title = "修改成功";
-                Swal.fire({
-                    title: title,
-                    icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
-                    confirmButtonText: '确定'
-                });
+    Swal.fire({
+        title: title,
+        icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
 }
 
 async function command_messageConfirm(blocks) {
@@ -1322,6 +1448,69 @@ async function command_messageConfirm(blocks) {
         const messagesTmp = document.getElementById("messages");
         messagesTmp.scrollTop = messagesTmp.scrollHeight;  // 滚动到最新消息
     }, 0);
+}
+
+async function command_requestList(blocks) {
+    const requestList = document.getElementById("requestList");  // 获取联系人列表的DOM元素
+    requestList.innerHTML = "";  // 清空现有的联系人列表
+
+    for (let i = 1; i < blocks.length; i += 4) {  // 遍历联系人列表
+        const userAccount = blocks[i];  // 获取用户账号
+        const userName = blocks[i + 1];  // 获取用户昵称
+        const fileType = blocks[i + 2];  //获取文件类型
+        const base64Data = blocks[i + 3]; //获取文件编码
+        addRequestItem(requestList, userAccount, userName, fileType, base64Data)
+    }
+}
+
+async function command_sendMessageError(blocks) {
+    const receiverAccount = blocks[1];
+    var title = "你和" + receiverAccount + "还不是好友";
+    Swal.fire({
+        title: title,
+        icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
+}
+
+async function command_searchForUser(blocks) {
+    const command_s = blocks[1];
+    if(command_s == "null"){
+        var title = "你搜索的账号不存在";
+    Swal.fire({
+        title: title,
+        icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
+    }else if(command_s =="yourself"){
+        var title = "你不能搜索自己";
+    Swal.fire({
+        title: title,
+        icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
+    }else if(command_s == "already"){
+        var title = "您已发送过请求";
+    Swal.fire({
+        title: title,
+        icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
+    }else if(command_s == "pleaseHandel"){
+        var title = "对方已请求添加你为好友，请尽快处理";
+    Swal.fire({
+        title: title,
+        icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
+    }else if(command_s == "requestSuccessfully"){
+        var title = "请求成功";
+    Swal.fire({
+        title: title,
+        icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+        confirmButtonText: '确定'
+    });
+    }
 }
 
 // 处理消息
@@ -1341,8 +1530,14 @@ function process(fullMessage) {
         command_myAvatar(blocks);
     } else if (command == "messageConfirm") {
         command_messageConfirm(blocks);
-    }else if(command == "setAvatar"){
+    } else if (command == "setAvatar") {
         command_setAvatar(blocks);
+    } else if (command == "requestList") {
+        command_requestList(blocks);
+    } else if (command == "sendMessageError") {
+        command_sendMessageError(blocks);
+    }else if (command == "searchForUser"){
+        command_searchForUser(blocks);
     }
 }
 
@@ -1373,9 +1568,13 @@ async function startConversation(chatwith, username) {
     const chatArea = document.querySelector(".chat-area");  // 获取聊天区域
     const userInfo = document.querySelector(".user-info2");
     const passwordArea = document.querySelector(".passwordArea");
+    const requestdArea = document.querySelector(".requestdArea");
+    const addFriendArea = document.querySelector(".addFriendArea");
     chatArea.style.display = "flex";  // 显示聊天区域
     userInfo.style.display = "none"; // 隐藏用户信息区域
     passwordArea.style.display = "none";  // 隐藏修改密码区域
+    requestdArea.style.display = "none";  // 隐藏修改密码区域
+    addFriendArea.style.display = "none";  //隐藏
 
     document.getElementById("input-area").style.visibility = "visible";  // 显示输入区域
     document.getElementById("tools").style.visibility = "visible";  // 显示工具区域
@@ -1390,22 +1589,49 @@ async function startConversation(chatwith, username) {
     console.log("开始与账号 " + chatwith + " 的对话");  // 打印对话信息
 }
 
+//删除好友项
+async function removeContactItem(userAccount) {
+    const id = userAccount + "contactItem";
+    const contactList = document.getElementById("contactList");
+    const contactItems = contactList.getElementsByClassName("contact-item");
+    for (let item of contactItems) {
+        if (item.id === id) {
+            contactList.removeChild(item);
+            break;
+        }
+    }
+}
+
+async function deleteFriend(account, chatWith) {
+    const command = "deleteFriend";  // 定义发送消息的命令
+    const senderAccount = account;  // 获取发送方账号
+    const receiverAccount = chatWith;
+    const payload = [command, senderAccount, receiverAccount];  // 定义包含登录和账号信息的消息
+    const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
+    sendMessageToServer(multiLinePayload);  // 发送消息到服务器
+}
+
 // 页面加载完成时的事件监听器
 document.addEventListener("DOMContentLoaded", function () {
 
     const menuButton = document.getElementById("menuButton");  // 获取菜单按钮DOM元素
     const exitButton = document.getElementById("exitButton");  // 获取退出按钮DOM元素
     const contactList = document.getElementById("contactList");  // 获取联系人列表DOM元素
+    const requestList = document.getElementById("requestList");  // 获取联系人列表DOM元素
     const chatArea = document.querySelector(".chat-area");  // 获取聊天区域
     const messages = document.getElementById("messages");  // 获取消息容器DOM元素
     const tools = document.getElementById("tools");  // 工具区域
     const fileButton = document.getElementById("fileButton");  // 获取文件按钮DOM元素
+    const deleteMessageButton = document.getElementById("deleteMessageButton");
+    const deleteFriendButton = document.getElementById("deleteFriendButton");
     const input_area = document.getElementById("input-area");  // 隐藏输入区域
     const messageInput = document.getElementById("messageInput");  // 获取消息输入框DOM元素
     const sendButton = document.getElementById("sendButton");  // 获取发送按钮DOM元素
     const customMenu = document.getElementById('customMenu');  // 右键菜单
     const userInfo = document.querySelector(".user-info2");
     const passwordArea = document.querySelector(".passwordArea");
+    const requestArea = document.querySelector(".requestdArea");
+    const addFriendArea = document.querySelector(".addFriendArea");
     const changesForm = document.getElementById("changesForm");
     const changePasswordForm = document.getElementById("changePasswordForm");
     const avatar = document.getElementById("avatar");
@@ -1416,6 +1642,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const oldPassword = document.getElementById("oldPassword");
     const newPassword = document.getElementById("newPassword");
     const newPassword_confirm = document.getElementById("newPassword_confirm");
+    const addFriendAccount = document.getElementById("addFriendAccount");
 
 
     const emojiTable = document.getElementById('emojiTable');  //菜单
@@ -1466,7 +1693,90 @@ document.addEventListener("DOMContentLoaded", function () {
     newPassword_confirm.oninput = function () {
         this.setCustomValidity('');  // 清除自定义的无效提示信息
     };
+    addFriendAccount.oninvalid = function () {
+        this.setCustomValidity('请输入账号');  // 设置自定义的无效提示信息
+    };
+    addFriendAccount.oninput = function () {
+        this.setCustomValidity('');  // 清除自定义的无效提示信息
+    };
 
+    deleteMessageButton.addEventListener("click", function () {
+        Swal.fire({
+            title: '你确定要删除当前会话所有聊天记录吗?',
+            text: "该操作无法撤销！",
+            icon: 'warning',
+            showCancelButton: true,  // 显示取消按钮
+            confirmButtonColor: '#3085d6',  // 确定按钮的颜色
+            cancelButtonColor: '#d33',  // 取消按钮的颜色
+            confirmButtonText: '确定',
+            cancelButtonText: '否'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 如果用户点击了 "确定" 按钮，执行函数
+                //executeFunction();
+                console.log("执行操作");
+                document.getElementById("messages").innerHTML = "";  // 清空输入框
+                const chatWith = sessionStorage.getItem('chatwith');
+                deleteMessagesForConversation(account, chatWith);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // 用户点击了 "否" 按钮，不执行函数
+                console.log("操作取消，不执行任何操作");
+            }
+        });
+    });
+    //deleteFriendButton
+    deleteFriendButton.addEventListener("click", function () {
+        Swal.fire({
+            title: '你确定要删除当前好友吗?',
+            text: "该操作无法撤销！",
+            icon: 'warning',
+            showCancelButton: true,  // 显示取消按钮
+            confirmButtonColor: '#3085d6',  // 确定按钮的颜色
+            cancelButtonColor: '#d33',  // 取消按钮的颜色
+            confirmButtonText: '确定',
+            cancelButtonText: '否'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 如果用户点击了 "确定" 按钮，执行函数
+                //executeFunction();
+                console.log("执行操作");
+                //document.getElementById("messages").innerHTML = "";  // 清空输入框
+                const chatWith = sessionStorage.getItem('chatwith');
+                deleteMessagesForConversation(account, chatWith);
+                document.querySelectorAll('.contact-item').forEach(i => i.classList.remove('selected'));
+                removeContactItem(chatWith);
+                deleteFriend(account, chatWith);
+                //deleteMessagesForConversation(account,chatWith);
+                chatArea.style.display = "none";
+                userInfo.style.display = "none"; // 隐藏用户信息区域
+                passwordArea.style.display = "none";  // 隐藏修改密码区域
+                requestArea.style.display = "none";
+                addFriendArea.style.display = "none";
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // 用户点击了 "否" 按钮，不执行函数
+                console.log("操作取消，不执行任何操作");
+            }
+        });
+    });
+    //寻找好友
+    searchForUserButton.addEventListener("click", function () {
+        const theAccount = addFriendAccount.value;
+        if (theAccount == "") {
+            var title = "账号不能为空";
+            Swal.fire({
+                title: title,
+                icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
+            });
+        } else {
+            const command = "searchForUser";  // 定义发送消息的命令
+            const senderAccount = account;  // 获取发送方账号
+            const receiverAccount = theAccount;
+            const payload = [command, senderAccount, receiverAccount];  // 定义包含登录和账号信息的消息
+            const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
+            sendMessageToServer(multiLinePayload);  // 发送消息到服务器
+        }
+    });
     avatar.addEventListener("click", function () {
         console.log("修改头像");  // 打印对话信息
         document.getElementById('avatarInput').click();
@@ -1496,7 +1806,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     base64String = e.target.result; // 获取 base64 编码的字符串
                     const command = "setAvatar";  // 定义发送消息的命令
                     const senderAccount = account;  // 获取发送方账号
-                    const payload = [command, senderAccount,base64String];  // 定义包含登录和账号信息的消息
+                    const payload = [command, senderAccount, base64String];  // 定义包含登录和账号信息的消息
                     const multiLinePayload = payload.join(DELIMITER);  // 用特定的分隔符连接消息
                     sendMessageToServer(multiLinePayload);  // 发送消息到服务器
                 };
@@ -1745,7 +2055,26 @@ document.addEventListener("DOMContentLoaded", function () {
             contactItem.classList.add('selected');
 
         }
+
     });
+
+    // 使用事件委托监听点击事件
+    /*requestList.addEventListener('click', (event) => {
+        // 使用 closest 查找点击的目标是否为 .contact-item 或其子元素
+        const requestItem = event.target.closest('.request-item');
+
+        // 如果找到了 contact-item 元素，继续处理
+        if (requestItem) {
+            // 移除所有联系项的 'selected' 类
+            document.querySelectorAll('.request-item').forEach(i => i.classList.remove('selected'));
+
+            // 为当前点击的联系项添加 'selected' 类
+            requestItem.classList.add('selected');
+
+        }
+    });*/
+
+
 
     // 发送消息按钮的点击事件
     sendButton.addEventListener("click", async function () {
@@ -1800,6 +2129,8 @@ document.addEventListener("DOMContentLoaded", function () {
             passwordArea.style.display = "none";
             // 隐藏聊天区域
             chatArea.style.display = "none";
+            requestArea.style.display = "none";
+            addFriendArea.style.display = "none";
             // 显示用户信息区域
             userInfo.style.display = "flex";
             // 填充用户信息
@@ -1814,6 +2145,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // 如果聊天区域已经隐藏，可以选择执行其他操作或切换回来
             chatArea.style.display = "flex";  // 显示聊天区域
             userInfo.style.display = "none"; // 隐藏用户信息区域
+            requestArea.style.display = "none";
+            addFriendArea.style.display = "none";
             passwordArea.style.display = "none";  // 隐藏修改密码区域
 
         }
@@ -1822,11 +2155,47 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("feature2").addEventListener("click", function () {
         //alert("功能 2 被点击");  // 弹出提示框 // 使用其他逻辑替换
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
+        //addFriendArea
+        if (addFriendArea.style.display === "none") {
+            // 隐藏聊天区域
+            chatArea.style.display = "none";
+            // 显示用户信息区域
+            userInfo.style.display = "none";
+            addFriendArea.style.display = "flex";
+            passwordArea.style.display = "none";
+            // 显示修改密码区域
+            requestArea.style.display = "none";
+        } else {
+            // 如果聊天区域和用户信息区域已经隐藏，可以选择执行其他操作或切换回来
+            chatArea.style.display = "flex";  // 显示聊天区域
+            userInfo.style.display = "none"; // 隐藏用户信息区域
+            passwordArea.style.display = "none";  // 隐藏修改密码区域
+            requestArea.style.display = "none";
+            addFriendArea.style.display = "none";
+        }
     });
 
     document.getElementById("feature3").addEventListener("click", function () {
         //alert("功能 3 被点击");  // 弹出提示框 // 使用其他逻辑替换
         dropdownContent.classList.toggle("show");  // 切换显示状态的类
+        // 判断聊天区域和用户信息区域是否显示,
+        if (requestArea.style.display === "none") {
+            // 隐藏聊天区域
+            chatArea.style.display = "none";
+            // 显示用户信息区域
+            userInfo.style.display = "none";
+            addFriendArea.style.display = "none";
+            passwordArea.style.display = "none";
+            // 显示修改密码区域
+            requestArea.style.display = "flex";
+        } else {
+            // 如果聊天区域和用户信息区域已经隐藏，可以选择执行其他操作或切换回来
+            chatArea.style.display = "flex";  // 显示聊天区域
+            userInfo.style.display = "none"; // 隐藏用户信息区域
+            passwordArea.style.display = "none";  // 隐藏修改密码区域
+            requestArea.style.display = "none";
+            addFriendArea.style.display = "none";
+        }
     });
     document.getElementById("feature4").addEventListener("click", function () {
         contactList.classList.toggle('collapsed');  //向左收回按钮
@@ -1837,6 +2206,8 @@ document.addEventListener("DOMContentLoaded", function () {
         chatArea.style.display = "none";
         userInfo.style.display = "none"; // 隐藏用户信息区域
         passwordArea.style.display = "none";  // 隐藏修改密码区域
+        requestArea.style.display = "none";
+        addFriendArea.style.display = "none";
         //.innerHTML = "";
         // 清空聊天头部区域的联系人名称和账号信息
         document.getElementById("contactName").textContent = "";
@@ -1857,6 +2228,8 @@ document.addEventListener("DOMContentLoaded", function () {
             chatArea.style.display = "none";
             // 显示用户信息区域
             userInfo.style.display = "none";
+            addFriendArea.style.display = "none";
+            requestArea.style.display = "none";
             // 显示修改密码区域
             passwordArea.style.display = "flex";
             changePasswordForm.classList.add('show');
@@ -1864,9 +2237,36 @@ document.addEventListener("DOMContentLoaded", function () {
             // 如果聊天区域和用户信息区域已经隐藏，可以选择执行其他操作或切换回来
             chatArea.style.display = "flex";  // 显示聊天区域
             userInfo.style.display = "none"; // 隐藏用户信息区域
+            requestArea.style.display = "none";
+            addFriendArea.style.display = "none";
             passwordArea.style.display = "none";  // 隐藏修改密码区域
         }
     });
+    document.getElementById("feature7").addEventListener("click", function () {
+        dropdownContent.classList.toggle("show");  // 切换显示状态的类
+        Swal.fire({
+            title: '你确定要销毁所有聊天记录吗?',
+            text: "该操作无法撤销！",
+            icon: 'warning',
+            showCancelButton: true,  // 显示取消按钮
+            confirmButtonColor: '#3085d6',  // 确定按钮的颜色
+            cancelButtonColor: '#d33',  // 取消按钮的颜色
+            confirmButtonText: '确定',
+            cancelButtonText: '否'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 如果用户点击了 "确定" 按钮，执行函数
+                //executeFunction();
+                console.log("执行操作");
+                document.getElementById("messages").innerHTML = "";  // 清空输入框
+                deleteAllMessages();
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // 用户点击了 "否" 按钮，不执行函数
+                console.log("操作取消，不执行任何操作");
+            }
+        });
+    });
+
 });
 
 
