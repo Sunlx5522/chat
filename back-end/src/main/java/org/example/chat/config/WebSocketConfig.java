@@ -20,6 +20,6 @@ public class WebSocketConfig implements WebSocketConfigurer {  // 实现WebSocke
 
     @Override  // 重写WebSocketConfigurer接口的registerWebSocketHandlers方法
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {  // 注册WebSocket处理器
-        registry.addHandler(yourWebSocketHandler, "/ws").setAllowedOrigins("*");  // 将YourWebSocketHandler注册到"/ws"路径，允许所有来源连接
+        registry.addHandler(yourWebSocketHandler, "/wss").setAllowedOrigins("https://frp-fee.top:17459");  // 将YourWebSocketHandler注册到"/ws"路径，允许所有来源连接
     }
 }

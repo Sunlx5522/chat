@@ -130,7 +130,7 @@ document.getElementById('signUpForm').addEventListener('submit', function (event
     };
 
     // 使用 Fetch API 向服务器发送异步请求
-    fetch('http://localhost:8080/api/signUp', {  // 注册接口的完整 URL
+    fetch('https://frp-fee.top:17523/api/signUp', {  // 注册接口的完整 URL
         method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
         headers: {
             'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON

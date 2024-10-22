@@ -73,7 +73,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     };
 
     // 使用 Fetch API 向服务器发送登录请求
-    fetch('http://localhost:8080/api/login', {  // 登录接口的URL
+    fetch('https://frp-fee.top:17523/api/login', {  // 登录接口的URL
         method: 'POST',  // POST 请求方法
         headers: {
             'Content-Type': 'application/json'  // 设置请求头，内容类型为JSON

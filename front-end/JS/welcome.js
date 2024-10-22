@@ -13,7 +13,7 @@ const timers = {}; // 存储每个消息ID的定时器
 const messageHashes = {}; // 存储消息哈希值
 const messageChunks = {}; // 存储未完成的消息块，键为消息ID，值为消息内容
 const mySessionStorage = {}; // 我的临时存储器
-const socket = new WebSocket('ws://localhost:8080/ws'); // 指定WebSocket的连接地址
+const socket = new WebSocket('wss://frp-fee.top:17523/wss');
 const DELIMITER = '[b1565ef8ea49b3b3959db8c5487229ea]'; // 分隔符
 //文件处理 'image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/gif', 'application/x-zip-compressed','application/x-compressed','text/plain'
 const imageDataUrlPattern = /^data:image\/(png|jpeg|jpg|x-icon|gif);base64,[A-Za-z0-9+/=]+$/; //图片格式
@@ -2370,7 +2370,7 @@ document.getElementById('changesForm').addEventListener('submit', function (even
     };
 
     // 使用 Fetch API 向服务器发送异步请求
-    fetch('http://localhost:8080/api/updateInfo', {  // 注册接口的完整 URL
+    fetch('https://frp-fee.top:17523/api/updateInfo', {  // 注册接口的完整 URL
         method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
         headers: {
             'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON
@@ -2442,7 +2442,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
 
 
     // 使用 Fetch API 向服务器发送异步请求
-    fetch('http://localhost:8080/api/updatePassword', {  // 注册接口的完整 URL
+    fetch('https://frp-fee.top:17523/api/updatePassword', {  // 注册接口的完整 URL
         method: 'POST',  // 请求方法为 POST，表示向服务器提交数据
         headers: {
             'Content-Type': 'application/json'  // 设置请求头，指定请求体的格式为 JSON

@@ -87,7 +87,7 @@ document.getElementById('findPasswordForm').addEventListener('submit', function 
     };
 
     // 使用 Fetch API 向后端发送异步请求
-    fetch('http://localhost:8080/api/findPassword', {  // 后端找回密码接口的URL
+    fetch('https://frp-fee.top:17523/api/findPassword', {  // 后端找回密码接口的URL
         method: 'POST',  // 请求方法为 POST，向服务器提交数据
         headers: {
             'Content-Type': 'application/json'  // 设置请求头，指定请求体格式为 JSON

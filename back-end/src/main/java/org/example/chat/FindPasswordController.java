@@ -10,7 +10,7 @@ import java.util.Map;  // 导入Java集合框架中的Map接口，用于存储�
 
 @RestController  // @RestController是一个复合注解，标记该类为RESTful控制器，相当于同时使用了@Controller和@ResponseBody，表示该类中的方法返回值会直接作为HTTP响应体。
 @RequestMapping("/api")  // 可选，添加一个统一的请求前缀。@RequestMapping用于定义请求路径的前缀，这里的所有请求路径都会以"/api"开头，这样可以统一管理和组织接口路径，方便前端调用和维护。
-@CrossOrigin(origins = "*")  // 允许跨域请求，origins可以指定前端地址。@CrossOrigin用于解决跨域请求的问题，origins属性指定允许的源，这里设置为"*"表示允许所有来源。
+// 允许跨域请求，origins可以指定前端地址。@CrossOrigin用于解决跨域请求的问题，origins属性指定允许的源，这里设置为"*"表示允许所有来源。
 
 public class FindPasswordController {  // 定义一个名为findPasswordController的控制器类，处理与找回密码相关的请求。
 

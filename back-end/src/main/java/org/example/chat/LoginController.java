@@ -10,7 +10,7 @@ import java.util.Map;  // 导入Map接口，用于存储键值对数据
 
 @RestController  // 标记该类为RESTful控制器
 @RequestMapping("/api")  // 定义请求路径的前缀为"/api"
-@CrossOrigin(origins = "*")  // 允许跨域请求，origins指定允许的源，这里允许所有来源
+
 
 public class LoginController {  // 定义LoginController类，处理登录请求
 
