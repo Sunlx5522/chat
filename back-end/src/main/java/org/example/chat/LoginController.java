@@ -12,7 +12,7 @@ import java.util.Map;  // 导入Map接口，用于存储键值对数据
 @RequestMapping("/api")  // 定义请求路径的前缀为"/api"
 
 
-public class LoginController {  // 定义LoginController类，处理登录请求
+public class LoginController {  // 定义LoginController类，处理登录请求 哈哈哈
 
     @Autowired  // 自动注入userRepository实例
     private UserRepository userRepository;  // 声明UserRepository变量，用于数据库操作

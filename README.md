@@ -43,3 +43,6 @@ CREATE TABLE messages (
     content TEXT NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+mvn compile  # 编译源码
+mvn spring-boot:run # 启动项目

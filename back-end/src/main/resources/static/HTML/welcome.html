@@ -1,0 +1,171 @@
+<!DOCTYPE html> <!-- 定义文档类型为 HTML5 -->
+<html lang="zh-CN"> <!-- 开始 HTML 文档，设置语言为中文（中国） -->
+
+<head>
+    <meta charset="UTF-8"> <!-- 设置文档字符编码为 UTF-8，支持中文显示 -->
+    <title>WELCOME</title> <!-- 设置网页标题，显示在浏览器标签页上 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="pragram" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="expires" content="0">
+    <link rel="stylesheet" href="../CSS/welcome.css"> <!-- 引入外部 CSS 样式表，定义页面样式 -->
+</head>
+
+<body>
+    <div class="container"> <!-- 页面主容器 -->
+        <div class="toolbar"> <!-- 工具栏区域 -->
+            <button id="menuButton"> <!-- 菜单按钮 -->
+                <img src="../SOURCEFILE/IMAGES/welcome/menu.png" alt="菜单" class="button-icon" id="menuImage">
+                <!-- 菜单图标 -->
+            </button>
+            <div class="dropdown" id="dropdownMenu"> <!-- 下拉菜单 -->
+                <div class="dropdown-content" id="dropdownContent"> <!-- 下拉菜单内容 -->
+                    <a href="#" id="feature1">个人中心</a> <!-- 功能链接 1 -->
+                    <a href="#" id="feature2">添加好友</a> <!-- 功能链接 2 -->
+                    <a href="#" id="feature3">好友请求</a> <!-- 功能链接 3 -->
+                    <a href="#" id="feature4">拉伸列表</a> <!-- 功能链接 4 -->
+                    <a href="#" id="feature5">刷新页面</a> <!-- 功能链接 5 -->
+                    <a href="#" id="feature6">修改密码</a> <!-- 功能链接 6 -->
+                    <a href="#" id="feature7">销毁记录</a> <!-- 功能链接 7 -->
+                </div>
+            </div>
+            <button id="exitButton"> <!-- 退出按钮 -->
+                <img src="../SOURCEFILE/IMAGES/welcome/exit.png" alt="退出" class="button-icon" id="exitImage">
+                <!-- 退出图标 -->
+            </button>
+        </div>
+        <!-- 联系人列表区域，增加收起按钮 -->
+        <div class="contact-list" id="contactList"></div>
+        <div class="chat-area"> <!-- 聊天区域 -->
+            <div class="chat-header" id="chatHeader"> <!-- 聊天头部区域 -->
+                <h2 id="contactName"></h2> <!-- 联系人名称 -->
+                <p id="contactAccount"></p> <!-- 联系人账号信息 -->
+            </div>
+            <div class="messages" id="messages"></div> <!-- 消息展示区域 -->
+            <div class="tools" id="tools">
+                <input type="file" id="fileInput" style="display: none;" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/gif,application/x-zip-compressed,.rar,.txt,video/mp4,audio/mpeg,application/pdf">
+                <input type="file" id="avatarInput" style="display: none;" accept="image/png,image/jpeg,image/jpg">
+                <button id="fileButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/file.png" alt="文件" class="button-icon" id="fileImage">
+                    <!-- 文件图标 -->
+                </button>
+                <button id="emojiButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/emoji.png" alt="表情" class="button-icon" id="emojiImage">
+                    <!-- 文件图标 -->
+                </button>
+                <div id="emojiTable" class="emojiTable hidden">
+                    <table id="eTable">
+                        <!-- Emoji按钮将通过JavaScript动态生成 -->
+                    </table>
+                </div>
+                <button id="superEmojiButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/superEmoji.png" alt="表情" class="button-icon"
+                        id="superEmojiImage">
+                    <!-- 文件图标 -->
+                </button>
+                <div id="superEmojiTable" class="emojiTable hidden">
+                    <table id="superETable">
+                        <!-- Emoji按钮将通过JavaScript动态生成 -->
+                    </table>
+                </div>
+                <div id="deleteMessageButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/delete.png" alt="删除" class="button-icon" id="deleteImage">
+                </div>
+                <div id="deleteFriendButton">
+                    <img src="../SOURCEFILE/IMAGES/welcome/delete_friend.png" alt="删除" class="button-icon" id="deleteImage">
+                </div>
+            </div> <!-- 功能工具区域 -->
+            <div class="input-area" id="input-area"> <!-- 消息输入区域 -->
+                <textarea id="messageInput" placeholder="输入消息..." rows="5"></textarea> <!-- 多行输入框 -->
+                <button id="sendButton">发送</button> <!-- 发送按钮 -->
+            </div>
+        </div>
+        <div class="user-info2" id="userInfo" style="display: none;">
+
+            <form id="changesForm" action="http://localhost:8080/api/updateInfo" method="post">
+                <!-- 创建表单，ID 为 loginForm，提交地址为 /api/updateInfo，使用 POST 方法 -->
+                <img src="../SOURCEFILE/IMAGES/login/chat.png" alt="头像" id="avatar"> <!-- 加载头像 -->
+                <p>帐号: <span id="userAccount"></span></p>
+                <div class="input-container"> <!-- 邮箱输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/email.png" alt="邮箱图标">
+                    <input type="text" id="userEmail" name="userEmail" placeholder="请输入新邮箱" required>
+                </div>
+
+                <div class="input-container"> <!-- 电话按钮的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/phoneNumber.png" alt="电话图标"> <!-- 显示电话图标 -->
+                    <input type="text" id="userPhoneInput" name="userPhoneInput" placeholder="请输入新电话" required>
+                </div>
+
+                <div class="input-container"> <!-- 昵称输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/user.png" alt="昵称图标">
+                    <input type="text" id="userNicknameInput" name="userNicknameInput" placeholder="请输入新昵称" required>
+                </div>
+
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="图标"> <!-- 显示注册图标 -->
+                    <button type="submit" id="changesSubmitButton" class="changesSubmitButton">修改信息</button>
+                    <!-- 按钮：提交修改 -->
+                </div>
+
+            </form>
+
+        </div>
+        <div class="passwordArea" style="display: none;">
+            <form id="changePasswordForm" action="http://localhost:8080/api/updatePassword" method="post">
+
+                <h3>&nbsp;修改密码</h3>
+                <p id="useless"> <span></span></p>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="oldPassword" name="userPassword" placeholder="请输入旧密码" required>
+                    <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="newPassword" name="userPassword" placeholder="请输入新密码" required>
+                    <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 密码输入框的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                    <input type="password" id="newPassword_confirm" name="newPassword_confirm" placeholder="请确认新密码"
+                        required> <!-- 输入框：密码 -->
+                </div>
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="图标"> <!-- 显示注册图标 -->
+                    <button type="submit" id="changesPasswordButton" class="changespasswordButton">修改密码</button>
+                    <!-- 按钮：提交修改 -->
+                </div>
+
+            </form>
+        </div>
+        <div class="requestdArea" style="display: none;">
+            <div id = "requestBox">
+            <div class="request-list" id="requestList" ></div>
+            </div>
+        </div>
+        <div class="addFriendArea" style="display: none;">
+            <div id="addFriendDiv">
+                <div class="input-container"> <!-- 创建输入容器 -->
+                    <img src="../SOURCEFILE/IMAGES/login/account.png" alt="账号图标"> <!-- 显示账号图标 -->
+                    <input type="text" id="addFriendAccount" name="addFriendAccount" placeholder="请输入账号" autocomplete="off" required> <!-- 输入框：账号 -->
+                </div>
+                <div class="input-container"> <!-- 提交的容器 -->
+                    <img src="../SOURCEFILE/IMAGES/signUp/commit.png" alt="图标"> <!-- 显示注册图标 -->
+                    <button id="searchForUserButton" class="searchForUserButton">添加好友</button>
+                    <!-- 按钮：提交修改 -->
+                </div>
+            </div>
+        </div>
+        <div id="customMenu">
+            <a href="#" id="menuItem1">删除</a>
+        </div>
+    </div>
+    <script src="../JS/eruda.js"></script>
+    <script>eruda.init();</script>
+    <script src="../JS/viewer.js"></script>
+    <script src="../JS/SweetAlert2.js"></script>
+    <script src="../JS/AESCryptoClient.js"></script>
+    <script src="../JS/welcome.js"></script> <!-- 引入外部 JavaScript 文件，包含页面的交互逻辑 -->
+</body>
+
+</html>

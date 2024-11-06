@@ -1,0 +1,41 @@
+<!-- index.html -->
+<!DOCTYPE html> <!-- 定义文档类型为 HTML5 -->
+<html lang="zh-CN"> <!-- 开始 HTML 文档，设置语言为中文（中国） -->
+<head>
+    <meta charset="UTF-8"> <!-- 设置文档字符编码为 UTF-8 -->
+    <title>CHAT</title> <!-- 设置网页标题 -->
+    <!-- 浏览器不缓存 -->
+    <meta http-equiv="pragram" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 设备选择 -->
+    <link rel="stylesheet" href="../CSS/styles.css"> <!-- 引入外部 CSS 样式表，定义页面样式 -->
+</head>
+<body>
+    <div class="container"> <!-- 表单容器 --> 
+        <form id="loginForm" action="/api/login" method="post"> <!-- 创建表单，ID 为 loginForm，提交地址为 /api/login，使用 POST 方法 -->
+            <img src="../SOURCEFILE/IMAGES/login/chat.png" alt="欢迎登录" id="welcome-image"> <!-- 加载登录欢迎图像 -->
+            <div class="input-container"> <!-- 创建输入容器 -->
+                <img src="../SOURCEFILE/IMAGES/login/account.png" alt="账号图标"> <!-- 显示账号图标 -->
+                <input type="text" id="account" name="account" placeholder="请输入账号" required> <!-- 输入框：账号 -->
+            </div>
+            <div class="input-container"> <!-- 密码输入框的容器 -->
+                <img src="../SOURCEFILE/IMAGES/login/password.png" alt="密码图标"> <!-- 显示密码图标 -->
+                <input type="password" id="password" name="password" placeholder="请输入密码" required> <!-- 输入框：密码 -->
+            </div>
+            <div class="input-container"> <!-- 登录按钮的容器 -->
+                <img src="../SOURCEFILE/IMAGES/login/login.png" alt="登录图标"> <!-- 显示登录图标 -->
+                <button type="submit" id="loginButton" class="loginButton">登录</button> <!-- 提交表单的登录按钮 -->
+            </div>
+            <div class="input-container"> <!-- 注册与找回密码按钮的容器 -->
+                <button type="button" id="findPasswordButton" class="findPasswordButton">找回密码</button> <!-- 按钮：找回密码 -->
+                <button type="button" id="registerButton" class="registerButton">注册</button> <!-- 按钮：注册新账户 -->
+            </div>
+        </form>
+    </div>
+    <script src="../JS/eruda.js"></script> <!-- 引入调试插件 -->
+    <script>eruda.init();</script> <!-- 调试插件初始化 -->
+    <script src="../JS/SweetAlert2.js"></script> <!-- 个性化弹窗 -->
+    <script src="../JS/script.js"></script> <!-- 主js文件 -->
+</body>
+</html> <!-- 结束 HTML 文档 -->

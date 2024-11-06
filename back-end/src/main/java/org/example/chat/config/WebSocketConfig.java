@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketConfigurer {  // 实现WebSocke
     private YourWebSocketHandler yourWebSocketHandler;  // 声明YourWebSocketHandler类型的成员变量
 
     @Override  // 重写WebSocketConfigurer接口的registerWebSocketHandlers方法
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {  // 注册WebSocket处理器
-        registry.addHandler(yourWebSocketHandler, "/wss").setAllowedOrigins("https://frp-fee.top:17459");  // 将YourWebSocketHandler注册到"/ws"路径，允许所有来源连接
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {  // 注册WebSocket处理器 @CrossOrigin(origins = "https://frp-fee.top:17459")
+        registry.addHandler(yourWebSocketHandler, "/wss").setAllowedOrigins("*");  // 将YourWebSocketHandler注册到"/ws"路径，允许所有来源连接
     }
 }
