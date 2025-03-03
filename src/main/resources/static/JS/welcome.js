@@ -15,7 +15,7 @@ const messageHashes = {}; // 存储消息哈希值
 const messageChunks = {}; // 存储未完成的消息块，键为消息ID，值为消息内容
 const mySessionStorage = {}; // 我的临时存储器
 //public版本
-const socket = new WebSocket('wss://frp-fee.com:17523/wss');
+const socket = new WebSocket('wss://frp-fog.com:34223/wss');
 //const socket = new WebSocket('wss://127.0.0.1:8443/wss');
 const DELIMITER = '[b1565ef8ea49b3b3959db8c5487229ea]'; // 分隔符
 //文件处理 'image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/gif', 'application/x-zip-compressed','application/x-compressed','text/plain'
@@ -1532,6 +1532,13 @@ async function command_searchForUser(blocks) {
         });
     } else if (command_s == "pleaseHandel") {
         var title = "对方已请求添加你为好友，请尽快处理";
+        Swal.fire({
+            title: title,
+            icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+            confirmButtonText: '确定'
+        });
+    } else if (command_s == "alreadyFriend") { 
+        var title = "您和对方已经是好友";
         Swal.fire({
             title: title,
             icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'

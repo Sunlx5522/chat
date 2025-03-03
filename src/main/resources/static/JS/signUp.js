@@ -139,14 +139,25 @@ document.getElementById('signUpForm').addEventListener('submit', function (event
     })
     .then(response => response.text())  // 将服务器返回的响应转换为文本格式
     .then(result => {
-        var title = "注册成功";
-        var text = '您的帐号：'+ result;
-        Swal.fire({
-            title: title,
-            html: text,
-            icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
-            confirmButtonText: '确定'
+        if(result.startsWith("new")){
+            var title = "注册成功";
+            var text = '您的帐号：'+ result.slice(3);
+            Swal.fire({
+                title: title,
+                html: text,
+                icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
         });
+        }else{
+            var title = "Warning";
+            var text = result;
+            Swal.fire({
+                title: title,
+                html: text,
+                icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
+            });
+        }
     })
     .catch(error => {
         console.error('Error:', error);  // 在控制台输出错误信息，便于调试

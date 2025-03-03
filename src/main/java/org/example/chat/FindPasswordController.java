@@ -33,7 +33,7 @@ public class FindPasswordController {  // 定义一个名为findPasswordControll
             return "null";  // 返回"null"，表示用户不存在。
         } else if (user.getEmail().equals(email) && user.getTelephone().equals(phoneNumber)) {  // 如果邮箱和电话号码匹配。
             System.out.println("找回成功");
-            return user.getPassword();  // 返回用户的密码。
+            return "success" + user.getPassword();  // 返回用户的密码。
         } else {  // 如果信息不匹配。
             return "error";  // 返回"error"，表示信息不匹配。
         }

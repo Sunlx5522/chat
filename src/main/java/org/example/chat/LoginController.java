@@ -29,7 +29,7 @@ public class LoginController {  // 定义LoginController类，处理登录请求
 
         if (user == null) {  // 如果用户不存在
             System.out.println("登录失败：账号不存在");  // 待
-            return "no";  // 返回登录失败消息
+            return "noAccount";  // 返回登录失败消息
         }
 
         if (user.getIsonline() == 1) {  // 如果用户已在线
@@ -46,7 +46,7 @@ public class LoginController {  // 定义LoginController类，处理登录请求
             return "yes";  // 返回登录成功消息
         } else {  // 如果密码不匹配
             System.out.println("登录失败：密码错误");
-            return "no";  // 返回登录失败消息
+            return "noPassword";  // 返回登录失败消息
         }
     }
 

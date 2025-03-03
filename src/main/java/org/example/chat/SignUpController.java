@@ -56,7 +56,7 @@ public class SignUpController {  // 定义一个名为SignUpController的控制�
         } while (exists);
 
         System.out.println("新账号：" + account);  // 待
-        return account;
+        return "new" + account;
     }
 
 }

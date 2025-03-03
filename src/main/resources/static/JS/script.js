@@ -105,12 +105,28 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
                 icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
                 confirmButtonText: '确定'
             });
-        } else {
-            var title = "用户名或密码错误";
+        }else if (result == "noAccount"){
+            var title = "此账号不存在";
             Swal.fire({
                 title: title,
                 icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
                 confirmButtonText: '确定',
+            });
+        }else if (result == "noPassword"){
+            var title = "密码错误";
+            Swal.fire({
+                title: title,
+                icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定',
+            });
+        }else {
+            var title = "Warning";
+            var text = result;
+            Swal.fire({
+                title: title,
+                html: text,
+                icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
             });
         }
     })

@@ -570,6 +570,17 @@ public class YourWebSocketHandler extends TextWebSocketHandler {  // 继承TextW
             String messageToSend = "searchForUser" + DELIMITER + "yourself";  // 构建要发送的消息
             sendMessage(session, messageToSend);
         }else{
+
+             List<Friend> allFriends = friendRepository.findByUserAccount(senderAccount);
+             for(Friend friend : allFriends) {
+                if(Objects.equals(friend.getFriend_account(), receiverAccount)){
+                    String messageToSend = "searchForUser" + DELIMITER + "alreadyFriend";  // 构建要发送的消息
+                    sendMessage(session, messageToSend);
+                    System.out.println("Debug ok.");
+                    return;
+                }
+            }
+
             Request request = requestRepository.findBySenderAndReceiver(senderAccount,receiverAccount);
             if(request != null){
                 String messageToSend = "searchForUser" + DELIMITER + "already";  // 构建要发送的消息

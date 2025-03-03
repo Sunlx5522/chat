@@ -110,13 +110,22 @@ document.getElementById('findPasswordForm').addEventListener('submit', function 
                 icon: 'error',  // 其他选项：'error', 'warning', 'info', 'question'
                 confirmButtonText: '确定',
             });
-        } else {  // 如果找回密码成功
+        } else if (result.startsWith("success")){
             var title = "找回成功";
-            var text = '您的密码：'+ result;
+            var text = '您的密码：'+ result.slice(7);
             Swal.fire({
                 title: title,
                 html: text,
                 icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                confirmButtonText: '确定'
+            });
+        } else {  // 如果找回密码成功
+            var title = "Warning";
+            var text = result;
+            Swal.fire({
+                title: title,
+                html: text,
+                icon: 'warning',  // 其他选项：'error', 'warning', 'info', 'question'
                 confirmButtonText: '确定'
             });
         }
