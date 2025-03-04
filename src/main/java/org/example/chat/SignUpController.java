@@ -38,7 +38,7 @@ public class SignUpController {  // 定义一个名为SignUpController的控制�
 
         userRepository.save(newUser);  // 将新用户保存到数据库中
 
-        return account;  // 返回生成的账号给前端
+        return "new" + account;  // 返回生成的账号给前端
     }
 
     // 生成唯一10位纯数字账号的方法
@@ -56,7 +56,7 @@ public class SignUpController {  // 定义一个名为SignUpController的控制�
         } while (exists);
 
         System.out.println("新账号：" + account);  // 待
-        return "new" + account;
+        return account;
     }
 
 }
