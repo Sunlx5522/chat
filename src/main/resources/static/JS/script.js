@@ -83,7 +83,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     })
     .then(response => response.text())  // 将服务器响应转换为文本格式
     .then(result => {
-        if (result == "yes") {  // 如果登录成功
+        if (result == "user") {  // 如果登录的是普通用户
             sessionStorage.setItem('account', account);  // 使用sessionStorage存储账号
             var title = "登录成功";
             Swal.fire({
@@ -93,10 +93,23 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         }).then((result) => {
             if (result.isConfirmed) {
                 // 用户点击了“确定”按钮，执行页面跳转
-                window.location.href = '../HTML/welcome.html';  // 跳转到欢迎页面
+                window.location.href = '../HTML/welcome.html';  // 跳转到欢迎页面(普通用户)
             }
         });
-        } else if (result == "repeat") {  // 如果账号已在别处登录
+        }else if (result === "admin") {  // 如果登录的是管理员
+             sessionStorage.setItem('account', account);  // 使用sessionStorage存储账号
+             var title = "登录成功";
+             Swal.fire({
+                 title: title,
+                 icon: 'success',  // 其他选项：'error', 'warning', 'info', 'question'
+                 confirmButtonText: '确定'
+        }).then((result) => {
+             if (result.isConfirmed) {
+                 // 用户点击了“确定”按钮，执行页面跳转
+                 window.location.href = '../HTML/admin.html';  // 跳转到欢迎页面(管理员)
+             }
+        });
+        }else if (result == "repeat") {  // 如果账号已在别处登录
             var title = "账号已在别处登录";
             var text = "若不是你，请尽快修改密码";
             Swal.fire({

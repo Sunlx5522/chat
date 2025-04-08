@@ -12,7 +12,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 
 
-public class updateInfoController {
+public class UpdateInfoController {
     @Autowired
     private UserRepository userRepository;
 

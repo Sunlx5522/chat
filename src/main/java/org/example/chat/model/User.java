@@ -25,6 +25,9 @@ public class User {  // 定义一个公有的类User，表示用户实体。
     @Column(name = "isonline", nullable = false)  // 将该字段映射到数据库表中的 "isonline" 列，并指定列的属性。
     private int isonline;  // 声明一个私有的整数变量isonline，表示用户的在线状态。
 
+    @Column(name = "is_admin", nullable = false)
+    private boolean isAdmin;  // 新增字段，标识是否为管理员
+
     public User() {
     }  // 定义一个公有的无参构造函数，JPA要求实体类必须有一个无参构造函数。
 
@@ -35,6 +38,7 @@ public class User {  // 定义一个公有的类User，表示用户实体。
         this.email = email;  // 初始化邮箱字段。
         this.telephone = telephone;  // 初始化电话号码字段。
         this.isonline = 0;  // 初始化在线状态为0，表示离线。
+        this.isAdmin = false;  // 默认为普通用户
     }
 
     // Getter 和 Setter 方法，用于访问和修改私有字段的值。
@@ -85,6 +89,14 @@ public class User {  // 定义一个公有的类User，表示用户实体。
 
     public void setIsonline(int isonline) {  // 设置在线状态。
         this.isonline = isonline;  // 将传入的在线状态赋值给isonline字段。
+    }
+
+    public boolean isAdmin() { //返回是否为管理员标识
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean isadmin) { //将传入的管理员标识赋值给admin字段
+        this.isAdmin = isadmin;
     }
 
 }

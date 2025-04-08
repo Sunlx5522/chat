@@ -1,48 +1,35 @@
 # chat
-html5工程
-用户表：
-create table users (
-    account varchar(20) not null primary key,
-    password varchar(20) not null,
-    email varchar(50) not null,
-    telephone varchar(20) not null,
-    username varchar(50) not null,
-    isonline int not null
-);
-好友表：
-create table friends (
-    user_account varchar(20) not null,
-    friend_account varchar(20) not null,
-    friendship_time datetime not null default CURRENT_TIMESTAMP,
-    primary key (user_account, friend_account),
-    foreign key (user_account) references users(account),
-    foreign key (friend_account) references users(account)
-);
-请求表：
-create table friend_requests (
-    request_id int auto_increment primary key,
-    sender_account varchar(20) not null,
-    receiver_account varchar(20) not null,
-    request_time datetime not null default CURRENT_TIMESTAMP,
-    status varchar(10) not null default 'pending',
-    foreign key (sender_account) references users(account),
-    foreign key (receiver_account) references users(account)
-);
--- 状态：'pending'、'accepted'、'rejected'
-头像表：
-create table avatar(
-    account varchar(20) not null primary key,
-    avatar_path varchar(255),
-    foreign key (account) references users(account)
-);
-信息表：
-CREATE TABLE messages (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    sender VARCHAR(255) NOT NULL,
-    receiver VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-mvn compile  # 编译源码
-mvn spring-boot:run # 启动项目
+本项目为一个简易的 HTML5 工程，包含用户系统、管理员系统，使用 Maven 进行编译与运行。
+
+## 数据库的构建
+
+在我们的文件夹目录中有sql文件夹。
+进入到该文件夹中。 `cd sql`
+在该目录下进入mysql。
+执行数据库指令：
+
+1. `source chat的数据库构建.sql`
+2. `source 创建测试用户.sql`
+执行上述命令后，便完成了数据库的构建。
+
+之后进入到项目的配置文件(.\src\main\resources\application.properties)，并进行修改。
+将一下代码段中的账号和密码改成自己的数据库的帐号和密码。
+
+```java
+spring.datasource.username=root
+spring.datasource.password=slx309696
+```
+
+## 运行项目
+
+执行以下两条命令:
+
+1. mvn compile
+2. mvn spring-boot:run
+项目启动成功。
+
+## 进入网站
+
+<https://127.0.0.1:8443/HTML/index.html>
+*管理员的账号：0020250408 管理员的密码：0020250408*

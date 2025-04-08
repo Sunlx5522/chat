@@ -1,0 +1,117 @@
+.confirm-dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.confirm-dialog-overlay.show {
+    opacity: 1;
+}
+
+.confirm-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background-color: #8EC5FC;
+    background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.confirm-dialog.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.confirm-dialog-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.confirm-dialog-message {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 25px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.confirm-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.confirm-dialog-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.confirm-dialog-username {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 5px 15px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.confirm-dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.confirm-dialog-button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirm-dialog-confirm {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.confirm-dialog-confirm:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.confirm-dialog-cancel {
+    background-color: #f44336;
+    color: white;
+}
+
+.confirm-dialog-cancel:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+}

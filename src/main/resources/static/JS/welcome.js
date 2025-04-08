@@ -15,8 +15,8 @@ const messageHashes = {}; // 存储消息哈希值
 const messageChunks = {}; // 存储未完成的消息块，键为消息ID，值为消息内容
 const mySessionStorage = {}; // 我的临时存储器
 //public版本
-const socket = new WebSocket('wss://frp-fog.com:34223/wss');
-//const socket = new WebSocket('wss://127.0.0.1:8443/wss');
+//const socket = new WebSocket('wss://frp-fog.com:34223/wss');
+const socket = new WebSocket('wss://127.0.0.1:8443/wss');
 const DELIMITER = '[b1565ef8ea49b3b3959db8c5487229ea]'; // 分隔符
 //文件处理 'image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/gif', 'application/x-zip-compressed','application/x-compressed','text/plain'
 const imageDataUrlPattern = /^data:image\/(png|jpeg|jpg|x-icon|gif);base64,[A-Za-z0-9+/=]+$/; //图片格式
@@ -179,16 +179,21 @@ async function chunkHandler(json) {
 }
 
 function initSocket() {
+    console.log('开始初始化 WebSocket 连接...');  // 测试代码
+    
     // 当WebSocket连接成功时触发
     socket.onopen = function () {  // 定义连接成功的回调函数
         console.log('WebSocket connection established');  // 打印连接成功信息
         // 发送初始消息到服务器
         const messages = ['login', account];  // 定义包含登录和账号信息的消息
         const multiLineMessage = messages.join(DELIMITER);  // 用特定的分隔符连接消息
+        console.log('准备发送登录消息:', account);  // 测试代码
         sendMessageToServer(multiLineMessage);  // 发送消息到服务器
     };
+
     // 当WebSocket连接关闭时触发
-    socket.onclose = function () {  // 定义连接关闭的回调函数
+    socket.onclose = function (event) {  // 定义连接关闭的回调函数
+        console.log('WebSocket连接关闭，关闭码:', event.code, '原因:', event.reason);  // 测试代码
         var title = "连接已断开";
         Swal.fire({
             title: title,
@@ -196,13 +201,15 @@ function initSocket() {
             confirmButtonText: '确定'
         }).then((result) => {
             if (result.isConfirmed) {
-                // 用户点击了“确定”按钮，执行页面跳转
+                // 用户点击了"确定"按钮，执行页面跳转
                 window.location.href = '../HTML/index.html';  // 跳转到首页
             }
         });
     };
+
     // 当WebSocket连接发生错误时触发
     socket.onerror = function (error) {  // 定义错误处理的回调函数
+        console.log('WebSocket连接错误:', error);  // 测试代码
         var title = "WebSocket连接失败，请检查网络连接！";
         Swal.fire({
             title: title,
@@ -210,25 +217,32 @@ function initSocket() {
             confirmButtonText: '确定'
         }).then((result) => {
             if (result.isConfirmed) {
-                // 用户点击了“确定”按钮，执行页面跳转
+                // 用户点击了"确定"按钮，执行页面跳转
                 window.location.href = '../HTML/index.html';  // 跳转到首页
             }
         });
     };
+
     // 接收来自服务器的消息
     socket.onmessage = async function (event) {  // 定义接收消息的回调函数
+        console.log('收到服务器消息:', event.data);  // 测试代码
         const payload = event.data;  // 获取消息的负载
         const json = JSON.parse(payload);  // 解析JSON
         if (json.type === 'chunk') {
             chunkHandler(json);
         }
     };
-
 }
+
+// 在页面加载完成时初始化 WebSocket
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('页面加载完成，准备初始化 WebSocket');  // 测试代码
+    console.log('当前用户账号:', account);  // 测试代码
+    initSocket();
+});
 
 initKey();
 initDB();
-initSocket();
 
 //功能性函数
 

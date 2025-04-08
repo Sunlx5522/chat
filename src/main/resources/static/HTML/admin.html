@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>CHAT管理员界面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../CSS/admin.css">
+    <!-- 引入管理员界面的CSS -->
+    <link rel="stylesheet" href="../CSS/welcome.css">
+    <link rel="stylesheet" href="../CSS/confirm-dialog.css">
+    <link rel="stylesheet" href="../CSS/friendship.css">
+    <!-- 添加vis.js依赖 -->
+    <script type="text/javascript" src="../JS/vis-network.min.js"></script>
+    <style type="text/css">
+      #network {
+        width: 100%;
+        height: 400px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+      /* 访问量统计样式 */
+      .visits-stats {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .visits-stats h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+      }
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .stat-item:last-child {
+        border-bottom: none;
+      }
+      .stat-label {
+        color: #666;
+        font-size: 1em;
+      }
+      .stat-value {
+        color: #007bff;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      /* 监控面板样式 */
+      .monitor-panel {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .monitor-section {
+        margin-bottom: 20px;
+      }
+      .monitor-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .metric-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+      .metric-title {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 5px;
+      }
+      .metric-value {
+        color: #007bff;
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+      /* 添加 SVG 图标样式 */
+      .button-icon {
+        width: 24px;
+        height: 24px;
+        color: #333; /* 默认颜色 */
+        transition: color 0.3s;
+      }
+      
+      button:hover .button-icon {
+        color: #007bff; /* 悬停时的颜色 */
+      }
+      
+      /* 确保按钮样式一致 */
+      .toolbar button {
+        background: none;
+        border: none;
+        padding: 8px;
+        margin: 4px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+      
+      .toolbar button:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </head>
+  
+  <body>
+    <main class="container" role="main">
+      <header class="admin-header">
+        <h1>管理界面</h1></header>
+      <div class="content-wrapper">
+        <aside class="toolbar" role="complementary">
+          <nav role="navigation" aria-label="管理员工具栏">
+            <button id="adminInfoButton" aria-label="查看管理员信息">
+              <img src="../SOURCEFILE/IMAGES/login/account.png" alt="管理员信息" class="button-icon"></button>
+            <button id="monitorButton" aria-label="查看系统监控">
+              <svg class="button-icon" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM9 17H7v-7h2v7zm4 0h-2v-4h2v4zm4 0h-2v-2h2v2zm-8-9H7V6h2v2zm4 0h-2V6h2v2zm4 0h-2V6h2v2z"/>
+              </svg>
+            </button>
+            <button id="exitButton" aria-label="退出系统">
+              <img src="../SOURCEFILE/IMAGES/welcome/exit.png" alt="退出" class="button-icon" id="exitImage"></button>
+          </nav>
+        </aside>
+        <div class="main-content">
+          <!-- 管理员信息模态框 -->
+          <dialog id="adminInfoModal" class="modal" aria-labelledby="adminInfoTitle">
+            <div class="modal-content">
+              <button id="closeAdminInfo" class="close" aria-label="关闭管理员信息">&times;</button>
+              <h2 id="adminInfoTitle">管理员信息</h2>
+              <dl>
+                <dt>账号</dt>
+                <dd id="adminAccount"></dd>
+                <dt>姓名</dt>
+                <dd id="adminName"></dd>
+                <dt>电话</dt>
+                <dd id="adminPhone"></dd>
+                <dt>邮箱</dt>
+                <dd id="adminEmail"></dd>
+              </dl>
+            </div>
+          </dialog>
+          
+          <!-- 系统监控模态框 -->
+          <dialog id="monitorModal" class="modal" aria-labelledby="monitorTitle">
+            <div class="modal-content">
+              <button id="closeMonitor" class="close" aria-label="关闭监控">&times;</button>
+              <h2 id="monitorTitle">系统监控</h2>
+              
+              <div class="monitor-panel">
+                <!-- 访问量统计 -->
+                <div class="monitor-section">
+                  <h3>访问量统计</h3>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="metric-card">
+                        <div class="metric-title">今日访问量</div>
+                        <div class="metric-value" id="todayVisits">0</div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="metric-card">
+                        <div class="metric-title">总访问量</div>
+                        <div class="metric-value" id="totalVisits">0</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 数据库监控 -->
+                <div class="monitor-section">
+                  <h3>数据库状态</h3>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="metric-card">
+                        <div class="metric-title">活跃连接数</div>
+                        <div class="metric-value" id="dbActiveConnections">0</div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="metric-card">
+                        <div class="metric-title">总连接数</div>
+                        <div class="metric-value" id="dbTotalConnections">0</div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="metric-card">
+                        <div class="metric-title">最大连接数</div>
+                        <div class="metric-value" id="dbMaxConnections">0</div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="metric-card">
+                        <div class="metric-title">数据库大小</div>
+                        <div class="metric-value" id="dbSize">0 MB</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 应用监控 -->
+                <div class="monitor-section">
+                  <h3>应用状态</h3>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="metric-card">
+                        <div class="metric-title">在线用户数</div>
+                        <div class="metric-value" id="onlineUsers">0</div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="metric-card">
+                        <div class="metric-title">消息总数</div>
+                        <div class="metric-value" id="todayMessages">0</div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="metric-card">
+                        <div class="metric-title">好友请求总数</div>
+                        <div class="metric-value" id="todayFriendRequests">0</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </dialog>
+          
+          <section id="userManagement" aria-label="用户管理">
+            <h2>用户信息页</h2>
+            <div class="search-area">
+              <div class="search-item">
+                <label for="accountSearch">账号：</label>
+                <input type="text" id="accountSearch" placeholder="请输入账号" aria-label="按账号搜索">
+              </div>
+              <div class="search-item">
+                <label for="usernameSearch">用户名：</label>
+                <input type="text" id="usernameSearch" placeholder="请输入用户名" aria-label="按用户名搜索">
+              </div>
+              <button id="searchButton" aria-label="搜索用户">搜索</button>
+              <div class="search-right">
+                <button id="refreshButton" aria-label="刷新用户列表">刷新用户信息</button>
+              </div>
+            </div>
+            <div class="user-list" id="userList">
+              <table id="userTable" aria-label="用户信息列表">
+                <thead>
+                  <tr>
+                    <th scope="col" title="红: 离线 绿: 在线">在线状态</th>
+                    <th scope="col">头像</th>
+                    <th scope="col">账号</th>
+                    <th scope="col">用户名</th>
+                    <th scope="col">邮箱</th>
+                    <th scope="col">电话</th>
+                    <th scope="col">抹除违规信息</th>
+                    <th scope="col">好友关系</th></tr>
+                </thead>
+                <tbody id="userTableBody">
+                  <!-- 用户信息将通过JavaScript动态填充 --></tbody>
+              </table>
+              <!-- 分页控制区域 -->
+              <div class="pagination-area">
+                <div class="records-info">
+                  <span>总记录数：<span id="totalRecords">0</span></span>
+                  <span>最大页数：<span id="maxPages">0</span></span>
+                </div>
+                <div id="paginationControls" class="pagination-controls">
+                  <!-- 分页按钮将通过JavaScript动态填充 -->
+                </div>
+                <div class="page-jump">
+                  <input type="number" id="pageJumpInput" min="1" placeholder="页码" aria-label="跳转页码">
+                  <button id="pageJumpButton">跳转</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <!-- 好友关系模态框 -->
+    <dialog id="friendshipModal" class="modal" aria-labelledby="friendshipTitle">
+      <div class="modal-content">
+        <button id="closeFriendship" class="close" aria-label="关闭好友关系">&times;</button>
+        <h2 id="friendshipTitle">好友关系</h2>
+        <div class="friendship-content">
+          <div class="user-info">
+            <img id="selectedUserAvatar" src="" alt="用户头像" class="friendship-avatar">
+            <div class="user-details">
+              <p>账号：<span id="selectedUserAccount"></span></p>
+              <p>用户名：<span id="selectedUserUsername"></span></p>
+            </div>
+          </div>
+          <div class="friends-list">
+            <h3>好友列表</h3>
+            <div id="friendsList" class="friends-grid">
+              <!-- 好友列表将通过JavaScript动态填充 -->
+            </div>
+            <!-- 添加网络图容器 -->
+            <div id="network"></div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+    <!-- 自定义确认对话框 -->
+    <div class="confirm-dialog-overlay" id="confirmDialogOverlay">
+      <div class="confirm-dialog" id="confirmDialog">
+        <h3 class="confirm-dialog-title" id="confirmDialogTitle"></h3>
+        <div class="confirm-dialog-content" id="confirmDialogContent">
+          <!-- 这里将显示头像或用户名 -->
+        </div>
+        <p class="confirm-dialog-message" id="confirmDialogMessage"></p>
+        <div class="confirm-dialog-buttons">
+          <button class="confirm-dialog-button confirm-dialog-confirm" id="confirmDialogConfirm">确定</button>
+          <button class="confirm-dialog-button confirm-dialog-cancel" id="confirmDialogCancel">取消</button>
+        </div>
+      </div>
+    </div>
+    <script src="../JS/admin.js"></script>
+  </body>
+</html>

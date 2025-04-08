@@ -12,7 +12,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 
 
-public class updatePasswordController {
+public class UpdatePasswordController {
     @Autowired
     private UserRepository userRepository;
 
